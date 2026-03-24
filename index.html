@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ashish | Personal Website</title>
+  <meta name="description" content="Personal website of Ashish">
+  
+  <!-- oat.ink CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/@knadh/oat/oat.min.css">
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  
+  <div class="site-wrapper container">
+    <!-- Header / Navigation -->
+    <header class="site-header row align-center">
+      <div class="col-6 col-md-4">
+        <a href="#/" class="site-brand hstack gap-2 unstyled-link">
+          <img src="assets/avatar.jpg" alt="Ashish" class="avatar brand-avatar" width="40" height="40">
+          <strong>Ashish</strong>
+        </a>
+      </div>
+      
+      <div class="col-6 col-md-8 text-right">
+        <!-- Desktop Nav -->
+        <nav id="desktop-nav" class="desktop-nav hstack gap-4 justify-end">
+          <!-- Links injected via JS -->
+        </nav>
+        
+        <!-- Mobile Menu Toggle -->
+        <button id="mobile-menu-toggle" class="mobile-menu-toggle outline icon-only" aria-label="Toggle Menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile Nav -->
+    <nav id="mobile-nav" class="mobile-nav hidden">
+       <!-- Links injected via JS -->
+       <div class="mobile-theme-wrapper vstack gap-2 mt-4">
+         <span>Theme</span>
+         <!-- Theme toggle injected here in mobile view if needed -->
+       </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="app" class="site-content">
+      <!-- Content injected by app.js router -->
+      <div class="loading-state vstack align-center justify-center p-8">
+        <div class="spinner"></div>
+        <p class="muted">Loading content...</p>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer mt-8 py-4 border-t text-center text-sm muted">
+      <p>&copy; <span id="current-year"></span> Ashish. Built with plain HTML/JS and <a href="https://oat.ink/" target="_blank" rel="noopener">oat.ink</a>.</p>
+    </footer>
+  </div>
+
+  <!-- Theme Toggle Floating Button (Desktop) -->
+  <button id="theme-toggle" class="theme-toggle outline icon-only" aria-label="Toggle Theme" title="Toggle Theme">
+    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M21 12.79A9 9 11 11.21 3 7 7 0 0021 12.79z"></path></svg>
+  </button>
+
+  <!-- Configuration -->
+  <script src="config.js"></script>
+  
+  <!-- oat.ink JS -->
+  <script src="https://unpkg.com/@knadh/oat/oat.min.js" defer></script>
+  
+  <!-- App JS -->
+  <script src="app.js" defer></script>
+</body>
+</html>

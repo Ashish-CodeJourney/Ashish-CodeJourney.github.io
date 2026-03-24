@@ -1,0 +1,11 @@
+{
+  "blogs": [
+    "first-post.md"
+  ],
+  "talks": [
+    "my-first-talk.md"
+  ],
+  "sponsors": [
+    "acme-corp.md"
+  ]
+}
