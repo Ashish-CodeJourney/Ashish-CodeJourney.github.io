@@ -6,12 +6,20 @@
   /* Font Override */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   
-  /* Slight tweaks to oat.ink default light theme for a more premium feel */
+  /* Explicit light theme colors for high contrast */
   --background: #fafafa;
+  --foreground: #09090b;
   --card: #ffffff;
-  --primary: #111827;
-  --primary-foreground: #ffffff;
-  --ring: #3b82f6; /* A nice blue focus ring */
+  --card-foreground: #09090b;
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #3b82f6;
 }
 
 /* Dark Theme Overrides */
