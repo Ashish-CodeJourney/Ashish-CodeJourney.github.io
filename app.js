@@ -250,22 +250,22 @@ async function renderHome() {
   const htmlContent = parseMarkdown(content);
 
   const html = `
-    <div class="hero mb-8 text-center vstack align-center justify-center gap-4 py-4">
+    <section class="hero mb-8 text-center vstack align-center justify-center gap-4 py-4">
       <img src="${CONFIG.site.avatar}" alt="${CONFIG.site.author}" class="avatar" width="120" height="120" style="border: 4px solid var(--border); border-radius: 50%;">
       <h1 class="mt-4">${CONFIG.site.title}</h1>
       <p class="text-lg muted" style="max-width: 600px; margin: 0 auto;">${CONFIG.site.description}</p>
       
-      <div class="social-links hstack gap-2 mt-4 justify-center" style="flex-wrap: wrap;">
+      <nav class="social-links hstack gap-2 mt-4 justify-center" aria-label="Social Links" style="flex-wrap: wrap;">
         ${Object.entries(CONFIG.site.socials)
             .filter(([_, url]) => url)
             .map(([platform, url]) => `<a href="${url}" target="_blank" class="button secondary outline" style="text-transform: capitalize;">${platform}</a>`)
             .join('')}
-      </div>
-    </div>
+      </nav>
+    </section>
     
-    <div class="home-content content-prose">
+    <section class="home-content content-prose">
       ${htmlContent}
-    </div>
+    </section>
   `;
 
   setView(html, 'Home');
@@ -292,11 +292,11 @@ async function renderBlogs() {
   posts.sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
 
   const html = `
-    <div class="mb-8">
+    <header class="mb-8">
       <h1>Blog</h1>
       <p class="muted">Thoughts, tutorials, and rants.</p>
-    </div>
-    <div class="vstack gap-4">
+    </header>
+    <section class="vstack gap-4">
       ${posts.length === 0 ? '<p>No posts found.</p>' : posts.map(post => `
         <article class="card p-0" style="transition: transform 0.2s">
           <a href="#/blogs/${post.filename.replace('.md', '')}" class="unstyled-link flex flex-col p-4" style="display:block; padding: 1.5rem;">
@@ -312,7 +312,7 @@ async function renderBlogs() {
           </a>
         </article>
       `).join('')}
-    </div>
+    </section>
   `;
   setView(html, 'Blog');
 }
@@ -363,10 +363,10 @@ async function renderTalks() {
   talks.sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
 
   const html = `
-    <div class="mb-8">
+    <header class="mb-8">
       <h1>Speaking</h1>
       <p class="muted">Conferences and meetups I've spoken at.</p>
-    </div>
+    </header>
     <div class="row">
       ${talks.length === 0 ? '<div class="col-12"><p>No talks found.</p></div>' : talks.map(talk => `
         <div class="col-12 col-md-6 mb-4">
@@ -415,11 +415,11 @@ async function renderSponsors() {
   const sponsors = resolvedSponsors.filter(p => p !== null);
 
   const html = `
-    <div class="mb-8 text-center">
+    <header class="mb-8 text-center">
       <h1>Sponsors</h1>
       <p class="muted">Amazing people and companies supporting my work.</p>
-    </div>
-    <div class="row justify-center">
+    </header>
+    <section class="row justify-center">
       ${sponsors.length === 0 ? '<div class="col-12"><p class="text-center">Become a sponsor!</p></div>' : sponsors.map(s => `
         <div class="col-6 col-md-4 mb-4 text-center">
           <div class="card p-4 vstack align-center text-center">
@@ -430,7 +430,7 @@ async function renderSponsors() {
           </div>
         </div>
       `).join('')}
-    </div>
+    </section>
   `;
   setView(html, 'Sponsors');
 }
