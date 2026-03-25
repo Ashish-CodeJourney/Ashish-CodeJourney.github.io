@@ -2,7 +2,7 @@
 
 A lightweight, minimal, and blazing-fast personal website built entirely with Vanilla HTML, CSS, and JavaScript. Zero dependencies, no heavy frameworks, no build steps, and perfectly suited for fast deployments to GitHub Pages.
 
-![Static Site](https://img.shields.io/badge/static-site-4caf82?style=flat-square) ![Vanilla JS](https://img.shields.io/badge/vanilla-JS-d4a024?style=flat-square)
+![Static Site](https://img.shields.io/badge/static-site-4caf82?style=flat-oval) [![pages-build-deployment](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/pages/pages-build-deployment) ![Vanilla JS](https://img.shields.io/badge/vanilla-JS-d4a024?style=flat-oval)
 
 
 ## Features
