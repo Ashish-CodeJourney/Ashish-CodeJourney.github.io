@@ -10,6 +10,7 @@ const DOM = {
   mobileMenuToggle: document.getElementById('mobile-menu-toggle'),
   themeToggle: document.getElementById('theme-toggle'),
   mobileThemeSwitch: document.getElementById('mobile-theme-switch'),
+  mobileThemeLabel: document.getElementById('mobile-theme-label'),
   currentYear: document.getElementById('current-year'),
   siteTitle: document.title
 };
@@ -83,9 +84,11 @@ function setupTheme() {
     if (theme === 'dark') {
       document.body.setAttribute('data-theme', 'dark');
       if (DOM.mobileThemeSwitch) DOM.mobileThemeSwitch.checked = true;
+      if (DOM.mobileThemeLabel) DOM.mobileThemeLabel.textContent = 'Dark Mode';
     } else {
       document.body.removeAttribute('data-theme');
       if (DOM.mobileThemeSwitch) DOM.mobileThemeSwitch.checked = false;
+      if (DOM.mobileThemeLabel) DOM.mobileThemeLabel.textContent = 'Light Mode';
     }
     localStorage.setItem('theme', theme);
   };
