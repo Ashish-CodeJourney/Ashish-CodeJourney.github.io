@@ -21,7 +21,7 @@ function init() {
   setupNavigation();
   setupTheme();
   setupMobileMenu();
-  
+
   // Router listener
   window.addEventListener('hashchange', handleRoute);
   // Initial route
@@ -34,9 +34,9 @@ function setupNavigation() {
     .filter(page => page.enabled)
     .map(page => `<a href="${page.path}" class="nav-link" data-path="${page.path}">${page.label}</a>`)
     .join('');
-    
+
   DOM.desktopNav.innerHTML = linksHtml;
-  
+
   // Mobile nav prepends links before the theme toggle wrapper
   const mobileWrapper = DOM.mobileNav.querySelector('.mobile-theme-wrapper');
   DOM.mobileNav.innerHTML = linksHtml;
@@ -46,9 +46,9 @@ function setupNavigation() {
 function updateActiveNav(hash) {
   // Extract base path (e.g. #/blogs from #/blogs/my-post)
   const basePath = hash === '' || hash === '#/' ? '#/' : '#' + hash.split('/')[1];
-  
+
   document.querySelectorAll('.nav-link').forEach(link => {
-    if (link.dataset.path === basePath || (basePath.startsWith(link.dataset.path) && link.dataset.path !== '#/' )) {
+    if (link.dataset.path === basePath || (basePath.startsWith(link.dataset.path) && link.dataset.path !== '#/')) {
       link.classList.add('active');
     } else {
       link.classList.remove('active');
@@ -61,7 +61,7 @@ function setupMobileMenu() {
   DOM.mobileMenuToggle.addEventListener('click', () => {
     DOM.mobileNav.classList.toggle('hidden');
   });
-  
+
   // Close on link click
   DOM.mobileNav.addEventListener('click', (e) => {
     if (e.target.tagName === 'A') {
@@ -79,7 +79,7 @@ function setupTheme() {
     if (CONFIG.theme !== 'system') return CONFIG.theme;
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   };
-  
+
   const setTheme = (theme) => {
     if (theme === 'dark') {
       document.body.setAttribute('data-theme', 'dark');
@@ -92,9 +92,9 @@ function setupTheme() {
     }
     localStorage.setItem('theme', theme);
   };
-  
+
   setTheme(getPreferredTheme());
-  
+
   // Toggle listener
   DOM.themeToggle.addEventListener('click', () => {
     const currentTheme = document.body.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
@@ -112,33 +112,33 @@ function setupTheme() {
 function parseMarkdown(md) {
   // Very naive parser for simple use cases
   let html = md;
-  
+
   // Headers
   html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
   html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
   html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
-  
+
   // Bold
   html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
-  
+
   // Italic
   html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
-  
+
   // Links
   html = html.replace(/\[(.*?)\]\((.*?)\)/gim, `<a href="$2" target="_blank" rel="noopener">$1</a>`);
-  
+
   // Code blocks (multiline)
   html = html.replace(/```([\s\S]*?)```/gim, '<pre><code>$1</code></pre>');
-  
+
   // Inline code
   html = html.replace(/`(.*?)`/gim, '<code>$1</code>');
-  
+
   // Lists
   html = html.replace(/^\s*\n\*/gm, '<ul>\n*');
   html = html.replace(/^(\*|\-) (.*)/gm, '<li>$2</li>');
   html = html.replace(/<\/li>\n<ul>/gim, '<ul>');
   html = html.replace(/<\/li>\n<br>/gim, '</li>\n</ul><br>'); // rough closing
-  
+
   // Paragraphs (split by double newline)
   html = html.split(/\n\n+/).map(p => {
     p = p.trim();
@@ -147,7 +147,7 @@ function parseMarkdown(md) {
     }
     return `<p>${p}</p>`;
   }).join('\n');
-  
+
   return html;
 }
 
@@ -155,17 +155,17 @@ function parseMarkdown(md) {
 function parseFrontmatter(text) {
   const match = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!match) return { meta: {}, content: text };
-  
+
   const frontmatter = match[1];
   const content = match[2];
-  
+
   const meta = {};
   frontmatter.split('\n').forEach(line => {
     const colonIdx = line.indexOf(':');
     if (colonIdx > -1) {
       const key = line.slice(0, colonIdx).trim();
       let val = line.slice(colonIdx + 1).trim();
-      
+
       // Handle array `[a, b]`
       if (val.startsWith('[') && val.endsWith(']')) {
         val = val.slice(1, -1).split(',').map(s => s.trim());
@@ -173,7 +173,7 @@ function parseFrontmatter(text) {
       meta[key] = val;
     }
   });
-  
+
   return { meta, content };
 }
 
@@ -233,10 +233,10 @@ async function renderHome() {
   renderLoading();
   const raw = await fetchContent('home.md');
   if (!raw) return renderError();
-  
+
   const { content } = parseFrontmatter(raw);
   const htmlContent = parseMarkdown(content);
-  
+
   const html = `
     <div class="hero mb-8 text-center vstack align-center justify-center gap-4 py-4">
       <img src="${CONFIG.site.avatar}" alt="${CONFIG.site.author}" class="avatar" width="120" height="120" style="border: 4px solid var(--border); border-radius: 50%;">
@@ -244,9 +244,10 @@ async function renderHome() {
       <p class="text-lg muted" style="max-width: 600px; margin: 0 auto;">${CONFIG.site.description}</p>
       
       <div class="social-links hstack gap-2 mt-4 justify-center">
-        ${CONFIG.site.socials.github ? `<a href="${CONFIG.site.socials.github}" target="_blank" class="button secondary outline">GitHub</a>` : ''}
         ${CONFIG.site.socials.twitter ? `<a href="${CONFIG.site.socials.twitter}" target="_blank" class="button secondary outline">Twitter</a>` : ''}
         ${CONFIG.site.socials.linkedin ? `<a href="${CONFIG.site.socials.linkedin}" target="_blank" class="button secondary outline">LinkedIn</a>` : ''}
+        ${CONFIG.site.socials.instagram ? `<a href="${CONFIG.site.socials.instagram}" target="_blank" class="button secondary outline">Instagram</a>` : ''}
+        ${CONFIG.site.socials.github ? `<a href="${CONFIG.site.socials.github}" target="_blank" class="button secondary outline">GitHub</a>` : ''}
       </div>
     </div>
     
@@ -254,17 +255,17 @@ async function renderHome() {
       ${htmlContent}
     </div>
   `;
-  
+
   setView(html, 'Home');
 }
 
 async function renderBlogs() {
   renderLoading();
   if (!CONFIG.pages.blogs.enabled) return renderError();
-  
+
   const manifest = await fetchManifest();
   const posts = [];
-  
+
   for (const filename of manifest.blogs || []) {
     const raw = await fetchContent(`blogs/${filename}`);
     if (raw) {
@@ -272,10 +273,10 @@ async function renderBlogs() {
       posts.push({ filename, meta });
     }
   }
-  
+
   // Sort by date desc
   posts.sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
-  
+
   const html = `
     <div class="mb-8">
       <h1>Blog</h1>
@@ -305,10 +306,10 @@ async function renderBlogPost(slug) {
   renderLoading();
   const raw = await fetchContent(`blogs/${slug}.md`);
   if (!raw) return renderError();
-  
+
   const { meta, content } = parseFrontmatter(raw);
   const htmlContent = parseMarkdown(content);
-  
+
   const html = `
     <article class="post">
       <header class="mb-8">
@@ -330,10 +331,10 @@ async function renderBlogPost(slug) {
 async function renderTalks() {
   renderLoading();
   if (!CONFIG.pages.talks.enabled) return renderError();
-  
+
   const manifest = await fetchManifest();
   const talks = [];
-  
+
   for (const filename of manifest.talks || []) {
     const raw = await fetchContent(`talks/${filename}`);
     if (raw) {
@@ -341,9 +342,9 @@ async function renderTalks() {
       talks.push({ filename, meta, content: parseMarkdown(content) });
     }
   }
-  
+
   talks.sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
-  
+
   const html = `
     <div class="mb-8">
       <h1>Speaking</h1>
@@ -383,10 +384,10 @@ async function renderTalks() {
 async function renderSponsors() {
   renderLoading();
   if (!CONFIG.pages.sponsors.enabled) return renderError();
-  
+
   const manifest = await fetchManifest();
   const sponsors = [];
-  
+
   for (const filename of manifest.sponsors || []) {
     const raw = await fetchContent(`sponsors/${filename}`);
     if (raw) {
@@ -394,7 +395,7 @@ async function renderSponsors() {
       sponsors.push({ filename, meta, content: parseMarkdown(content) });
     }
   }
-  
+
   const html = `
     <div class="mb-8 text-center">
       <h1>Sponsors</h1>
@@ -419,13 +420,13 @@ async function renderSponsors() {
 async function renderNow() {
   renderLoading();
   if (!CONFIG.pages.now.enabled) return renderError();
-  
+
   const raw = await fetchContent('now.md');
   if (!raw) return renderError();
-  
+
   const { content } = parseFrontmatter(raw);
   const htmlContent = parseMarkdown(content);
-  
+
   const html = `
     <article class="post">
       <div class="post-content">
@@ -441,7 +442,7 @@ async function renderNow() {
 function handleRoute() {
   let hash = window.location.hash || '#/';
   updateActiveNav(hash);
-  
+
   if (hash === '#/') {
     renderHome();
   } else if (hash === '#/blogs') {

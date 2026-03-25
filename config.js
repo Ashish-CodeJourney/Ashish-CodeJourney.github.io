@@ -5,9 +5,10 @@ const CONFIG = {
     author: "Ashish",
     avatar: "assets/avatar.jpg",
     socials: {
-      github: "https://github.com/Ashish-CodeJourney",
       twitter: "https://twitter.com/codejourney_",
-      linkedin: "https://linkedin.com/in/ashish-codejourney"
+      linkedin: "https://linkedin.com/in/ashish-codejourney",
+      instagram: "https://instagram.com/heyyy_ashish",
+      github: "https://github.com/Ashish-CodeJourney",
     }
   },
   // Set enabled: false to hide a page from the navigation
