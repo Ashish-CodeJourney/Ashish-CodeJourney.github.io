@@ -2,6 +2,9 @@
 
 A lightweight, minimal, and blazing-fast personal website built entirely with Vanilla HTML, CSS, and JavaScript. Zero dependencies, no heavy frameworks, no build steps, and perfectly suited for fast deployments to GitHub Pages.
 
+![Static Site](https://img.shields.io/badge/static-site-4caf82?style=flat-square) ![Vanilla JS](https://img.shields.io/badge/vanilla-JS-d4a024?style=flat-square)
+
+
 ## Features
 
 - **No Node.js or Build Tools**: Just pure web standards. Write some code, push it to GitHub, and deploy.
