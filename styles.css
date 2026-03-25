@@ -268,6 +268,10 @@ h6 {
   border-top: 1px solid var(--border);
 }
 
+pre{background:hsl(240,6%,10%);color:hsl(0,0%,98%);padding:1rem;border-radius:8px;overflow-x:auto}
+pre code{color:inherit;background:transparent;padding:0}
+code{background:var(--muted);color:var(--foreground);padding:.2rem .4rem;border-radius:4px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:.875rem}
+
 .social-links .button.outline:hover {
   background: var(--secondary);
   color: var(--secondary-foreground);

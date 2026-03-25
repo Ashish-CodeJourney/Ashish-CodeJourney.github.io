@@ -122,12 +122,18 @@ function parseMarkdown(md) {
     .replace(/^# (.*$)/gim, '\n\n<h1>$1</h1>\n\n')
     .replace(/^\> (.*$)/gim, '\n\n<blockquote>$1</blockquote>\n\n')
     .replace(/^---$/gim, '\n\n<hr>\n\n')
-    .replace(/^```(\w*)\n([\s\S]*?)\n```/gim, '\n\n<pre><code class="language-$1">$2</code></pre>\n\n');
+    .replace(/^```(\w*)\n([\s\S]*?)\n```/gim, (match, lang, code) => {
+      const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return `\n\n<pre><code class="language-${lang}">${escaped}</code></pre>\n\n`;
+    });
 
   html = html
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/`([^`]+)`/g, (match, code) => {
+      const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return `<code>${escaped}</code>`;
+    })
     .replace(/!\[([^\]]+)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">')
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
 
@@ -158,7 +164,15 @@ function parseFrontmatter(text) {
 
       // Handle array `[a, b]`
       if (val.startsWith('[') && val.endsWith(']')) {
-        val = val.slice(1, -1).split(',').map(s => s.trim());
+        val = val.slice(1, -1).split(',').map(s => {
+          s = s.trim();
+          if (s.startsWith('"') && s.endsWith('"')) return s.slice(1, -1);
+          if (s.startsWith("'") && s.endsWith("'")) return s.slice(1, -1);
+          return s;
+        });
+      } else {
+        if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
+        else if (val.startsWith("'") && val.endsWith("'")) val = val.slice(1, -1);
       }
       meta[key] = val;
     }
@@ -278,9 +292,9 @@ async function renderBlogs() {
           <a href="#/blogs/${post.filename.replace('.md', '')}" class="unstyled-link flex flex-col p-4" style="display:block; padding: 1.5rem;">
             <header class="mb-2">
               <h3 style="margin: 0 0 0.5rem 0">${post.meta.title}</h3>
-              <div class="hstack gap-2 text-sm muted">
-                <time>${post.meta.date}</time>
-                ${post.meta.tags ? `• <span>${post.meta.tags.join(', ')}</span>` : ''}
+              <div class="hstack gap-2 text-sm muted" style="flex-wrap: wrap;">
+                <time class="badge primary">${post.meta.date}</time>
+                ${Array.isArray(post.meta.tags) ? post.meta.tags.map(t => `<span class="badge secondary">${t}</span>`).join('') : ''}
               </div>
             </header>
             <p style="margin:0">${post.meta.description || 'Read more...'}</p>
@@ -305,9 +319,9 @@ async function renderBlogPost(slug) {
       <header class="mb-8">
         <a href="#/blogs" class="unstyled-link muted text-sm mb-4" style="display:inline-block">← Back to Blog</a>
         <h1 class="mt-2" style="margin-bottom: 0.5rem;">${meta.title}</h1>
-        <div class="hstack gap-2 muted">
-           <time>${meta.date}</time>
-           ${meta.tags ? `• <span>${meta.tags.join(', ')}</span>` : ''}
+        <div class="hstack gap-2 mt-4" style="flex-wrap: wrap;">
+           <span class="badge primary mb-2">${meta.date}</span>
+           ${Array.isArray(meta.tags) ? meta.tags.map(t => `<span class="badge secondary mb-2">${t}</span>`).join('') : ''}
         </div>
       </header>
       <div class="post-content" style="font-size: 1.05rem;">
