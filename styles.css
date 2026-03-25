@@ -204,6 +204,13 @@ h1, h2, h3, h4, h5, h6 {
 .muted { color: var(--muted-foreground); }
 .border-t { border-top: 1px solid var(--border); }
 
+/* Social Links Custom Overrides */
+.social-links .button.outline:hover {
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+  border-color: var(--border);
+}
+
 /* Responsive Overrides */
 @media (max-width: 768px) {
   .desktop-nav { display: none; }
