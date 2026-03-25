@@ -182,11 +182,17 @@ function parseFrontmatter(text) {
 }
 
 // --- Content Loading ---
+const contentCache = new Map();
+let manifestCache = null;
+
 async function fetchContent(path) {
+  if (contentCache.has(path)) return contentCache.get(path);
   try {
     const res = await fetch(`content/${path}`);
     if (!res.ok) throw new Error(`Failed to fetch ${path}`);
-    return await res.text();
+    const text = await res.text();
+    contentCache.set(path, text);
+    return text;
   } catch (err) {
     console.error(err);
     return null;
@@ -194,10 +200,12 @@ async function fetchContent(path) {
 }
 
 async function fetchManifest() {
+  if (manifestCache) return manifestCache;
   try {
     const res = await fetch(`content/index.json`);
     if (!res.ok) throw new Error("Failed to fetch manifest");
-    return await res.json();
+    manifestCache = await res.json();
+    return manifestCache;
   } catch (err) {
     console.error(err);
     return { blogs: [], talks: [], sponsors: [] };
@@ -268,15 +276,17 @@ async function renderBlogs() {
   if (!CONFIG.pages.blogs.enabled) return renderError();
 
   const manifest = await fetchManifest();
-  const posts = [];
-
-  for (const filename of manifest.blogs || []) {
+  const blogPromises = (manifest.blogs || []).map(async filename => {
     const raw = await fetchContent(`blogs/${filename}`);
     if (raw) {
       const { meta } = parseFrontmatter(raw);
-      posts.push({ filename, meta });
+      return { filename, meta };
     }
-  }
+    return null;
+  });
+  
+  const resolvedPosts = await Promise.all(blogPromises);
+  const posts = resolvedPosts.filter(p => p !== null);
 
   // Sort by date desc
   posts.sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
@@ -339,15 +349,16 @@ async function renderTalks() {
   if (!CONFIG.pages.talks.enabled) return renderError();
 
   const manifest = await fetchManifest();
-  const talks = [];
-
-  for (const filename of manifest.talks || []) {
+  const talkPromises = (manifest.talks || []).map(async filename => {
     const raw = await fetchContent(`talks/${filename}`);
     if (raw) {
       const { meta, content } = parseFrontmatter(raw);
-      talks.push({ filename, meta, content: parseMarkdown(content) });
+      return { filename, meta, content: parseMarkdown(content) };
     }
-  }
+    return null;
+  });
+  const resolvedTalks = await Promise.all(talkPromises);
+  const talks = resolvedTalks.filter(p => p !== null);
 
   talks.sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
 
@@ -392,15 +403,16 @@ async function renderSponsors() {
   if (!CONFIG.pages.sponsors.enabled) return renderError();
 
   const manifest = await fetchManifest();
-  const sponsors = [];
-
-  for (const filename of manifest.sponsors || []) {
+  const sponsorPromises = (manifest.sponsors || []).map(async filename => {
     const raw = await fetchContent(`sponsors/${filename}`);
     if (raw) {
       const { meta, content } = parseFrontmatter(raw);
-      sponsors.push({ filename, meta, content: parseMarkdown(content) });
+      return { filename, meta, content: parseMarkdown(content) };
     }
-  }
+    return null;
+  });
+  const resolvedSponsors = await Promise.all(sponsorPromises);
+  const sponsors = resolvedSponsors.filter(p => p !== null);
 
   const html = `
     <div class="mb-8 text-center">
