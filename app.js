@@ -9,6 +9,7 @@ const DOM = {
   mobileNav: document.getElementById('mobile-nav'),
   mobileMenuToggle: document.getElementById('mobile-menu-toggle'),
   themeToggle: document.getElementById('theme-toggle'),
+  mobileThemeSwitch: document.getElementById('mobile-theme-switch'),
   currentYear: document.getElementById('current-year'),
   siteTitle: document.title
 };
@@ -81,8 +82,10 @@ function setupTheme() {
   const setTheme = (theme) => {
     if (theme === 'dark') {
       document.body.setAttribute('data-theme', 'dark');
+      if (DOM.mobileThemeSwitch) DOM.mobileThemeSwitch.checked = true;
     } else {
       document.body.removeAttribute('data-theme');
+      if (DOM.mobileThemeSwitch) DOM.mobileThemeSwitch.checked = false;
     }
     localStorage.setItem('theme', theme);
   };
@@ -94,6 +97,12 @@ function setupTheme() {
     const currentTheme = document.body.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
     setTheme(currentTheme === 'dark' ? 'light' : 'dark');
   });
+
+  if (DOM.mobileThemeSwitch) {
+    DOM.mobileThemeSwitch.addEventListener('change', (e) => {
+      setTheme(e.target.checked ? 'dark' : 'light');
+    });
+  }
 }
 
 // --- Markdown Parser (Simple) ---
