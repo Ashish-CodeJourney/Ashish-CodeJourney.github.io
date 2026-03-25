@@ -4,6 +4,7 @@ const CONFIG = {
     description: "Welcome to my personal slice of the internet. I'm Ashish, a developer who loves building things.",
     author: "Ashish",
     avatar: "assets/avatar.jpg",
+    email: "vaghelaashish111@gmail.com",
     socials: {
       twitter: "https://twitter.com/codejourney_",
       linkedin: "https://linkedin.com/in/ashish-codejourney",

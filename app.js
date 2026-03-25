@@ -113,6 +113,11 @@ function parseMarkdown(md) {
   // Very naive parser for simple use cases
   let html = md;
 
+  // Template variables
+  if (CONFIG.site.email) {
+    html = html.replace(/\{\{email\}\}/g, CONFIG.site.email);
+  }
+
   // Headers
   html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
   html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
@@ -243,11 +248,11 @@ async function renderHome() {
       <h1 class="mt-4">${CONFIG.site.title}</h1>
       <p class="text-lg muted" style="max-width: 600px; margin: 0 auto;">${CONFIG.site.description}</p>
       
-      <div class="social-links hstack gap-2 mt-4 justify-center">
-        ${CONFIG.site.socials.twitter ? `<a href="${CONFIG.site.socials.twitter}" target="_blank" class="button secondary outline">Twitter</a>` : ''}
-        ${CONFIG.site.socials.linkedin ? `<a href="${CONFIG.site.socials.linkedin}" target="_blank" class="button secondary outline">LinkedIn</a>` : ''}
-        ${CONFIG.site.socials.instagram ? `<a href="${CONFIG.site.socials.instagram}" target="_blank" class="button secondary outline">Instagram</a>` : ''}
-        ${CONFIG.site.socials.github ? `<a href="${CONFIG.site.socials.github}" target="_blank" class="button secondary outline">GitHub</a>` : ''}
+      <div class="social-links hstack gap-2 mt-4 justify-center" style="flex-wrap: wrap;">
+        ${Object.entries(CONFIG.site.socials)
+            .filter(([_, url]) => url)
+            .map(([platform, url]) => `<a href="${url}" target="_blank" class="button secondary outline" style="text-transform: capitalize;">${platform}</a>`)
+            .join('')}
       </div>
     </div>
     
