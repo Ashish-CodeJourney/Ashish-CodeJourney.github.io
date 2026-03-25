@@ -1,5 +1,17 @@
 {
   "blogs": [
+    "using-google-sheets-as-a-cms.md",
+    "the-ai-testing-paradox.md",
+    "my-hacktoberfest-2025-journey.md",
+    "crafting-code-with-intent.md",
+    "mastering-junit-techniques.md",
+    "the-hidden-dangers-of-programming.md",
+    "why-beginners-fail-coding-tests.md",
+    "functional-programming-meets-tdd.md",
+    "does-test-driven-development-weaken-debugging-skills.md",
+    "dotfiles-the-developer-secret-to-the-perfect-setup.md",
+    "webhooks-the-secret-sauce.md",
+    "renaming-bugs-as-unwritten-test-cases.md",
     "first-post.md"
   ],
   "talks": [
