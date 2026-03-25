@@ -1,0 +1,29 @@
+name: Update oat.ink CSS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update-css:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download latest oat.min.css
+        run: |
+          curl -sL https://raw.githubusercontent.com/knadh/oat/refs/heads/gh-pages/oat.min.css -o assets/oat.min.css
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --exit-code || echo "changes=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push changes
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add assets/oat.min.css
+          git commit -m "chore: update oat.min.css to latest version"
+          git push
