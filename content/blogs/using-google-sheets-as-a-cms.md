@@ -32,11 +32,14 @@ The workflow is straightforward:
 ### Step 1: Create Your Google Sheet
 
 First, create a Google Sheet with your content. Here's an example structure for a blog or events website:
+```
 
-| id | title | description | date | image_url | category |
-|----|-------|-------------|------|-----------|----------|
-| 1 | First Post | This is my first post | 2024-01-15 | https://example.com/img1.jpg | Tech |
-| 2 | Second Post | Another great post | 2024-01-20 | https://example.com/img2.jpg | Design |
+| id | title       | description           | date       | image_url                    | category |
+|----|-------------|-----------------------|------------|------------------------------|----------|
+| 1  | First Post  | This is my first post | 2024-01-15 | https://example.com/img1.jpg | Tech     |
+| 2  | Second Post | Another great post    | 2024-01-20 | https://example.com/img2.jpg | Design   |
+
+```
 
 **Important**: The first row should contain your column headers (field names).
 
