@@ -110,50 +110,35 @@ function setupTheme() {
 
 // --- Markdown Parser (Simple) ---
 function parseMarkdown(md) {
-  // Very naive parser for simple use cases
-  let html = md;
-
-  // Template variables
   if (CONFIG.site.email) {
-    html = html.replace(/\{\{email\}\}/g, CONFIG.site.email);
+    md = md.replace(/\{\{email\}\}/g, CONFIG.site.email);
   }
 
-  // Headers
-  html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-  html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-  html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+  let html = md.replace(/\r\n/g, '\n');
 
-  // Bold
-  html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+  html = html
+    .replace(/^### (.*$)/gim, '\n\n<h3>$1</h3>\n\n')
+    .replace(/^## (.*$)/gim, '\n\n<h2>$1</h2>\n\n')
+    .replace(/^# (.*$)/gim, '\n\n<h1>$1</h1>\n\n')
+    .replace(/^\> (.*$)/gim, '\n\n<blockquote>$1</blockquote>\n\n')
+    .replace(/^---$/gim, '\n\n<hr>\n\n')
+    .replace(/^```(\w*)\n([\s\S]*?)\n```/gim, '\n\n<pre><code class="language-$1">$2</code></pre>\n\n');
 
-  // Italic
-  html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+  html = html
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/!\[([^\]]+)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
 
-  // Links
-  html = html.replace(/\[(.*?)\]\((.*?)\)/gim, `<a href="$2" target="_blank" rel="noopener">$1</a>`);
+  html = html.replace(/^\s*[-*]\s+(.*)/gm, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>(?:\n<li>.*<\/li>)*)/g, '\n\n<ul>\n$1\n</ul>\n\n');
 
-  // Code blocks (multiline)
-  html = html.replace(/```([\s\S]*?)```/gim, '<pre><code>$1</code></pre>');
-
-  // Inline code
-  html = html.replace(/`(.*?)`/gim, '<code>$1</code>');
-
-  // Lists
-  html = html.replace(/^\s*\n\*/gm, '<ul>\n*');
-  html = html.replace(/^(\*|\-) (.*)/gm, '<li>$2</li>');
-  html = html.replace(/<\/li>\n<ul>/gim, '<ul>');
-  html = html.replace(/<\/li>\n<br>/gim, '</li>\n</ul><br>'); // rough closing
-
-  // Paragraphs (split by double newline)
-  html = html.split(/\n\n+/).map(p => {
+  return html.split(/\n\n+/).map(p => {
     p = p.trim();
-    if (p.startsWith('<h') || p.startsWith('<pre') || p.startsWith('<ul') || p.startsWith('<li')) {
-      return p;
-    }
+    if (!p || p.startsWith('<')) return p;
     return `<p>${p}</p>`;
   }).join('\n');
-
-  return html;
 }
 
 // --- Frontmatter Parser ---
