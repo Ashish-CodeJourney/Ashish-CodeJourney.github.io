@@ -3,6 +3,7 @@ title: "Functional Programming Meets TDD: A Match Made in Code Heaven 🚀"
 date: "2024-07-24"
 description: "Discover how combining Functional Programming and Test-Driven Development leads to the ultimate coding experience."
 tags: ["functional-programming", "tdd", "javascript", "testing"]
+banner: "https://media2.dev.to/dynamic/image/width=1000,height=420,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Frbx6wrpnygnzd7r4ohxe.png"
 ---
 
 This is the story of how these two paradigms can be combined for the ultimate coding experience.

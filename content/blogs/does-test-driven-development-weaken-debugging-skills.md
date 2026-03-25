@@ -3,6 +3,7 @@ title: "Does Test-Driven Development Weaken Debugging Skills? 🐞🧪"
 date: "2024-06-28"
 description: "Exploring the relationship between TDD and traditional debugging skills in software development."
 tags: ["testing", "tdd", "debugging", "programming"]
+banner: "https://media2.dev.to/dynamic/image/width=1000,height=420,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fkgskdvh87gih76f1e9he.png"
 ---
 
 **Test-Driven Development (TDD)** is a programming method where tests are written before the actual code. The process involves writing a test, failing it, writing the minimum code necessary to pass the test, and refactoring the code if the tests pass. This iterative cycle promotes clean, reliable, and well-tested code. However, there is sometimes a concern that practicing TDD may lead to a decline in traditional debugging skills. Let's explore this concept in detail.

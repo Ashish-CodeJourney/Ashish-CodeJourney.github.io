@@ -290,6 +290,7 @@ async function renderBlogs() {
       ${posts.length === 0 ? '<p>No posts found.</p>' : posts.map(post => `
         <article class="card p-0" style="transition: transform 0.2s">
           <a href="#/blogs/${post.filename.replace('.md', '')}" class="unstyled-link flex flex-col p-4" style="display:block; padding: 1.5rem;">
+            ${post.meta.banner ? `<img src="${post.meta.banner}" alt="${post.meta.title}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">` : ''}
             <header class="mb-2">
               <h3 style="margin: 0 0 0.5rem 0">${post.meta.title}</h3>
               <div class="hstack gap-2 text-sm muted" style="flex-wrap: wrap;">
@@ -318,6 +319,7 @@ async function renderBlogPost(slug) {
     <article class="post">
       <header class="mb-8">
         <a href="#/blogs" class="unstyled-link muted text-sm mb-4" style="display:inline-block">← Back to Blog</a>
+        ${meta.banner ? `<img src="${meta.banner}" alt="${meta.title}" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; margin-bottom: 1.5rem;">` : ''}
         <h1 class="mt-2" style="margin-bottom: 0.5rem;">${meta.title}</h1>
         <div class="hstack gap-2 mt-4" style="flex-wrap: wrap;">
            <span class="badge primary mb-2">${meta.date}</span>

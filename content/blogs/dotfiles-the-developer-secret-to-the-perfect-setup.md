@@ -3,6 +3,7 @@ title: "Dotfiles: The Developer Secret to the Perfect Setup"
 date: "2024-06-25"
 description: "Discover the power of dotfiles to streamline, automate, and version control your development environment."
 tags: ["dotfiles", "productivity", "linux", "terminal"]
+banner: "https://media2.dev.to/dynamic/image/width=1000,height=420,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fr25u2fx4fegao1k979lj.png"
 ---
 
 ## What Are Dotfiles? 📁
