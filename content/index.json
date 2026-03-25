@@ -11,8 +11,7 @@
     "does-test-driven-development-weaken-debugging-skills.md",
     "dotfiles-the-developer-secret-to-the-perfect-setup.md",
     "webhooks-the-secret-sauce.md",
-    "renaming-bugs-as-unwritten-test-cases.md",
-    "first-post.md"
+    "renaming-bugs-as-unwritten-test-cases.md"
   ],
   "talks": [
     "my-first-talk.md"
