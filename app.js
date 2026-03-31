@@ -224,10 +224,13 @@ function setView(html, title) {
 
 function renderError() {
   setView(`
-    <div class="vstack align-center justify-center p-8 text-center">
-      <h2>404 - Not Found</h2>
-      <p class="muted">The content you are looking for does not exist.</p>
-      <a href="#/" class="button mt-4">Go Home</a>
+    <div class="vstack align-center justify-center p-8 text-center error-container-sm">
+      <img src="assets/404-illustration.png" alt="Lost Explorer" class="error-illustration-sm">
+      <h2 class="error-title error-title-sm">Journey Interrupted</h2>
+      <p class="muted error-text error-text-sm">Oops! This part of the journey hasn't been coded yet, or maybe a rogue bug hid the path.</p>
+      <a href="#/" class="button mt-4 back-home-btn back-home-btn-sm">
+         Teleport Home
+      </a>
     </div>
   `, 'Not Found');
 }
