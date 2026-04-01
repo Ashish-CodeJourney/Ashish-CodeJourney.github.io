@@ -1,10 +1,10 @@
 ## What I'm doing right now
-*Updated March 2026*
+*Updated April, 1st, 2026*
 
-- Building my personal website with minimal tech  
-- Learning more about startups  
-- Exploring mental health & wellness  
-- Helping Communities and People...(Because that's what makes us Human)
+- Learning Ngnix and Docker  
+- Trying to contribute to Open Source Projects I use everyday
+- Saving money for new phone (Iphone or Samsung IDK not sure yet)  
+- Plainning a small trip....
 
 ---
 
