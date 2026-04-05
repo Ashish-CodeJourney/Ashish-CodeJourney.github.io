@@ -7,7 +7,7 @@ A lightweight, minimal, and blazing-fast personal website built entirely with Va
 
 ## Features
 
-- **No Node.js or Build Tools**: Just pure web standards. Write some code, push it to GitHub, and deploy.
+- **Minimal Node.js Build Tool**: Includes a tiny `build-index.js` script to automatically parse metadata, keeping the website blazing fast and pure Vanilla JS on the client side.
 - **Markdown Driven**: All dynamic content (blogs, talks, sponsors, now page) is written beautifully in simple Markdown (`.md`) files.
 - **Custom Markdown Parser**: A built-in, lightweight Vanilla JS parser handles Markdown and YAML-like frontmatter parsing natively.
 - **Dynamic SPA Routing**: Hash-based routing (`#/blogs`) guarantees fast navigation without full page reloads, making it extremely straightforward to host on static services like GitHub Pages.
@@ -62,7 +62,7 @@ All text content lives inside the `content/` folder.
 - **Blogs, Talks, & Sponsors**: 
   1. Copy the `_template.md` file found in their respective directories.
   2. Write your Markdown content and populate the Frontmatter (the metadata at the top of the file).
-  3. **Crucial**: Because absolute static hosting cannot read directory folders dynamically, you *must manually add your new filename* to the corresponding array inside `content/index.json` to make it appear on the site!
+  3. **Crucial**: Run `node build-index.js` to automatically parse your new files and update the `content/index.json` manifest! (If you push to GitHub, a GitHub Action will do this for you automatically).
 
 ### 3. Modifying Styles
 Open `styles.css`. The entire aesthetic of the site is powered by CSS variables (Custom Properties) written in `HSL` color format. You can drastically alter the entire site's color scheme in seconds simply by altering the `--primary`, `--background`, and `--border` variables located at the top of the file.

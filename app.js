@@ -279,17 +279,7 @@ async function renderBlogs() {
   if (!CONFIG.pages.blogs.enabled) return renderError();
 
   const manifest = await fetchManifest();
-  const blogPromises = (manifest.blogs || []).map(async filename => {
-    const raw = await fetchContent(`blogs/${filename}`);
-    if (raw) {
-      const { meta } = parseFrontmatter(raw);
-      return { filename, meta };
-    }
-    return null;
-  });
-  
-  const resolvedPosts = await Promise.all(blogPromises);
-  const posts = resolvedPosts.filter(p => p !== null);
+  const posts = manifest.blogs || [];
 
   // Sort by date desc
   posts.sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
@@ -352,16 +342,10 @@ async function renderTalks() {
   if (!CONFIG.pages.talks.enabled) return renderError();
 
   const manifest = await fetchManifest();
-  const talkPromises = (manifest.talks || []).map(async filename => {
-    const raw = await fetchContent(`talks/${filename}`);
-    if (raw) {
-      const { meta, content } = parseFrontmatter(raw);
-      return { filename, meta, content: parseMarkdown(content) };
-    }
-    return null;
-  });
-  const resolvedTalks = await Promise.all(talkPromises);
-  const talks = resolvedTalks.filter(p => p !== null);
+  const talks = (manifest.talks || []).map(talk => ({
+    ...talk,
+    content: parseMarkdown(talk.content || '')
+  }));
 
   talks.sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
 
@@ -406,16 +390,10 @@ async function renderSponsors() {
   if (!CONFIG.pages.sponsors.enabled) return renderError();
 
   const manifest = await fetchManifest();
-  const sponsorPromises = (manifest.sponsors || []).map(async filename => {
-    const raw = await fetchContent(`sponsors/${filename}`);
-    if (raw) {
-      const { meta, content } = parseFrontmatter(raw);
-      return { filename, meta, content: parseMarkdown(content) };
-    }
-    return null;
-  });
-  const resolvedSponsors = await Promise.all(sponsorPromises);
-  const sponsors = resolvedSponsors.filter(p => p !== null);
+  const sponsors = (manifest.sponsors || []).map(sponsor => ({
+    ...sponsor,
+    content: parseMarkdown(sponsor.content || '')
+  }));
 
   const html = `
     <header class="mb-8 text-center">
