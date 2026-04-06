@@ -15,7 +15,8 @@ const CONFIG = {
   // Set enabled: false to hide a page from the navigation
   pages: {
     home: { enabled: true, label: "Home", path: "#/" },
-    blogs: { enabled: true, label: "Blog", path: "#/blogs" },
+    writings: { enabled: true, label: "Writings", path: "#/writings" },
+    technical: { enabled: true, label: "Technical", path: "#/technical" },
     talks: { enabled: false, label: "Talks", path: "#/talks" },
     sponsors: { enabled: false, label: "Sponsors", path: "#/sponsors" },
     now: { enabled: true, label: "Now", path: "#/now" }

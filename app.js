@@ -1,5 +1,5 @@
 /**
- * Personal Website App Logic
+ * Personal Website — App Logic
  * Vanilla JS, no dependencies.
  */
 
@@ -15,127 +15,143 @@ const DOM = {
   siteTitle: document.title
 };
 
-// --- Initialization ---
+// ─── Init ──────────────────────────────────────────────────────
 function init() {
   DOM.currentYear.textContent = new Date().getFullYear();
   setupNavigation();
   setupTheme();
   setupMobileMenu();
-
-  // Router listener
+  setupSocialRedirects();
   window.addEventListener('hashchange', handleRoute);
-  // Initial route
   handleRoute();
 }
 
-// --- Navigation ---
+// ─── Social Redirects ──────────────────────────────────────────
+function setupSocialRedirects() {
+  const hash = window.location.hash || '';
+  const url = getSocialRedirect(hash);
+  if (url) window.location.href = url;
+}
+
+function getSocialRedirect(hash) {
+  const path = hash.replace('#/', '').toLowerCase();
+  const socials = CONFIG.site.socials || {};
+  for (const [platform, url] of Object.entries(socials)) {
+    if (path === platform.toLowerCase() && url) return url;
+  }
+  return null;
+}
+
+window.addEventListener('hashchange', () => {
+  const url = getSocialRedirect(window.location.hash || '');
+  if (url) window.location.href = url;
+});
+
+// ─── Navigation ────────────────────────────────────────────────
 function setupNavigation() {
   const linksHtml = Object.values(CONFIG.pages)
-    .filter(page => page.enabled)
-    .map(page => `<a href="${page.path}" class="nav-link" data-path="${page.path}">${page.label}</a>`)
-    .join('');
+      .filter(p => p.enabled)
+      .map(p => `<a href="${p.path}" class="nav-link" data-path="${p.path}">${p.label}</a>`)
+      .join('');
 
   DOM.desktopNav.innerHTML = linksHtml;
 
-  // Mobile nav prepends links before the theme toggle wrapper
   const mobileWrapper = DOM.mobileNav.querySelector('.mobile-theme-wrapper');
   DOM.mobileNav.innerHTML = linksHtml;
-  DOM.mobileNav.appendChild(mobileWrapper);
+  if (mobileWrapper) DOM.mobileNav.appendChild(mobileWrapper);
 }
 
 function updateActiveNav(hash) {
-  // Extract base path (e.g. #/blogs from #/blogs/my-post)
   const basePath = hash === '' || hash === '#/' ? '#/' : '#' + hash.split('/')[1];
-
   document.querySelectorAll('.nav-link').forEach(link => {
-    if (link.dataset.path === basePath || (basePath.startsWith(link.dataset.path) && link.dataset.path !== '#/')) {
-      link.classList.add('active');
-    } else {
-      link.classList.remove('active');
-    }
+    const match = link.dataset.path === basePath ||
+        (basePath.startsWith(link.dataset.path) && link.dataset.path !== '#/');
+    link.classList.toggle('active', match);
   });
 }
 
-// --- Mobile Menu ---
+// ─── Mobile Menu ───────────────────────────────────────────────
 function setupMobileMenu() {
+  const mq = window.matchMedia('(max-width: 640px)');
+
+  function syncToggle(e) {
+    DOM.mobileMenuToggle.style.display = e.matches ? 'inline-flex' : 'none';
+    if (!e.matches) DOM.mobileNav.classList.add('hidden');
+  }
+
+  syncToggle(mq);
+  mq.addEventListener('change', syncToggle);
+
   DOM.mobileMenuToggle.addEventListener('click', () => {
     DOM.mobileNav.classList.toggle('hidden');
   });
-
-  // Close on link click
-  DOM.mobileNav.addEventListener('click', (e) => {
-    if (e.target.tagName === 'A') {
-      DOM.mobileNav.classList.add('hidden');
-    }
+  DOM.mobileNav.addEventListener('click', e => {
+    if (e.target.tagName === 'A') DOM.mobileNav.classList.add('hidden');
   });
 }
 
-// --- Theme Management ---
+// ─── Theme ─────────────────────────────────────────────────────
 function setupTheme() {
-  // Determine initial theme
-  const getPreferredTheme = () => {
+  const getPreferred = () => {
     const saved = localStorage.getItem('theme');
     if (saved) return saved;
     if (CONFIG.theme !== 'system') return CONFIG.theme;
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   };
 
-  const setTheme = (theme) => {
+  const setTheme = theme => {
     if (theme === 'dark') {
       document.body.setAttribute('data-theme', 'dark');
       if (DOM.mobileThemeSwitch) DOM.mobileThemeSwitch.checked = true;
-      if (DOM.mobileThemeLabel) DOM.mobileThemeLabel.textContent = 'Dark Mode';
+      if (DOM.mobileThemeLabel) DOM.mobileThemeLabel.textContent = 'Dark mode';
     } else {
       document.body.removeAttribute('data-theme');
       if (DOM.mobileThemeSwitch) DOM.mobileThemeSwitch.checked = false;
-      if (DOM.mobileThemeLabel) DOM.mobileThemeLabel.textContent = 'Light Mode';
+      if (DOM.mobileThemeLabel) DOM.mobileThemeLabel.textContent = 'Light mode';
     }
     localStorage.setItem('theme', theme);
   };
 
-  setTheme(getPreferredTheme());
+  setTheme(getPreferred());
 
-  // Toggle listener
   DOM.themeToggle.addEventListener('click', () => {
-    const currentTheme = document.body.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-    setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    const current = document.body.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    setTheme(current === 'dark' ? 'light' : 'dark');
   });
 
   if (DOM.mobileThemeSwitch) {
-    DOM.mobileThemeSwitch.addEventListener('change', (e) => {
+    DOM.mobileThemeSwitch.addEventListener('change', e => {
       setTheme(e.target.checked ? 'dark' : 'light');
     });
   }
 }
 
-// --- Markdown Parser (Simple) ---
+// ─── Markdown Parser ───────────────────────────────────────────
 function parseMarkdown(md) {
-  if (CONFIG.site.email) {
-    md = md.replace(/\{\{email\}\}/g, CONFIG.site.email);
-  }
+  if (CONFIG.site.email) md = md.replace(/\{\{email\}\}/g, CONFIG.site.email);
 
   let html = md.replace(/\r\n/g, '\n');
 
   html = html
-    .replace(/^### (.*$)/gim, '\n\n<h3>$1</h3>\n\n')
-    .replace(/^## (.*$)/gim, '\n\n<h2>$1</h2>\n\n')
-    .replace(/^# (.*$)/gim, '\n\n<h1>$1</h1>\n\n')
-    .replace(/^\> (.*$)/gim, '\n\n<blockquote>$1</blockquote>\n\n')
-    .replace(/^---$/gim, '\n\n<hr>\n\n')
-    .replace(/^```(\w*)\n([\s\S]*?)\n```/gim, (match, lang, code) => {
-      const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      return `\n\n<pre><code class="language-${lang}">${escaped}</code></pre>\n\n`;
-    });
+      .replace(/^### (.*$)/gim, '\n\n<h3>$1</h3>\n\n')
+      .replace(/^## (.*$)/gim, '\n\n<h2>$1</h2>\n\n')
+      .replace(/^# (.*$)/gim, '\n\n<h1>$1</h1>\n\n')
+      .replace(/^\> (.*$)/gim, '\n\n<blockquote>$1</blockquote>\n\n')
+      .replace(/^---$/gim, '\n\n<hr>\n\n')
+      .replace(/^```(\w*)\n([\s\S]*?)\n```/gim, (_, lang, code) => {
+        const esc = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return `\n\n<pre><code class="language-${lang}">${esc}</code></pre>\n\n`;
+      });
 
   html = html
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/`([^`]+)`/g, (match, code) => {
-      const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      return `<code>${escaped}</code>`;
-    })
-    .replace(/!\[([^\]]+)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, (_, code) => {
+        const esc = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return `<code>${esc}</code>`;
+      })
+      .replace(/!\[([^\]]+)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
 
   html = html.replace(/^\s*[-*]\s+(.*)/gm, '<li>$1</li>');
   html = html.replace(/(<li>.*<\/li>(?:\n<li>.*<\/li>)*)/g, '\n\n<ul>\n$1\n</ul>\n\n');
@@ -147,41 +163,35 @@ function parseMarkdown(md) {
   }).join('\n');
 }
 
-// --- Frontmatter Parser ---
+// ─── Frontmatter ───────────────────────────────────────────────
 function parseFrontmatter(text) {
   const match = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!match) return { meta: {}, content: text };
 
-  const frontmatter = match[1];
-  const content = match[2];
-
   const meta = {};
-  frontmatter.split('\n').forEach(line => {
-    const colonIdx = line.indexOf(':');
-    if (colonIdx > -1) {
-      const key = line.slice(0, colonIdx).trim();
-      let val = line.slice(colonIdx + 1).trim();
-
-      // Handle array `[a, b]`
+  match[1].split('\n').forEach(line => {
+    const idx = line.indexOf(':');
+    if (idx > -1) {
+      const key = line.slice(0, idx).trim();
+      let val = line.slice(idx + 1).trim();
       if (val.startsWith('[') && val.endsWith(']')) {
         val = val.slice(1, -1).split(',').map(s => {
           s = s.trim();
-          if (s.startsWith('"') && s.endsWith('"')) return s.slice(1, -1);
-          if (s.startsWith("'") && s.endsWith("'")) return s.slice(1, -1);
-          return s;
+          return (s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))
+              ? s.slice(1, -1) : s;
         });
       } else {
-        if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
-        else if (val.startsWith("'") && val.endsWith("'")) val = val.slice(1, -1);
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'")))
+          val = val.slice(1, -1);
       }
       meta[key] = val;
     }
   });
 
-  return { meta, content };
+  return { meta, content: match[2].trim() };
 }
 
-// --- Content Loading ---
+// ─── Content Loading ───────────────────────────────────────────
 const contentCache = new Map();
 let manifestCache = null;
 
@@ -189,7 +199,7 @@ async function fetchContent(path) {
   if (contentCache.has(path)) return contentCache.get(path);
   try {
     const res = await fetch(`content/${path}`);
-    if (!res.ok) throw new Error(`Failed to fetch ${path}`);
+    if (!res.ok) throw new Error(`Failed: ${path}`);
     const text = await res.text();
     contentCache.set(path, text);
     return text;
@@ -202,48 +212,54 @@ async function fetchContent(path) {
 async function fetchManifest() {
   if (manifestCache) return manifestCache;
   try {
-    const res = await fetch(`content/index.json`);
-    if (!res.ok) throw new Error("Failed to fetch manifest");
+    const res = await fetch('content/index.json');
+    if (!res.ok) throw new Error('Failed to fetch manifest');
     manifestCache = await res.json();
     return manifestCache;
   } catch (err) {
     console.error(err);
-    return { blogs: [], talks: [], sponsors: [] };
+    return { technical: [], writings: [], blogs: [], talks: [], sponsors: [] };
   }
 }
 
-// --- View Rendering Helpers ---
+// ─── View Helpers ──────────────────────────────────────────────
 function setView(html, title) {
-  document.title = title ? `${title} | ${CONFIG.site.title}` : CONFIG.site.title;
-  // Apply enter animation
+  document.title = title ? `${title} — ${CONFIG.site.title}` : CONFIG.site.title;
   DOM.app.className = 'site-content';
-  void DOM.app.offsetWidth; // trigger reflow
+  void DOM.app.offsetWidth;
   DOM.app.className = 'site-content view-enter';
   DOM.app.innerHTML = html;
+  applyStagger();
+}
+
+function applyStagger() {
+  document.querySelectorAll('.stagger-item').forEach((el, i) => {
+    el.style.animationDelay = `${i * 0.06}s`;
+  });
+}
+
+function renderLoading() {
+  DOM.app.innerHTML = `<div class="loading-state"><div class="spinner"></div></div>`;
 }
 
 function renderError() {
   setView(`
-    <div class="vstack align-center justify-center p-8 text-center error-container-sm">
-      <img src="assets/404-illustration.png" alt="Lost Explorer" class="error-illustration-sm">
-      <h2 class="error-title error-title-sm">Journey Interrupted</h2>
-      <p class="muted error-text error-text-sm">Oops! This part of the journey hasn't been coded yet, or maybe a rogue bug hid the path.</p>
-      <a href="#/" class="button mt-4 back-home-btn back-home-btn-sm">
-         Teleport Home
-      </a>
+    <div class="error-container">
+      <div class="error-code">404</div>
+      <h2 class="error-title">Page not found</h2>
+      <p class="error-text">This path doesn't exist yet, or something went wrong.</p>
+      <a href="#/" class="button primary mt-4">Back home</a>
     </div>
   `, 'Not Found');
 }
 
-function renderLoading() {
-  DOM.app.innerHTML = `
-    <div class="loading-state vstack align-center justify-center p-8">
-      <div class="spinner"></div>
-    </div>
-  `;
+// ─── Tag rendering ──────────────────────────────────────────────
+function renderTags(tags) {
+  if (!Array.isArray(tags) || !tags.length) return '';
+  return tags.map(t => `<span class="badge secondary">${t}</span>`).join('');
 }
 
-// --- Route Handlers ---
+// ─── Home ───────────────────────────────────────────────────────
 async function renderHome() {
   renderLoading();
   const raw = await fetchContent('home.md');
@@ -252,132 +268,240 @@ async function renderHome() {
   const { content } = parseFrontmatter(raw);
   const htmlContent = parseMarkdown(content);
 
+  const manifest = await fetchManifest();
+  const writings = (manifest.writings || [])
+      .sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date))
+      .slice(0, 3);
+
+  const socials = Object.entries(CONFIG.site.socials || {})
+      .filter(([_, url]) => url)
+      .map(([platform, url]) => `
+      <a href="${url}" target="_blank" rel="noopener" class="social-pill">
+        ${platform}
+      </a>
+    `).join('');
+
+  const writingsSection = writings.length > 0 ? `
+    <section class="mt-8">
+      <div class="section-header">
+        <h2 style="font-size:1.35rem;">Recent writings</h2>
+        <a href="#/writings" class="button outline" style="font-size:0.8rem; padding:0.3rem 0.85rem;">All writings →</a>
+      </div>
+      <div>
+        ${writings.map(post => `
+          <div class="post-item stagger-item">
+            <a href="#/writings/${post.filename.replace('.md', '')}">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; gap:1rem;">
+                <h3>${post.meta.title}</h3>
+                <span class="text-sm muted" style="white-space:nowrap; flex-shrink:0;">${post.meta.date || ''}</span>
+              </div>
+              ${post.meta.description ? `<p class="text-sm muted" style="margin:0.25rem 0 0;">${post.meta.description}</p>` : ''}
+            </a>
+          </div>
+        `).join('')}
+      </div>
+    </section>
+  ` : '';
+
   const html = `
-    <section class="hero mb-8 text-center vstack align-center justify-center gap-4 py-4">
-      <img src="${CONFIG.site.avatar}" alt="${CONFIG.site.author}" class="avatar" width="120" height="120" style="border: 4px solid var(--border); border-radius: 50%;">
-      <h1 class="mt-4">${CONFIG.site.title}</h1>
-      <p class="text-lg muted" style="max-width: 600px; margin: 0 auto;">${CONFIG.site.description}</p>
-      
-      <nav class="social-links hstack gap-2 mt-4 justify-center" aria-label="Social Links" style="flex-wrap: wrap;">
-        ${Object.entries(CONFIG.site.socials)
-            .filter(([_, url]) => url)
-            .map(([platform, url]) => `<a href="${url}" target="_blank" class="button secondary outline" style="text-transform: capitalize;">${platform}</a>`)
-            .join('')}
+    <section class="hero text-center vstack align-center">
+      <img src="${CONFIG.site.avatar}" alt="${CONFIG.site.author}" class="avatar" width="88" height="88">
+      <h1 class="hero-name">${CONFIG.site.title}</h1>
+      <p class="hero-desc">${CONFIG.site.description}</p>
+      <nav class="social-links hstack gap-2 justify-center" aria-label="Social links">
+        ${socials}
       </nav>
     </section>
-    
-    <section class="home-content content-prose">
+
+    <section class="home-content post-content stagger-item" style="margin-top: 0.5rem;">
       ${htmlContent}
     </section>
+
+    ${writingsSection}
   `;
 
   setView(html, 'Home');
 }
 
+// ─── Post list renderer ─────────────────────────────────────────
+function renderPostList(posts, sectionHref, slugPrefix) {
+  if (!posts.length) return '<p class="muted">Nothing here yet.</p>';
+  return `<div>` + posts.map(post => `
+    <div class="post-item stagger-item">
+      <a href="${slugPrefix}/${post.filename.replace('.md', '')}">
+        ${post.meta.banner ? `<img src="${post.meta.banner}" alt="${post.meta.title}" style="width:100%; height:180px; object-fit:cover; border-radius:8px; margin-bottom:0.75rem; border:1px solid var(--border);">` : ''}
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:1rem;">
+          <h3>${post.meta.title}</h3>
+          <span class="text-sm muted" style="white-space:nowrap; flex-shrink:0;">${post.meta.date || ''}</span>
+        </div>
+        ${post.meta.description ? `<p class="text-sm muted" style="margin:0.3rem 0 0;">${post.meta.description}</p>` : ''}
+        ${Array.isArray(post.meta.tags) && post.meta.tags.length ? `<div style="margin-top:0.5rem; display:flex; gap:0.4rem; flex-wrap:wrap;">${renderTags(post.meta.tags)}</div>` : ''}
+      </a>
+    </div>
+  `).join('') + `</div>`;
+}
+
+// ─── Blogs ──────────────────────────────────────────────────────
 async function renderBlogs() {
   renderLoading();
-  if (!CONFIG.pages.blogs.enabled) return renderError();
+  if (!CONFIG.pages.blogs?.enabled) return renderError();
 
   const manifest = await fetchManifest();
-  const posts = manifest.blogs || [];
-
-  // Sort by date desc
-  posts.sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
+  const posts = (manifest.blogs || []).sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
 
   const html = `
-    <header class="mb-8">
+    <header style="margin-bottom:2.5rem;">
+      <p class="section-eyebrow">Journal</p>
       <h1>Blog</h1>
-      <p class="muted">Thoughts, tutorials, and rants.</p>
+      <p class="muted" style="margin-top:0.4rem; font-size:0.95rem;">Thoughts, tutorials, and things worth saying.</p>
     </header>
-    <section class="vstack gap-4">
-      ${posts.length === 0 ? '<p>No posts found.</p>' : posts.map(post => `
-        <article class="card p-0" style="transition: transform 0.2s">
-          <a href="#/blogs/${post.filename.replace('.md', '')}" class="unstyled-link flex flex-col p-4" style="display:block; padding: 1.5rem;">
-            ${post.meta.banner ? `<img src="${post.meta.banner}" alt="${post.meta.title}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">` : ''}
-            <header class="mb-2">
-              <h3 style="margin: 0 0 0.5rem 0">${post.meta.title}</h3>
-              <div class="hstack gap-2 text-sm muted" style="flex-wrap: wrap;">
-                <time class="badge primary">${post.meta.date}</time>
-                ${Array.isArray(post.meta.tags) ? post.meta.tags.map(t => `<span class="badge secondary">${t}</span>`).join('') : ''}
-              </div>
-            </header>
-            <p style="margin:0">${post.meta.description || 'Read more...'}</p>
-          </a>
-        </article>
-      `).join('')}
-    </section>
+    ${renderPostList(posts, '#/blogs', '#/blogs')}
   `;
   setView(html, 'Blog');
 }
 
+// ─── Blog post ─────────────────────────────────────────────────
 async function renderBlogPost(slug) {
   renderLoading();
   const raw = await fetchContent(`blogs/${slug}.md`);
   if (!raw) return renderError();
 
   const { meta, content } = parseFrontmatter(raw);
-  const htmlContent = parseMarkdown(content);
-
   const html = `
-    <article class="post">
-      <header class="mb-8">
-        <a href="#/blogs" class="unstyled-link muted text-sm mb-4" style="display:inline-block">← Back to Blog</a>
-        ${meta.banner ? `<img src="${meta.banner}" alt="${meta.title}" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; margin-bottom: 1.5rem;">` : ''}
-        <h1 class="mt-2" style="margin-bottom: 0.5rem;">${meta.title}</h1>
-        <div class="hstack gap-2 mt-4" style="flex-wrap: wrap;">
-           <span class="badge primary mb-2">${meta.date}</span>
-           ${Array.isArray(meta.tags) ? meta.tags.map(t => `<span class="badge secondary mb-2">${t}</span>`).join('') : ''}
+    <article>
+      <header class="post-header">
+        <a href="#/blogs" class="back-link">← Blog</a>
+        ${meta.banner ? `<img src="${meta.banner}" alt="${meta.title}" class="banner-img">` : ''}
+        <h1>${meta.title}</h1>
+        <div class="post-meta">
+          ${meta.date ? `<span class="badge primary">${meta.date}</span>` : ''}
+          ${renderTags(meta.tags)}
         </div>
       </header>
-      <div class="post-content" style="font-size: 1.05rem;">
-        ${htmlContent}
-      </div>
+      <div class="post-content">${parseMarkdown(content)}</div>
     </article>
   `;
   setView(html, meta.title);
 }
 
-async function renderTalks() {
+// ─── Technical ─────────────────────────────────────────────────
+async function renderTechnical() {
   renderLoading();
-  if (!CONFIG.pages.talks.enabled) return renderError();
+  if (!CONFIG.pages.technical?.enabled) return renderError();
 
   const manifest = await fetchManifest();
-  const talks = (manifest.talks || []).map(talk => ({
-    ...talk,
-    content: parseMarkdown(talk.content || '')
-  }));
-
-  talks.sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
+  const posts = (manifest.technical || []).sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
 
   const html = `
-    <header class="mb-8">
-      <h1>Speaking</h1>
-      <p class="muted">Conferences and meetups I've spoken at.</p>
+    <header style="margin-bottom:2.5rem;">
+      <p class="section-eyebrow">Engineering</p>
+      <h1>Technical</h1>
+      <p class="muted" style="margin-top:0.4rem; font-size:0.95rem;">Deep dives on code, systems, and craft.</p>
     </header>
-    <div class="row">
-      ${talks.length === 0 ? '<div class="col-12"><p>No talks found.</p></div>' : talks.map(talk => `
-        <div class="col-12 col-md-6 mb-4">
-          <article class="card h-100 vstack justify-between">
+    ${renderPostList(posts, '#/technical', '#/technical')}
+  `;
+  setView(html, 'Technical');
+}
+
+// ─── Technical post ────────────────────────────────────────────
+async function renderTechnicalPost(slug) {
+  renderLoading();
+  const raw = await fetchContent(`technical/${slug}.md`);
+  if (!raw) return renderError();
+
+  const { meta, content } = parseFrontmatter(raw);
+  const html = `
+    <article>
+      <header class="post-header">
+        <a href="#/technical" class="back-link">← Technical</a>
+        ${meta.banner ? `<img src="${meta.banner}" alt="${meta.title}" class="banner-img">` : ''}
+        <h1>${meta.title}</h1>
+        <div class="post-meta">
+          ${meta.date ? `<span class="badge primary">${meta.date}</span>` : ''}
+          ${renderTags(meta.tags)}
+        </div>
+      </header>
+      <div class="post-content">${parseMarkdown(content)}</div>
+    </article>
+  `;
+  setView(html, meta.title);
+}
+
+// ─── Writings ──────────────────────────────────────────────────
+async function renderWritings() {
+  renderLoading();
+  if (!CONFIG.pages.writings?.enabled) return renderError();
+
+  const manifest = await fetchManifest();
+  const posts = (manifest.writings || []).sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
+
+  const html = `
+    <header style="margin-bottom:2.5rem;">
+      <p class="section-eyebrow">Essays</p>
+      <h1>Writings</h1>
+      <p class="muted" style="margin-top:0.4rem; font-size:0.95rem;">Personal thoughts, stories, and reflections.</p>
+    </header>
+    ${renderPostList(posts, '#/writings', '#/writings')}
+  `;
+  setView(html, 'Writings');
+}
+
+// ─── Writing post ──────────────────────────────────────────────
+async function renderWritingPost(slug) {
+  renderLoading();
+  const raw = await fetchContent(`writings/${slug}.md`);
+  if (!raw) return renderError();
+
+  const { meta, content } = parseFrontmatter(raw);
+  const html = `
+    <article>
+      <header class="post-header">
+        <a href="#/writings" class="back-link">← Writings</a>
+        ${meta.banner ? `<img src="${meta.banner}" alt="${meta.title}" class="banner-img">` : ''}
+        <h1>${meta.title}</h1>
+        <div class="post-meta">
+          ${meta.date ? `<span class="badge primary">${meta.date}</span>` : ''}
+          ${renderTags(meta.tags)}
+        </div>
+      </header>
+      <div class="post-content">${parseMarkdown(content)}</div>
+    </article>
+  `;
+  setView(html, meta.title);
+}
+
+// ─── Talks ─────────────────────────────────────────────────────
+async function renderTalks() {
+  renderLoading();
+  if (!CONFIG.pages.talks?.enabled) return renderError();
+
+  const manifest = await fetchManifest();
+  const talks = (manifest.talks || [])
+      .map(t => ({ ...t, content: parseMarkdown(t.content || '') }))
+      .sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
+
+  const html = `
+    <header style="margin-bottom:2.5rem;">
+      <p class="section-eyebrow">Speaking</p>
+      <h1>Talks</h1>
+      <p class="muted" style="margin-top:0.4rem; font-size:0.95rem;">Conferences and meetups I've spoken at.</p>
+    </header>
+    <div style="display:flex; flex-direction:column; gap:1rem;">
+      ${talks.length === 0 ? '<p class="muted">No talks yet.</p>' : talks.map(talk => `
+        <div class="talk-card stagger-item">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; margin-bottom:0.75rem;">
             <div>
-              <header class="mb-2">
-                <span class="badge primary mb-2">${talk.meta.event}</span>
-                <h3 style="margin: 0 0 0.5rem 0">${talk.meta.title}</h3>
-                <div class="hstack gap-2 text-sm muted mb-4">
-                  <span>🗓 ${talk.meta.date}</span>
-                  <span>📍 ${talk.meta.location}</span>
-                </div>
-              </header>
-              <div class="text-sm pb-4">
-                ${talk.content}
-              </div>
+              <span class="badge secondary" style="margin-bottom:0.5rem;">${talk.meta.event || ''}</span>
+              <h3 style="margin-top:0.5rem;">${talk.meta.title}</h3>
             </div>
-            <footer class="mt-auto border-t py-4">
-              <div class="hstack gap-2">
-                 ${talk.meta.slides ? `<a href="${talk.meta.slides}" target="_blank" class="button secondary small">Slides</a>` : ''}
-                 ${talk.meta.video ? `<a href="${talk.meta.video}" target="_blank" class="button secondary small">Video</a>` : ''}
-              </div>
-            </footer>
-          </article>
+            <span class="text-sm muted" style="white-space:nowrap; flex-shrink:0;">${talk.meta.date || ''}</span>
+          </div>
+          ${talk.meta.location ? `<p class="text-sm muted" style="margin-bottom:0.75rem;">📍 ${talk.meta.location}</p>` : ''}
+          <div class="post-content text-sm" style="font-size:0.9rem; margin-bottom:1rem;">${talk.content}</div>
+          <div style="display:flex; gap:0.5rem;">
+            ${talk.meta.slides ? `<a href="${talk.meta.slides}" target="_blank" class="button secondary">Slides</a>` : ''}
+            ${talk.meta.video ? `<a href="${talk.meta.video}" target="_blank" class="button secondary">Video</a>` : ''}
+          </div>
         </div>
       `).join('')}
     </div>
@@ -385,80 +509,81 @@ async function renderTalks() {
   setView(html, 'Talks');
 }
 
+// ─── Sponsors ──────────────────────────────────────────────────
 async function renderSponsors() {
   renderLoading();
-  if (!CONFIG.pages.sponsors.enabled) return renderError();
+  if (!CONFIG.pages.sponsors?.enabled) return renderError();
 
   const manifest = await fetchManifest();
-  const sponsors = (manifest.sponsors || []).map(sponsor => ({
-    ...sponsor,
-    content: parseMarkdown(sponsor.content || '')
+  const sponsors = (manifest.sponsors || []).map(s => ({
+    ...s, content: parseMarkdown(s.content || '')
   }));
 
   const html = `
-    <header class="mb-8 text-center">
+    <header style="margin-bottom:2.5rem; text-align:center;">
+      <p class="section-eyebrow">Supporters</p>
       <h1>Sponsors</h1>
-      <p class="muted">Amazing people and companies supporting my work.</p>
+      <p class="muted" style="margin-top:0.4rem; font-size:0.95rem;">People and companies backing this work.</p>
     </header>
-    <section class="row justify-center">
-      ${sponsors.length === 0 ? '<div class="col-12"><p class="text-center">Become a sponsor!</p></div>' : sponsors.map(s => `
-        <div class="col-6 col-md-4 mb-4 text-center">
-          <div class="card p-4 vstack align-center text-center">
-            ${s.meta.logo ? `<img src="${s.meta.logo}" alt="${s.meta.name}" style="max-height: 80px; margin-bottom: 1rem;">` : `<div style="width:80px;height:80px;border-radius:50%;background:var(--accent);margin-bottom:1rem;" class="hstack justify-center text-xl font-bold">${s.meta.name[0]}</div>`}
-            <h4>${s.meta.name}</h4>
-            <span class="badge secondary mb-2">${s.meta.tier}</span>
-            <a href="${s.meta.url}" target="_blank" class="text-sm mt-2">Visit Website</a>
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:1rem;">
+      ${sponsors.length === 0
+      ? '<p class="muted text-center" style="grid-column:1/-1;">Be the first to sponsor.</p>'
+      : sponsors.map(s => `
+          <div class="sponsor-card stagger-item">
+            ${s.meta.logo
+          ? `<img src="${s.meta.logo}" alt="${s.meta.name}" style="max-height:60px; margin-bottom:1rem;">`
+          : `<div style="width:60px;height:60px;border-radius:50%;background:var(--muted);display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:1.5rem;color:var(--muted-fg);margin:0 auto 1rem;">${(s.meta.name||'?')[0]}</div>`}
+            <h4 style="font-size:1rem;">${s.meta.name}</h4>
+            <span class="badge secondary" style="margin-top:0.4rem;">${s.meta.tier || ''}</span>
+            ${s.meta.url ? `<a href="${s.meta.url}" target="_blank" class="text-sm muted" style="display:block; margin-top:0.75rem;">Visit →</a>` : ''}
           </div>
-        </div>
-      `).join('')}
-    </section>
+        `).join('')}
+    </div>
   `;
   setView(html, 'Sponsors');
 }
 
+// ─── Now ────────────────────────────────────────────────────────
 async function renderNow() {
   renderLoading();
-  if (!CONFIG.pages.now.enabled) return renderError();
+  if (!CONFIG.pages.now?.enabled) return renderError();
 
   const raw = await fetchContent('now.md');
   if (!raw) return renderError();
 
   const { content } = parseFrontmatter(raw);
-  const htmlContent = parseMarkdown(content);
-
   const html = `
-    <article class="post">
-      <div class="post-content">
-        ${htmlContent}
-      </div>
+    <article>
+      <header style="margin-bottom:2.5rem;">
+        <p class="section-eyebrow">Present</p>
+        <h1>Now</h1>
+        <p class="muted" style="margin-top:0.4rem; font-size:0.95rem;">What I'm focused on at this moment.</p>
+      </header>
+      <div class="post-content">${parseMarkdown(content)}</div>
     </article>
   `;
   setView(html, 'Now');
 }
 
-
-// --- Router ---
+// ─── Router ────────────────────────────────────────────────────
 function handleRoute() {
-  let hash = window.location.hash || '#/';
+  const hash = window.location.hash || '#/';
+
+  if (getSocialRedirect(hash)) { window.location.href = getSocialRedirect(hash); return; }
+
   updateActiveNav(hash);
 
-  if (hash === '#/') {
-    renderHome();
-  } else if (hash === '#/blogs') {
-    renderBlogs();
-  } else if (hash.startsWith('#/blogs/')) {
-    const slug = hash.replace('#/blogs/', '');
-    renderBlogPost(slug);
-  } else if (hash === '#/talks') {
-    renderTalks();
-  } else if (hash === '#/sponsors') {
-    renderSponsors();
-  } else if (hash === '#/now') {
-    renderNow();
-  } else {
-    renderError();
-  }
+  if (hash === '#/') renderHome();
+  else if (hash === '#/blogs') renderBlogs();
+  else if (hash.startsWith('#/blogs/')) renderBlogPost(hash.replace('#/blogs/', ''));
+  else if (hash === '#/technical') renderTechnical();
+  else if (hash.startsWith('#/technical/')) renderTechnicalPost(hash.replace('#/technical/', ''));
+  else if (hash === '#/writings') renderWritings();
+  else if (hash.startsWith('#/writings/')) renderWritingPost(hash.replace('#/writings/', ''));
+  else if (hash === '#/talks') renderTalks();
+  else if (hash === '#/sponsors') renderSponsors();
+  else if (hash === '#/now') renderNow();
+  else renderError();
 }
 
-// Start
 init();

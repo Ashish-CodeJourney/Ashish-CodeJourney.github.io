@@ -35,6 +35,11 @@ A lightweight, minimal, and blazing-fast personal website built entirely with Va
     └── talks/        # Talk logs (uses _template.md)
 ```
 
+### Add a Writing
+Same process but in `content/writings/` folder and under `"writings"` array in index.json.
+
+Use the template at `content/writings/_template.md` as reference.
+
 ---
 
 ## How to Run Locally
