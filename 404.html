@@ -39,6 +39,19 @@
     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
        document.body.setAttribute('data-theme', 'dark');
     }
+
+    // SPA redirect: if someone lands on a direct path like /writings/some-post/,
+    // GitHub Pages will serve this 404.html. Redirect them to the SPA hash route.
+    (function() {
+      var path = window.location.pathname;
+      // Don't redirect if we're at root or if path is just /404.html
+      if (path && path !== '/' && path !== '/404.html') {
+        // Convert /writings/some-post/ → /#/writings/some-post/
+        var hashRoute = '/#' + path;
+        if (window.location.search) hashRoute += window.location.search;
+        window.location.replace(hashRoute);
+      }
+    })();
   </script>
 </body>
 

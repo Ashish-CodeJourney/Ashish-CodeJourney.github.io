@@ -44,10 +44,10 @@
     <div class="hstack gap-4">
       <!-- Desktop Nav -->
       <nav class="desktop-nav hstack gap-4">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/writings/" class="nav-link">Writings</a>
-        <a href="/technical/" class="nav-link">Technical</a>
-        <a href="/now/" class="nav-link">Now</a>
+        <a href="#/" class="nav-link">Home</a>
+        <a href="#/writings/" class="nav-link">Writings</a>
+        <a href="#/technical/" class="nav-link">Technical</a>
+        <a href="#/now/" class="nav-link">Now</a>
       </nav>
 
       <!-- Mobile Toggle -->
@@ -64,10 +64,10 @@
 
   <!-- Mobile Nav -->
   <nav id="mobile-nav" class="mobile-nav hidden">
-    <a href="/" class="nav-link">Home</a>
-    <a href="/writings/" class="nav-link">Writings</a>
-    <a href="/technical/" class="nav-link">Technical</a>
-    <a href="/now/" class="nav-link">Now</a>
+    <a href="#/" class="nav-link">Home</a>
+    <a href="#/writings/" class="nav-link">Writings</a>
+    <a href="#/technical/" class="nav-link">Technical</a>
+    <a href="#/now/" class="nav-link">Now</a>
     <label class="mobile-theme-wrapper hstack justify-between" style="margin-top: 1rem;">
       <span id="mobile-theme-label" class="text-sm muted">Light mode</span>
       <input type="checkbox" id="mobile-theme-switch" role="switch">
@@ -75,8 +75,10 @@
   </nav>
 
   <!-- Main -->
-  <main class="site-content view-enter">
-    {{CONTENT}}
+  <main class="site-content">
+    <div id="router-content" class="page-container page-enter-active">
+      {{CONTENT}}
+    </div>
   </main>
 
   <!-- Footer -->
@@ -130,7 +132,8 @@
   </svg>
 </button>
 
-
+<!-- SPA Page Data -->
+{{__PAGES_SCRIPT__}}
 
 <!-- App -->
 <script src="app.js" defer></script>

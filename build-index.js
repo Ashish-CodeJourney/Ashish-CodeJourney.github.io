@@ -11,6 +11,9 @@ const configRaw = fs.readFileSync(path.join(rootDir, 'config.js'), 'utf-8');
 const siteConfig = eval(configRaw + '; CONFIG');
 const CONFIG = siteConfig;
 
+// ─── Collected page data for SPA ───────────────────────────────
+const PAGES = {};          // route -> { html, title }
+
 function parseFrontmatter(text) {
   const match = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!match) return { meta: {}, content: text };
@@ -52,7 +55,7 @@ function parseMarkdown(md) {
       .replace(/^### (.*$)/gim, '\n\n<h3>$1</h3>\n\n')
       .replace(/^## (.*$)/gim, '\n\n<h2>$1</h2>\n\n')
       .replace(/^# (.*$)/gim, '\n\n<h1>$1</h1>\n\n')
-      .replace(/^\> (.*$)/gim, '\n\n<blockquote>$1</blockquote>\n\n')
+      .replace(/^\\> (.*$)/gim, '\n\n<blockquote>$1</blockquote>\n\n')
       .replace(/^---$/gim, '\n\n<hr>\n\n')
       .replace(/^```(\w*)\n([\s\S]*?)\n```/gim, (_, lang, code) => {
         const esc = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -70,7 +73,7 @@ function parseMarkdown(md) {
       .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
 
   html = html.replace(/^\s*[-*]\s+(.*)/gm, '<li>$1</li>');
-  html = html.replace(/(<li>.*<\/li>(?:\n<li>.*<\/li>)*)/g, '\n\n<ul>\n$1\n</ul>\n\n');
+  html = html.replace(/((<li>.*<\/li>)(\n<li>.*<\/li>)*)/g, '\n\n<ul>\n$1\n</ul>\n\n');
 
   return html.split(/\n\n+/).map(p => {
     p = p.trim();
@@ -84,10 +87,19 @@ function renderTags(tags) {
   return tags.map(t => `<span class="badge secondary" style="font-size:0.75rem;">${t}</span>`).join('');
 }
 
-function renderLayout(title, contentHTML) {
-  return layoutStr
+function renderLayout(title, contentHTML, pagesScript) {
+  let page = layoutStr
     .replace('{{TITLE}}', title === CONFIG.site.title ? title : `${title} — ${CONFIG.site.title}`)
     .replace('{{CONTENT}}', contentHTML);
+
+  // Inject SPA page data if provided, otherwise remove the placeholder
+  if (pagesScript) {
+    page = page.replace('{{__PAGES_SCRIPT__}}', pagesScript);
+  } else {
+    page = page.replace('{{__PAGES_SCRIPT__}}', '');
+  }
+
+  return page;
 }
 
 function writePage(outPath, html) {
@@ -97,11 +109,13 @@ function writePage(outPath, html) {
   fs.writeFileSync(fullPath, html, 'utf-8');
 }
 
+// ─── Post list rendering ─────────────────────────────────────
+// Note: All internal links use #/ prefix for SPA routing
 function renderPostList(posts, slugPrefix) {
   if (!posts.length) return '<p class="muted">Nothing here yet.</p>';
   return `<div>` + posts.map(post => `
     <div class="post-item stagger-item">
-      <a href="${slugPrefix}/${post.filename.replace('.md', '')}/">
+      <a href="#${slugPrefix}/${post.filename.replace('.md', '')}/">
         ${post.meta.banner ? `<img src="${post.meta.banner}" alt="${post.meta.title}" style="width:100%; height:180px; object-fit:cover; border-radius:8px; margin-bottom:0.75rem; border:1px solid var(--border);">` : ''}
         <div style="display:flex; justify-content:space-between; align-items:baseline; gap:1rem;">
           <h3>${post.meta.title}</h3>
@@ -136,11 +150,11 @@ function buildIndex() {
 
   const technicalPosts = processDirectory('technical');
   const writingPosts = processDirectory('writings');
-  
-  // 1. Home Page
+
+  // ─── 1. Home Page ──────────────────────────────────────────
   const homeRaw = fs.readFileSync(path.join(contentDir, 'home.md'), 'utf-8');
   const homeContent = parseMarkdown(parseFrontmatter(homeRaw).content);
-  
+
   const socials = Object.entries(CONFIG.site.socials || {})
       .filter(([_, url]) => url)
       .map(([platform, url]) => `
@@ -156,7 +170,7 @@ function buildIndex() {
       <section class="mt-8">
         <div class="section-header">
           <h2 style="font-size:1.35rem;">Recent writings</h2>
-          <a href="/writings/" class="button outline" style="font-size:0.8rem; padding:0.3rem 0.85rem;">All writings →</a>
+          <a href="#/writings/" class="button outline" style="font-size:0.8rem; padding:0.3rem 0.85rem;">All writings →</a>
         </div>
         ${renderPostList(recentWritings, '/writings')}
       </section>
@@ -165,7 +179,7 @@ function buildIndex() {
 
   const homeHTML = `
     <section class="hero text-center vstack align-center">
-      <img src="${CONFIG.site.avatar}" alt="${CONFIG.site.author}" class="avatar" width="88" height="88">
+      <img src="assets/avatar.jpg" alt="${CONFIG.site.author}" class="avatar" width="88" height="88">
       <h1 class="hero-name">${CONFIG.site.title}</h1>
       <p class="hero-desc">${CONFIG.site.description}</p>
       <nav class="social-links hstack gap-2 justify-center" aria-label="Social links">
@@ -179,9 +193,10 @@ function buildIndex() {
     
     ${recentWritingsHTML}
   `;
-  writePage('index.html', renderLayout(CONFIG.site.title, homeHTML));
 
-  // 2. Writings Index
+  PAGES['/'] = { html: homeHTML, title: CONFIG.site.title };
+
+  // ─── 2. Writings Index ─────────────────────────────────────
   const writingsIndexHTML = `
     <header style="margin-bottom:2.5rem;">
       <p class="section-eyebrow">Essays</p>
@@ -190,14 +205,15 @@ function buildIndex() {
     </header>
     ${renderPostList(writingPosts, '/writings')}
   `;
-  writePage('writings/index.html', renderLayout('Writings', writingsIndexHTML));
 
-  // 3. Writing Posts
+  PAGES['/writings/'] = { html: writingsIndexHTML, title: 'Writings' };
+
+  // ─── 3. Writing Posts ──────────────────────────────────────
   for (const post of writingPosts) {
     const postHTML = `
       <article>
         <header class="post-header">
-          <a href="/writings/" class="back-link">← Writings</a>
+          <a href="#/writings/" class="back-link">← Writings</a>
           ${post.meta.banner ? `<img src="${post.meta.banner}" alt="${post.meta.title}" class="banner-img">` : ''}
           <h1>${post.meta.title}</h1>
           <div class="post-meta">
@@ -208,10 +224,11 @@ function buildIndex() {
         <div class="post-content">${post.content}</div>
       </article>
     `;
-    writePage(`writings/${post.filename.replace('.md', '')}/index.html`, renderLayout(post.meta.title, postHTML));
+    const slug = post.filename.replace('.md', '');
+    PAGES[`/writings/${slug}/`] = { html: postHTML, title: post.meta.title };
   }
 
-  // 4. Technical Index
+  // ─── 4. Technical Index ────────────────────────────────────
   const technicalIndexHTML = `
     <header style="margin-bottom:2.5rem;">
       <p class="section-eyebrow">Engineering</p>
@@ -220,14 +237,15 @@ function buildIndex() {
     </header>
     ${renderPostList(technicalPosts, '/technical')}
   `;
-  writePage('technical/index.html', renderLayout('Technical', technicalIndexHTML));
 
-  // 5. Technical Posts
+  PAGES['/technical/'] = { html: technicalIndexHTML, title: 'Technical' };
+
+  // ─── 5. Technical Posts ────────────────────────────────────
   for (const post of technicalPosts) {
     const postHTML = `
       <article>
         <header class="post-header">
-          <a href="/technical/" class="back-link">← Technical</a>
+          <a href="#/technical/" class="back-link">← Technical</a>
           ${post.meta.banner ? `<img src="${post.meta.banner}" alt="${post.meta.title}" class="banner-img">` : ''}
           <h1>${post.meta.title}</h1>
           <div class="post-meta">
@@ -238,10 +256,11 @@ function buildIndex() {
         <div class="post-content">${post.content}</div>
       </article>
     `;
-    writePage(`technical/${post.filename.replace('.md', '')}/index.html`, renderLayout(post.meta.title, postHTML));
+    const slug = post.filename.replace('.md', '');
+    PAGES[`/technical/${slug}/`] = { html: postHTML, title: post.meta.title };
   }
 
-  // 6. Now Page
+  // ─── 6. Now Page ───────────────────────────────────────────
   const nowRaw = fs.readFileSync(path.join(contentDir, 'now.md'), 'utf-8');
   const nowContent = parseMarkdown(parseFrontmatter(nowRaw).content);
   const nowHTML = `
@@ -254,16 +273,45 @@ function buildIndex() {
       <div class="post-content">${nowContent}</div>
     </article>
   `;
+
+  PAGES['/now/'] = { html: nowHTML, title: 'Now' };
+
+  // ─── 7. Generate SPA pages JSON script ─────────────────────
+  const pagesJSON = JSON.stringify(PAGES);
+  const pagesScript = `<script>window.__PAGES = ${pagesJSON};</script>`;
+
+  // ─── 8. Write the main index.html (SPA shell) ──────────────
+  writePage('index.html', renderLayout(CONFIG.site.title, homeHTML, pagesScript));
+
+  // ─── 9. Write individual HTML pages (SEO/fallback) ─────────
+  writePage('writings/index.html', renderLayout('Writings', writingsIndexHTML));
+  for (const post of writingPosts) {
+    const slug = post.filename.replace('.md', '');
+    writePage(`writings/${slug}/index.html`, renderLayout(post.meta.title, PAGES[`/writings/${slug}/`].html));
+  }
+
+  writePage('technical/index.html', renderLayout('Technical', technicalIndexHTML));
+  for (const post of technicalPosts) {
+    const slug = post.filename.replace('.md', '');
+    writePage(`technical/${slug}/index.html`, renderLayout(post.meta.title, PAGES[`/technical/${slug}/`].html));
+  }
+
   writePage('now/index.html', renderLayout('Now', nowHTML));
 
-  // 7. Copy static assets
+  // ─── 10. Copy static assets ────────────────────────────────
   if (fs.existsSync(path.join(rootDir, 'assets'))) {
     fs.cpSync(path.join(rootDir, 'assets'), path.join(distDir, 'assets'), { recursive: true });
   }
   fs.copyFileSync(path.join(rootDir, 'styles.css'), path.join(distDir, 'styles.css'));
   fs.copyFileSync(path.join(rootDir, 'app.js'), path.join(distDir, 'app.js'));
 
-  console.log('Successfully built static site files to dist/ directory.');
+  // Copy 404.html for GitHub Pages
+  if (fs.existsSync(path.join(rootDir, '404.html'))) {
+    fs.copyFileSync(path.join(rootDir, '404.html'), path.join(distDir, '404.html'));
+  }
+
+  const routeCount = Object.keys(PAGES).length;
+  console.log(`Successfully built SPA with ${routeCount} routes to dist/ directory.`);
 }
 
 buildIndex();
