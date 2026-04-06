@@ -3,6 +3,7 @@ const path = require('path');
 
 const rootDir = __dirname;
 const contentDir = path.join(rootDir, 'content');
+const distDir = path.join(rootDir, 'dist');
 const layoutStr = fs.readFileSync(path.join(rootDir, '_layout.html'), 'utf-8');
 
 // Parse config securely
@@ -90,7 +91,7 @@ function renderLayout(title, contentHTML) {
 }
 
 function writePage(outPath, html) {
-  const fullPath = path.join(rootDir, outPath);
+  const fullPath = path.join(distDir, outPath);
   const dir = path.dirname(fullPath);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(fullPath, html, 'utf-8');
@@ -130,10 +131,8 @@ function processDirectory(dir) {
 
 function buildIndex() {
   console.log('Cleaning up old generated files...');
-  fs.rmSync(path.join(rootDir, 'technical'), { recursive: true, force: true });
-  fs.rmSync(path.join(rootDir, 'writings'), { recursive: true, force: true });
-  fs.rmSync(path.join(rootDir, 'now'), { recursive: true, force: true });
-  try { fs.unlinkSync(path.join(rootDir, 'index.html')); } catch(e) {}
+  fs.rmSync(distDir, { recursive: true, force: true });
+  fs.mkdirSync(distDir, { recursive: true });
 
   const technicalPosts = processDirectory('technical');
   const writingPosts = processDirectory('writings');
@@ -257,7 +256,14 @@ function buildIndex() {
   `;
   writePage('now/index.html', renderLayout('Now', nowHTML));
 
-  console.log('Successfully built static site files to root directory.');
+  // 7. Copy static assets
+  if (fs.existsSync(path.join(rootDir, 'assets'))) {
+    fs.cpSync(path.join(rootDir, 'assets'), path.join(distDir, 'assets'), { recursive: true });
+  }
+  fs.copyFileSync(path.join(rootDir, 'styles.css'), path.join(distDir, 'styles.css'));
+  fs.copyFileSync(path.join(rootDir, 'app.js'), path.join(distDir, 'app.js'));
+
+  console.log('Successfully built static site files to dist/ directory.');
 }
 
 buildIndex();
