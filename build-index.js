@@ -58,7 +58,6 @@ function processDirectory(dir, includeContent = false) {
 
 function buildIndex() {
   const index = {
-    blogs: processDirectory('blogs', false),
     talks: processDirectory('talks', true),
     sponsors: processDirectory('sponsors', true),
     technical: processDirectory('technical', false),

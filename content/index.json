@@ -1,9 +1,5 @@
 {
-  "blogs": [],
   "talks": [],
-<<<<<<< HEAD
-  "sponsors": []
-=======
   "sponsors": [],
   "technical": [
     {
@@ -192,5 +188,4 @@
       }
     }
   ]
->>>>>>> adc030e (feat: add technical and writings directories to index builder and reformat tags in index.json)
 }

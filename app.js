@@ -218,7 +218,7 @@ async function fetchManifest() {
     return manifestCache;
   } catch (err) {
     console.error(err);
-    return { technical: [], writings: [], blogs: [], talks: [], sponsors: [] };
+    return { technical: [], writings: [], talks: [], sponsors: [] };
   }
 }
 
@@ -341,48 +341,7 @@ function renderPostList(posts, sectionHref, slugPrefix) {
   `).join('') + `</div>`;
 }
 
-// ─── Blogs ──────────────────────────────────────────────────────
-async function renderBlogs() {
-  renderLoading();
-  if (!CONFIG.pages.blogs?.enabled) return renderError();
 
-  const manifest = await fetchManifest();
-  const posts = (manifest.blogs || []).sort((a, b) => new Date(b.meta.date) - new Date(a.meta.date));
-
-  const html = `
-    <header style="margin-bottom:2.5rem;">
-      <p class="section-eyebrow">Journal</p>
-      <h1>Blog</h1>
-      <p class="muted" style="margin-top:0.4rem; font-size:0.95rem;">Thoughts, tutorials, and things worth saying.</p>
-    </header>
-    ${renderPostList(posts, '#/blogs', '#/blogs')}
-  `;
-  setView(html, 'Blog');
-}
-
-// ─── Blog post ─────────────────────────────────────────────────
-async function renderBlogPost(slug) {
-  renderLoading();
-  const raw = await fetchContent(`blogs/${slug}.md`);
-  if (!raw) return renderError();
-
-  const { meta, content } = parseFrontmatter(raw);
-  const html = `
-    <article>
-      <header class="post-header">
-        <a href="#/blogs" class="back-link">← Blog</a>
-        ${meta.banner ? `<img src="${meta.banner}" alt="${meta.title}" class="banner-img">` : ''}
-        <h1>${meta.title}</h1>
-        <div class="post-meta">
-          ${meta.date ? `<span class="badge primary">${meta.date}</span>` : ''}
-          ${renderTags(meta.tags)}
-        </div>
-      </header>
-      <div class="post-content">${parseMarkdown(content)}</div>
-    </article>
-  `;
-  setView(html, meta.title);
-}
 
 // ─── Technical ─────────────────────────────────────────────────
 async function renderTechnical() {
@@ -574,8 +533,7 @@ function handleRoute() {
   updateActiveNav(hash);
 
   if (hash === '#/') renderHome();
-  else if (hash === '#/blogs') renderBlogs();
-  else if (hash.startsWith('#/blogs/')) renderBlogPost(hash.replace('#/blogs/', ''));
+
   else if (hash === '#/technical') renderTechnical();
   else if (hash.startsWith('#/technical/')) renderTechnicalPost(hash.replace('#/technical/', ''));
   else if (hash === '#/writings') renderWritings();
