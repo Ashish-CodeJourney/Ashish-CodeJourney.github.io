@@ -60,7 +60,9 @@ function buildIndex() {
   const index = {
     blogs: processDirectory('blogs', false),
     talks: processDirectory('talks', true),
-    sponsors: processDirectory('sponsors', true)
+    sponsors: processDirectory('sponsors', true),
+    technical: processDirectory('technical', false),
+    writings: processDirectory('writings', false)
   };
 
   fs.writeFileSync(
