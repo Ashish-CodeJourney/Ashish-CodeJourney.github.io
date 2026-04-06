@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ashish</title>
+  <title>{{TITLE}}</title>
+  <base href="/">
   <meta name="description" content="Personal website of Ashish">
   <link rel="icon" type="image/jpeg" href="assets/avatar.jpg">
 
@@ -42,7 +43,12 @@
 
     <div class="hstack gap-4">
       <!-- Desktop Nav -->
-      <nav id="desktop-nav" class="desktop-nav hstack gap-4"></nav>
+      <nav class="desktop-nav hstack gap-4">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/writings/" class="nav-link">Writings</a>
+        <a href="/technical/" class="nav-link">Technical</a>
+        <a href="/now/" class="nav-link">Now</a>
+      </nav>
 
       <!-- Mobile Toggle -->
       <button id="mobile-menu-toggle" class="button icon-only mobile-menu-toggle" aria-label="Toggle menu" style="display:none;">
@@ -58,23 +64,25 @@
 
   <!-- Mobile Nav -->
   <nav id="mobile-nav" class="mobile-nav hidden">
-    <label class="mobile-theme-wrapper hstack justify-between">
+    <a href="/" class="nav-link">Home</a>
+    <a href="/writings/" class="nav-link">Writings</a>
+    <a href="/technical/" class="nav-link">Technical</a>
+    <a href="/now/" class="nav-link">Now</a>
+    <label class="mobile-theme-wrapper hstack justify-between" style="margin-top: 1rem;">
       <span id="mobile-theme-label" class="text-sm muted">Light mode</span>
       <input type="checkbox" id="mobile-theme-switch" role="switch">
     </label>
   </nav>
 
   <!-- Main -->
-  <main id="app" class="site-content">
-    <div class="loading-state">
-      <div class="spinner"></div>
-    </div>
+  <main class="site-content view-enter">
+    {{CONTENT}}
   </main>
 
   <!-- Footer -->
   <footer class="site-footer">
     <p>
-      &copy; <span id="current-year"></span> Ashish Vaghela ·
+      &copy; 2026 Ashish Vaghela ·
       Built with
       <a href="https://oat.ink/" target="_blank" rel="noopener">oat.ink</a>
     </p>
@@ -122,8 +130,7 @@
   </svg>
 </button>
 
-<!-- Config -->
-<script src="config.js"></script>
+
 
 <!-- App -->
 <script src="app.js" defer></script>

@@ -1,16 +1,14 @@
 # Minimal Personal Website
 
-A lightweight, minimal, and blazing-fast personal website built entirely with Vanilla HTML, CSS, and JavaScript. Zero dependencies, no heavy frameworks, no build steps, and perfectly suited for fast deployments to GitHub Pages.
+A lightweight, minimal, and blazing-fast personal website. It is built as a highly-optimized Static Site Generator (SSG). Zero dependencies, no heavy frameworks, and perfectly suited for fast deployments to GitHub Pages.
 
 ![Static Site](https://img.shields.io/badge/static-site-4caf82?style=flat-oval) [![pages-build-deployment](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/pages/pages-build-deployment) ![Vanilla JS](https://img.shields.io/badge/vanilla-JS-d4a024?style=flat-oval)
 
-
 ## Features
 
-- **Minimal Node.js Build Tool**: Includes a tiny `build-index.js` script to automatically parse metadata, keeping the website blazing fast and pure Vanilla JS on the client side.
+- **Static Site Generator**: Includes a local `build-index.js` script to automatically parse markdown and assemble static `.html` files, guaranteeing the absolute fastest possible page loads with an entirely tiny javascript footprint remaining on the client.
 - **Markdown Driven**: All dynamic content (blogs, talks, sponsors, now page) is written beautifully in simple Markdown (`.md`) files.
-- **Custom Markdown Parser**: A built-in, lightweight Vanilla JS parser handles Markdown and YAML-like frontmatter parsing natively.
-- **Dynamic SPA Routing**: Hash-based routing (`#/blogs`) guarantees fast navigation without full page reloads, making it extremely straightforward to host on static services like GitHub Pages.
+- **Fully Automated Deployment**: A GitHub Action is configured (in `.github/workflows/deploy.yml`) to automatically build and deploy your site to GitHub Pages whenever you push changes. You never have to manually build HTML files before pushing.
 - **Light / Dark Theme System**: Fully native theme toggling with automatic system preference detection and `localStorage` persistence.
 - **Highly Configurable**: Manage navigation visibility, social media handles, and base site metadata entirely through a single `config.js` file.
 - **Powered by oat.ink**: Uses the minimal [oat.ink](https://oat.ink/) UI library for beautiful, semantic, and responsive base styling.
@@ -21,38 +19,58 @@ A lightweight, minimal, and blazing-fast personal website built entirely with Va
 
 ```text
 .
-├── index.html        # The main HTML shell and layout
-├── app.js            # Core Single Page App logic (Router & Parser)
+├── _layout.html      # The main HTML shell and layout template
+├── app.js            # Tiny client-side script for theme toggling and mobile nav
+├── build-index.js    # Node.js Static Site Generator
 ├── config.js         # Site configuration (Title, Socials, Navigation)
 ├── styles.css        # Custom theme overrides (using HSL colors)
 ├── assets/           # Static assets (Favicons, images, logos)
 └── content/          # The Markdown content directory
-    ├── index.json    # JSON manifest that maps your markdown files
     ├── home.md       # Homepage content
     ├── now.md        # Status "Now" page content
-    ├── blogs/        # Blog posts (uses _template.md)
-    ├── sponsors/     # Sponsor cards (uses _template.md)
-    └── talks/        # Talk logs (uses _template.md)
+    ├── writings/     # Essay and writing posts
+    ├── technical/    # Engineering and technical blog posts
+    ├── sponsors/     # Sponsor cards
+    └── talks/        # Talk logs
 ```
-
-### Add a Writing
-Same process but in `content/writings/` folder and under `"writings"` array in index.json.
-
-Use the template at `content/writings/_template.md` as reference.
 
 ---
 
-## How to Run Locally
+## ✍️ How to Publish New Content
 
-Because this Single Page Application relies on JavaScript `fetch()` to dynamically load the Markdown files, you cannot just double-click `index.html` (which uses the `file://` protocol) due to browser CORS security restrictions.
+You **ONLY** need to work with Markdown files. The generated `.html` files are fully ignored by git.
 
-You must run a local HTTP server. If you have Python installed, just run this from the project root:
+1. **Write it:** Create a new markdown (`.md`) file inside `content/technical/` or `content/writings/`.
+2. **Add Frontmatter:** Make sure the top of your markdown file has standard metadata:
+   ```yaml
+   ---
+   title: "My Awesome New Post"
+   date: "Apr 06, 2026"
+   description: "A short summary of what this post is about"
+   tags: ["React", "JavaScript"]
+   ---
+   ```
+3. **Write the post:** Start writing your markdown content below the dashes.
+4. **Commit and Deploy:** Save the markdown file, `git commit` your changes, and push to GitHub!
+5. **Automation:** The magic happens on GitHub. The GitHub Actions workflow will securely pre-build the markdown to HTML on the server, ensuring your site's JavaScript footprint remains impossibly tiny, and instantly deploy your latest content to GitHub Pages in the background.
 
-```bash
-python3 -m http.server 8080
-```
+---
 
-Then visit `http://localhost:8080/` in your browser.
+## How to Run & Preview Locally
+
+If you want to preview your content locally before you push it to GitHub:
+
+1. Run the static site generator:
+   ```bash
+   node build-index.js
+   ```
+2. Start a local HTTP server (if you have Python installed):
+   ```bash
+   python3 -m http.server 8080
+   ```
+3. Visit `http://localhost:8080/` in your browser.
+
+*Note: The generated `.html` folders are safely ignored by `.gitignore`, so they won't accidentally be pushed to GitHub.*
 
 ---
 
@@ -61,13 +79,8 @@ Then visit `http://localhost:8080/` in your browser.
 ### 1. `config.js` (Site Settings)
 Open `config.js` to change your site title, description, avatar, and social media links. You can also toggle entire navigation pages on or off by modifying the `enabled: true/false` flags inside the `pages` object.
 
-### 2. Creating New Content
-All text content lives inside the `content/` folder.
-- **Static Pages**: Just edit `content/home.md` or `content/now.md` directly.
-- **Blogs, Talks, & Sponsors**: 
-  1. Copy the `_template.md` file found in their respective directories.
-  2. Write your Markdown content and populate the Frontmatter (the metadata at the top of the file).
-  3. **Crucial**: Run `node build-index.js` to automatically parse your new files and update the `content/index.json` manifest! (If you push to GitHub, a GitHub Action will do this for you automatically).
+### 2. Modifying Site Structure
+Open `_layout.html`. This file acts as the primary layout template for every single page built. 
 
 ### 3. Modifying Styles
-Open `styles.css`. The entire aesthetic of the site is powered by CSS variables (Custom Properties) written in `HSL` color format. You can drastically alter the entire site's color scheme in seconds simply by altering the `--primary`, `--background`, and `--border` variables located at the top of the file.
+Open `styles.css`. The entire aesthetic of the site is powered by CSS variables (Custom Properties) written in `HSL/HEX` color format. You can drastically alter the entire site's color scheme in seconds simply by altering the variables located at the top of the file. After tweaking styles or layouts, re-run `node build-index.js` locally to see the changes.
