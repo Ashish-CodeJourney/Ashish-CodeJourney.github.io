@@ -8,6 +8,7 @@
   --foreground: #111210;
   --card: #FFFFFF;
   --primary: #C2956C;
+  --primary-hover: #A67853;
   --primary-fg: #FFFFFF;
   --accent: #8FA68A;
   --muted: #F0EBE3;
@@ -24,6 +25,7 @@
   --foreground: #F0EDE8;
   --card: #161B22;
   --primary: #D4A87A;
+  --primary-hover: #E6BA8B;
   --primary-fg: #0D1117;
   --accent: #6E8F7A;
   --muted: #1E2530;
@@ -64,7 +66,7 @@ h4 { font-size: 1.1rem; }
 p { margin-bottom: 1rem; }
 
 a { color: var(--primary); text-decoration: none; }
-a:hover { opacity: 0.75; }
+a:hover { color: var(--primary-hover); opacity: 1; }
 
 strong { font-weight: 600; }
 em { font-style: italic; }
@@ -285,7 +287,7 @@ article.card:hover {
   transition: color 0.2s ease;
 }
 
-.post-item:hover h3 { color: var(--primary); }
+.post-item:hover h3 { color: var(--primary-hover); }
 
 /* ─── Badges & Buttons ───────────────────────────────────────── */
 .badge {
@@ -352,7 +354,7 @@ article.card:hover {
   color: var(--muted-fg);
 }
 
-.button.outline:hover { border-color: var(--primary); color: var(--primary); }
+.button.outline:hover { border-color: var(--primary-hover); color: var(--primary-hover); }
 
 .button.icon-only {
   padding: 0.5rem;
@@ -419,8 +421,8 @@ article.card:hover {
 }
 
 .social-pill:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+  border-color: var(--primary-hover);
+  color: var(--primary-hover);
   opacity: 1;
 }
 
