@@ -129,6 +129,12 @@ function processDirectory(dir) {
 }
 
 function buildIndex() {
+  console.log('Cleaning up old generated files...');
+  fs.rmSync(path.join(rootDir, 'technical'), { recursive: true, force: true });
+  fs.rmSync(path.join(rootDir, 'writings'), { recursive: true, force: true });
+  fs.rmSync(path.join(rootDir, 'now'), { recursive: true, force: true });
+  try { fs.unlinkSync(path.join(rootDir, 'index.html')); } catch(e) {}
+
   const technicalPosts = processDirectory('technical');
   const writingPosts = processDirectory('writings');
   
