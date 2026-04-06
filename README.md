@@ -60,13 +60,13 @@ You **ONLY** need to work with Markdown files. The generated `.html` files are f
 
 If you want to preview your content locally before you push it to GitHub:
 
-1. Run the static site generator:
+1. Run the static site generator so it creates the `dist/` folder:
    ```bash
    node build-index.js
    ```
-2. Start a local HTTP server (if you have Python installed):
+2. Start a local HTTP server targeting that new `dist/` folder. If you have Python installed, you can simply run:
    ```bash
-   python3 -m http.server 8080
+   python3 -m http.server 8080 -d dist
    ```
 3. Visit `http://localhost:8080/` in your browser.
 
