@@ -22,8 +22,8 @@ const DOM = {
 
 // ─── SPA Router ────────────────────────────────────────────────
 const Router = {
-  // Transition duration in ms — keep in sync with CSS (250ms)
-  TRANSITION_DURATION: 250,
+  // Transition duration in ms — keep in sync with CSS (400ms)
+  TRANSITION_DURATION: 400,
 
   // Track the currently active route to avoid redundant transitions
   _currentRoute: null,
@@ -83,6 +83,7 @@ const Router = {
     if (this._transitioning) return;
 
     const container = DOM.routerContent;
+    const siteContent = document.querySelector('.site-content');
 
     // First load or explicit skip — just set content immediately
     if (skipAnimation || !this._currentRoute) {
@@ -93,6 +94,7 @@ const Router = {
     }
 
     this._transitioning = true;
+    if (siteContent) siteContent.classList.add('transitioning');
 
     // Determine direction
     const isGoingDeeper = route.split('/').filter(Boolean).length > (this._currentRoute || '').split('/').filter(Boolean).length;
@@ -103,7 +105,7 @@ const Router = {
     container.classList.remove('page-enter-active', 'page-enter-left', 'page-enter-right');
     container.classList.add(exitClass);
 
-    // Swap slightly before the transition fully ends for a "cross-fade" feel
+    // Swap content slightly after exit begins
     setTimeout(() => {
       // Phase 2: Swap content
       container.innerHTML = pageData.html;
@@ -121,8 +123,9 @@ const Router = {
 
       setTimeout(() => {
         this._transitioning = false;
+        if (siteContent) siteContent.classList.remove('transitioning');
       }, this.TRANSITION_DURATION);
-    }, this.TRANSITION_DURATION * 0.8);
+    }, this.TRANSITION_DURATION * 0.7);
   },
 
   /**

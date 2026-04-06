@@ -178,7 +178,7 @@ function buildIndex() {
   }
 
   const homeHTML = `
-    <section class="hero text-center vstack align-center">
+    <section class="hero text-center vstack align-center stagger-item">
       <img src="assets/avatar.jpg" alt="${CONFIG.site.author}" class="avatar" width="88" height="88">
       <h1 class="hero-name">${CONFIG.site.title}</h1>
       <p class="hero-desc">${CONFIG.site.description}</p>
@@ -198,12 +198,14 @@ function buildIndex() {
 
   // ─── 2. Writings Index ─────────────────────────────────────
   const writingsIndexHTML = `
-    <header style="margin-bottom:2.5rem;">
+    <header style="margin-bottom:2.5rem;" class="stagger-item">
       <p class="section-eyebrow">Essays</p>
       <h1>Writings</h1>
       <p class="muted" style="margin-top:0.4rem; font-size:0.95rem;">Personal thoughts, stories, and reflections.</p>
     </header>
-    ${renderPostList(writingPosts, '/writings')}
+    <div class="stagger-item">
+      ${renderPostList(writingPosts, '/writings')}
+    </div>
   `;
 
   PAGES['/writings/'] = { html: writingsIndexHTML, title: 'Writings' };
@@ -212,7 +214,7 @@ function buildIndex() {
   for (const post of writingPosts) {
     const postHTML = `
       <article>
-        <header class="post-header">
+        <header class="post-header stagger-item">
           <a href="#/writings/" class="back-link">← Writings</a>
           ${post.meta.banner ? `<img src="${post.meta.banner}" alt="${post.meta.title}" class="banner-img">` : ''}
           <h1>${post.meta.title}</h1>
@@ -221,7 +223,7 @@ function buildIndex() {
             ${renderTags(post.meta.tags)}
           </div>
         </header>
-        <div class="post-content">${post.content}</div>
+        <div class="post-content stagger-item">${post.content}</div>
       </article>
     `;
     const slug = post.filename.replace('.md', '');
@@ -230,12 +232,14 @@ function buildIndex() {
 
   // ─── 4. Technical Index ────────────────────────────────────
   const technicalIndexHTML = `
-    <header style="margin-bottom:2.5rem;">
+    <header style="margin-bottom:2.5rem;" class="stagger-item">
       <p class="section-eyebrow">Engineering</p>
       <h1>Technical</h1>
       <p class="muted" style="margin-top:0.4rem; font-size:0.95rem;">Deep dives on code, systems, and craft.</p>
     </header>
-    ${renderPostList(technicalPosts, '/technical')}
+    <div class="stagger-item">
+      ${renderPostList(technicalPosts, '/technical')}
+    </div>
   `;
 
   PAGES['/technical/'] = { html: technicalIndexHTML, title: 'Technical' };
@@ -244,7 +248,7 @@ function buildIndex() {
   for (const post of technicalPosts) {
     const postHTML = `
       <article>
-        <header class="post-header">
+        <header class="post-header stagger-item">
           <a href="#/technical/" class="back-link">← Technical</a>
           ${post.meta.banner ? `<img src="${post.meta.banner}" alt="${post.meta.title}" class="banner-img">` : ''}
           <h1>${post.meta.title}</h1>
@@ -253,7 +257,7 @@ function buildIndex() {
             ${renderTags(post.meta.tags)}
           </div>
         </header>
-        <div class="post-content">${post.content}</div>
+        <div class="post-content stagger-item">${post.content}</div>
       </article>
     `;
     const slug = post.filename.replace('.md', '');
@@ -265,12 +269,12 @@ function buildIndex() {
   const nowContent = parseMarkdown(parseFrontmatter(nowRaw).content);
   const nowHTML = `
     <article>
-      <header style="margin-bottom:2.5rem;">
+      <header style="margin-bottom:2.5rem;" class="stagger-item">
         <p class="section-eyebrow">Present</p>
         <h1>Now</h1>
         <p class="muted" style="margin-top:0.4rem; font-size:0.95rem;">What I'm focused on at this moment.</p>
       </header>
-      <div class="post-content">${nowContent}</div>
+      <div class="post-content stagger-item">${nowContent}</div>
     </article>
   `;
 
