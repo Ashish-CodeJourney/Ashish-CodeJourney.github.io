@@ -208,6 +208,7 @@ em { font-style: italic; }
   cursor: pointer;
   z-index: 100;
   transition: transform 0.2s ease, border-color 0.2s ease;
+  color: var(--foreground);
 }
 
 .theme-toggle:hover {
@@ -215,6 +216,7 @@ em { font-style: italic; }
   border-color: var(--primary);
 }
 
+.moon-icon { display: none; }
 [data-theme="dark"] .sun-icon { display: none; }
 [data-theme="dark"] .moon-icon { display: block !important; }
 
