@@ -1,7 +1,7 @@
 const CONFIG = {
   site: {
     title: "Ashish",
-    description: "Welcome to my personal slice of the internet. I'm Ashish, a developer who loves building things.",
+    description: "This is where I think out loud. You're welcome to listen. ",
     author: "Ashish",
     avatar: "assets/avatar.jpg",
     email: "vaghelaashish111@gmail.com",

@@ -1,7 +1,6 @@
 # Hi, I'm Ashish! 👋
 
-I'm a Software Engineer based somewhere on Earth. I love building cool stuff without the bloat. 
-
+I'm just a human based somewhere on Earth. I love building cool stuff, learning new things, and sharing my knowledge with others.
 When I'm not coding, you can find me:
 - Attending Tech or Startup meetups
 - Writing about tech
