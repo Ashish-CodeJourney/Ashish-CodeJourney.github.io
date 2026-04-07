@@ -27,14 +27,9 @@ h1, h2, h3, h4 { font-family: var(--font-serif); letter-spacing: -0.02em; }
 .site-header { padding: var(--space-5) 0; border-bottom: 1px solid var(--border); }
 
 /* ─── Header / Nav ───────────────────────────────────────────── */
-.brand-avatar {
-  border-radius: var(--radius-full);
-  object-fit: cover;
-  border: 2px solid var(--border-strong);
-  transition: border-color var(--transition), transform var(--transition);
-}
-.brand-avatar:hover { border-color: var(--primary); transform: scale(1.05); }
-.brand-name { font-family: var(--font-serif); font-weight: var(--font-semibold); font-size: 1.1rem; }
+.brand-link { display: inline-flex; text-decoration: none; color: var(--foreground); }
+.brand-link:hover { opacity: 0.8; text-decoration: none; }
+.brand-logo { height: 32px; width: auto; }
 
 .desktop-nav a {
   color: var(--muted-foreground);
