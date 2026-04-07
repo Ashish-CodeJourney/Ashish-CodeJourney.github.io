@@ -1,15 +1,18 @@
 # Hi, I'm Ashish! 👋
 
-I'm just a human based somewhere on Earth. I love building cool stuff, learning new things, and sharing my knowledge with others.
-When I'm not coding, you can find me:
-- Attending Tech or Startup meetups
-- Writing about tech
-- Playing with Street Cats 🐾
+A human based somewhere on Earth. Curious by nature, builder by choice.
+
+When I'm not at my desk, you'll find me:
+- At meetups & startup events
+- Writing about things I find interesting
+- Making friends with street cats 🐾
 
 ### What is this site?
-This is my personal playground. It's built with **Vanilla HTML/CSS/JS** and the amazing [oat.ink](https://oat.ink/) library. No Node.js, no crazy build steps, just simple files that work.
+My personal playground. Simple files, no frameworks,
+just an [oat.ink](https://oat.ink/) library doing the heavy lifting.
 
-Feel free to browse around!
 ### Let's Chat!
-Got a cool startup idea? Want to debate tech stacks? Or just want to send me pictures of street cats? 
-Drop me a line at [{{email}}](mailto:{{email}}) — my inbox is always open. I promise I don't bite (unless you steal my Chai).☕
+Got a cool startup idea? Want to debate ideas? Or just want
+to send me pictures of street cats?
+Drop me a line at [{{email}}](mailto:{{email}}) — my inbox is
+always open. I promise I don't bite (unless you steal my Chai). ☕
