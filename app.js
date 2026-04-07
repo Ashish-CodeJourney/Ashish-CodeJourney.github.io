@@ -137,18 +137,19 @@ function setupMobileMenu() {
 
 // ─── Theme ─────────────────────────────────────────────────────
 function setupTheme() {
+  const html = document.documentElement;
   const getTheme = () => localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 
   const setTheme = theme => {
-    if (theme === 'dark') document.body.setAttribute('data-theme', 'dark');
-    else document.body.removeAttribute('data-theme');
+    html.classList.toggle('dark', theme === 'dark');
+    html.style.colorScheme = theme;
     if (DOM.mobileThemeSwitch) DOM.mobileThemeSwitch.checked = theme === 'dark';
     if (DOM.mobileThemeLabel) DOM.mobileThemeLabel.textContent = theme === 'dark' ? 'Dark mode' : 'Light mode';
     localStorage.setItem('theme', theme);
   };
 
   setTheme(getTheme());
-  DOM.themeToggle?.addEventListener('click', () => setTheme(document.body.hasAttribute('data-theme') ? 'light' : 'dark'));
+  DOM.themeToggle?.addEventListener('click', () => setTheme(html.classList.contains('dark') ? 'light' : 'dark'));
   DOM.mobileThemeSwitch?.addEventListener('change', e => setTheme(e.target.checked ? 'dark' : 'light'));
 }
 

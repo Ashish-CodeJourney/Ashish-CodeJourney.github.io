@@ -112,16 +112,16 @@ function writePage(outPath, html) {
 // ─── Post list rendering ─────────────────────────────────────
 // Note: All internal links use #/ prefix for SPA routing
 function renderPostList(posts, slugPrefix) {
-  if (!posts.length) return '<p class="muted">Nothing here yet.</p>';
+  if (!posts.length) return '<p class="text-light">Nothing here yet.</p>';
   return `<div>` + posts.map(post => `
     <div class="post-item stagger-item">
       <a href="#${slugPrefix}/${post.filename.replace('.md', '')}/">
         ${post.meta.banner ? `<img src="${post.meta.banner}" alt="${post.meta.title}" style="width:100%; height:180px; object-fit:cover; border-radius:8px; margin-bottom:0.75rem; border:1px solid var(--border);">` : ''}
         <div style="display:flex; justify-content:space-between; align-items:baseline; gap:1rem;">
           <h3>${post.meta.title}</h3>
-          <span class="text-sm muted" style="white-space:nowrap; flex-shrink:0;">${post.meta.date || ''}</span>
+          <span class="text-light" style="font-size:var(--text-7); white-space:nowrap; flex-shrink:0;">${post.meta.date || ''}</span>
         </div>
-        ${post.meta.description ? `<p class="text-sm muted" style="margin:0.3rem 0 0;">${post.meta.description}</p>` : ''}
+        ${post.meta.description ? `<p class="text-light" style="font-size:var(--text-7); margin:0.3rem 0 0;">${post.meta.description}</p>` : ''}
         ${Array.isArray(post.meta.tags) && post.meta.tags.length ? `<div style="margin-top:0.5rem; display:flex; gap:0.4rem; flex-wrap:wrap;">${renderTags(post.meta.tags)}</div>` : ''}
       </a>
     </div>
@@ -200,7 +200,7 @@ function buildIndex() {
     <header style="margin-bottom:2.5rem;" class="stagger-item">
       <p class="section-eyebrow">Essays</p>
       <h1>Writings</h1>
-      <p class="muted" style="margin-top:0.4rem; font-size:0.95rem;">Personal thoughts, stories, and reflections.</p>
+      <p class="text-light" style="margin-top:0.4rem; font-size:var(--text-6);">Personal thoughts, stories, and reflections.</p>
     </header>
     <div class="stagger-item">
       ${renderPostList(writingPosts, '/writings')}
@@ -234,7 +234,7 @@ function buildIndex() {
     <header style="margin-bottom:2.5rem;" class="stagger-item">
       <p class="section-eyebrow">Engineering</p>
       <h1>Technical</h1>
-      <p class="muted" style="margin-top:0.4rem; font-size:0.95rem;">Deep dives on code, systems, and craft.</p>
+      <p class="text-light" style="margin-top:0.4rem; font-size:var(--text-6);">Deep dives on code, systems, and craft.</p>
     </header>
     <div class="stagger-item">
       ${renderPostList(technicalPosts, '/technical')}
@@ -271,7 +271,7 @@ function buildIndex() {
       <header style="margin-bottom:2.5rem;" class="stagger-item">
         <p class="section-eyebrow">Present</p>
         <h1>Now</h1>
-        <p class="muted" style="margin-top:0.4rem; font-size:0.95rem;">What I'm focused on at this moment.</p>
+        <p class="text-light" style="margin-top:0.4rem; font-size:var(--text-6);">What I'm focused on at this moment.</p>
       </header>
       <div class="post-content stagger-item">${nowContent}</div>
     </article>
