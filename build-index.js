@@ -178,11 +178,10 @@ function buildIndex() {
   }
 
   const homeHTML = `
-    <section class="hero text-center vstack align-center stagger-item">
-      <img src="assets/avatar.jpg" alt="${CONFIG.site.author}" class="avatar" width="88" height="88">
-      <h1 class="hero-name">${CONFIG.site.title}</h1>
+    <section class="hero text-center stagger-item">
+      <img src="assets/avatar.jpg" alt="${CONFIG.site.author}" class="hero-avatar" width="100" height="100">
       <p class="hero-desc">${CONFIG.site.description}</p>
-      <nav class="social-links hstack gap-2 justify-center" aria-label="Social links">
+      <nav class="hstack gap-2 justify-center" aria-label="Social links">
         ${socials}
       </nav>
     </section>

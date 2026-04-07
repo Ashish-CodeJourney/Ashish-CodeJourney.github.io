@@ -207,14 +207,18 @@ a:hover { color: var(--primary-hover); }
   border-bottom: 1px solid var(--border);
   margin-bottom: 3rem;
 }
-.hero-name {
-  font-family: var(--font-serif);
-  font-size: clamp(2.4rem, 6vw, 3.5rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-  margin: 1rem 0 0.75rem;
+
+.hero-avatar {
+  display: block;
+  margin: 0 auto 1rem;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 3px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease, transform 0.3s ease;
 }
+.hero-avatar:hover { border-color: var(--primary); transform: scale(1.05); }
+
 .hero-desc {
   font-size: 1rem;
   color: var(--muted-foreground);
