@@ -10,7 +10,7 @@ A lightweight, minimal, and blazing-fast personal website. It is built as a high
 - **Markdown Driven**: All dynamic content (blogs, talks, sponsors, now page) is written beautifully in simple Markdown (`.md`) files.
 - **Fully Automated Deployment**: A GitHub Action is configured (in `.github/workflows/deploy.yml`) to automatically build and deploy your site to GitHub Pages whenever you push changes. You never have to manually build HTML files before pushing.
 - **Light / Dark Theme System**: Fully native theme toggling with automatic system preference detection and `localStorage` persistence.
-- **Highly Configurable**: Manage navigation visibility, social media handles, and base site metadata entirely through a single `config.js` file.
+- **Highly Configurable**: Manage navigation visibility, social media handles, and base site metadata entirely through a single `config.json` file.
 - **Powered by oat.ink**: Uses the minimal [oat.ink](https://oat.ink/) UI library for beautiful, semantic, and responsive base styling.
 
 ---
@@ -22,7 +22,7 @@ A lightweight, minimal, and blazing-fast personal website. It is built as a high
 ├── _layout.html      # The main HTML shell and layout template
 ├── app.js            # Tiny client-side script for theme toggling and mobile nav
 ├── build-index.js    # Node.js Static Site Generator
-├── config.js         # Site configuration (Title, Socials, Navigation)
+├── config.json         # Site configuration (Title, Socials, Navigation)
 ├── styles.css        # Custom theme overrides (using HSL colors)
 ├── assets/           # Static assets (Favicons, images, logos)
 └── content/          # The Markdown content directory
@@ -76,8 +76,8 @@ If you want to preview your content locally before you push it to GitHub:
 
 ## Customization Guide
 
-### 1. `config.js` (Site Settings)
-Open `config.js` to change your site title, description, avatar, and social media links. You can also toggle entire navigation pages on or off by modifying the `enabled: true/false` flags inside the `pages` object.
+### 1. `config.json` (Site Settings)
+Open `config.json` to change your site title, description, avatar, and social media links. You can also toggle entire navigation pages on or off by modifying the `enabled: true/false` flags inside the `pages` object.
 
 ### 2. Modifying Site Structure
 Open `_layout.html`. This file acts as the primary layout template for every single page built. 
