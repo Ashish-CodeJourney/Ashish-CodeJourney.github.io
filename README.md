@@ -1,86 +1,104 @@
-# Minimal Personal Website
+# Ashish CodeJourney
 
-A lightweight, minimal, and blazing-fast personal website. It is built as a highly-optimized Static Site Generator (SSG). Zero dependencies, no heavy frameworks, and perfectly suited for fast deployments to GitHub Pages.
+Personal website and blog — fast, minimal, content-first. Built with Astro 5 and deployed to GitHub Pages.
 
-![Static Site](https://img.shields.io/badge/static-site-4caf82?style=flat-oval) [![pages-build-deployment](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/pages/pages-build-deployment) ![Vanilla JS](https://img.shields.io/badge/vanilla-JS-d4a024?style=flat-oval)
+![Astro](https://img.shields.io/badge/astro-5-BC52EE?style=flat-oval&logo=astro) [![pages-build-deployment](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/pages/pages-build-deployment) ![TypeScript](https://img.shields.io/badge/typescript-strict-3178C6?style=flat-oval&logo=typescript)
 
 ## Features
 
-- **Static Site Generator**: Includes a local `build-index.js` script to automatically parse markdown and assemble static `.html` files, guaranteeing the absolute fastest possible page loads with an entirely tiny javascript footprint remaining on the client.
-- **Markdown Driven**: All dynamic content (blogs, talks, sponsors, now page) is written beautifully in simple Markdown (`.md`) files.
-- **Fully Automated Deployment**: A GitHub Action is configured (in `.github/workflows/deploy.yml`) to automatically build and deploy your site to GitHub Pages whenever you push changes. You never have to manually build HTML files before pushing.
-- **Light / Dark Theme System**: Fully native theme toggling with automatic system preference detection and `localStorage` persistence.
-- **Highly Configurable**: Manage navigation visibility, social media handles, and base site metadata entirely through a single `config.json` file.
-- **Powered by oat.ink**: Uses the minimal [oat.ink](https://oat.ink/) UI library for beautiful, semantic, and responsive base styling.
+- **Astro 5 SSG** — zero JS by default, only what's needed ships to the browser
+- **Content Collections** — type-safe Zod schemas for all markdown frontmatter
+- **View Transitions** — smooth page navigation via Astro's `ClientRouter`
+- **Dual-theme code highlighting** — Shiki with `github-light` / `github-dark` themes
+- **Light / Dark mode** — system preference detection, `localStorage` persistence, no flash
+- **Reading time** — auto-calculated from post body word count
+- **Sitemap** — generated automatically via `@astrojs/sitemap`
+- **Powered by oat.ink** — minimal CSS framework for base styling
 
 ---
 
-## Workspace Structure
+## Project Structure
 
 ```text
 .
-├── _layout.html      # The main HTML shell and layout template
-├── app.js            # Tiny client-side script for theme toggling and mobile nav
-├── build-index.js    # Node.js Static Site Generator
-├── config.json         # Site configuration (Title, Socials, Navigation)
-├── styles.css        # Custom theme overrides (using HSL colors)
-├── assets/           # Static assets (Favicons, images, logos)
-└── content/          # The Markdown content directory
-    ├── home.md       # Homepage content
-    ├── now.md        # Status "Now" page content
-    ├── writings/     # Essay and writing posts
-    ├── technical/    # Engineering and technical blog posts
-    ├── sponsors/     # Sponsor cards
-    └── talks/        # Talk logs
+├── src/
+│   ├── content/
+│   │   ├── config.ts          # Zod schemas for all collections
+│   │   ├── pages/             # home.md, now.md
+│   │   ├── technical/         # Engineering blog posts
+│   │   └── writings/          # Essays and personal writing
+│   ├── layouts/
+│   │   ├── BaseLayout.astro   # HTML shell, fonts, GA, theme script
+│   │   └── PostLayout.astro   # Shared post page template
+│   ├── components/
+│   │   ├── Header.astro
+│   │   ├── Footer.astro
+│   │   ├── PostCard.astro
+│   │   ├── PostList.astro
+│   │   ├── SocialLinks.astro
+│   │   └── ThemeToggle.astro
+│   ├── pages/
+│   │   ├── index.astro
+│   │   ├── now.astro
+│   │   ├── technical/[slug].astro
+│   │   └── writings/[slug].astro
+│   ├── styles/global.css      # Theme overrides, layout, component styles
+│   ├── utils/
+│   │   ├── date.ts            # formatDate, readingTime
+│   │   └── slug.ts            # toSlug — strips .md extension from entry IDs
+│   └── site.config.ts         # Single source of truth for site metadata
+├── public/
+│   ├── oat.min.css            # oat.ink UI library
+│   └── avatar.jpg
+├── astro.config.mjs
+└── tsconfig.json
 ```
 
 ---
 
-## ✍️ How to Publish New Content
+## Publishing Content
 
-You **ONLY** need to work with Markdown files. The generated `.html` files are fully ignored by git.
+Only touch markdown files inside `src/content/`.
 
-1. **Write it:** Create a new markdown (`.md`) file inside `content/technical/` or `content/writings/`.
-2. **Add Frontmatter:** Make sure the top of your markdown file has standard metadata:
+1. Create a new `.md` file in `src/content/technical/` or `src/content/writings/`
+2. Add frontmatter:
    ```yaml
    ---
-   title: "My Awesome New Post"
-   date: "Apr 06, 2026"
-   description: "A short summary of what this post is about"
-   tags: ["React", "JavaScript"]
+   title: "My Post Title"
+   date: "2026-05-07"
+   description: "Short summary shown in post cards."
+   tags: ["TypeScript", "TDD"]
+   banner: "/images/my-banner.jpg"   # optional
    ---
    ```
-3. **Write the post:** Start writing your markdown content below the dashes.
-4. **Commit and Deploy:** Save the markdown file, `git commit` your changes, and push to GitHub!
-5. **Automation:** The magic happens on GitHub. The GitHub Actions workflow will securely pre-build the markdown to HTML on the server, ensuring your site's JavaScript footprint remains impossibly tiny, and instantly deploy your latest content to GitHub Pages in the background.
+3. Write markdown content below the frontmatter
+4. Commit and push — GitHub Actions builds and deploys automatically
 
 ---
 
-## How to Run & Preview Locally
+## Local Development
 
-If you want to preview your content locally before you push it to GitHub:
-
-1. Run the static site generator so it creates the `dist/` folder:
-   ```bash
-   node build-index.js
-   ```
-2. Start a local HTTP server targeting that new `dist/` folder. If you have Python installed, you can simply run:
-   ```bash
-   python3 -m http.server 8080 -d dist
-   ```
-3. Visit `http://localhost:8080/` in your browser.
-
-*Note: The generated `.html` folders are safely ignored by `.gitignore`, so they won't accidentally be pushed to GitHub.*
+```bash
+npm install
+npm run dev        # dev server at localhost:4321
+npm run build      # production build → dist/
+npm run preview    # preview dist/ locally
+```
 
 ---
 
-## Customization Guide
+## Customization
 
-### 1. `config.json` (Site Settings)
-Open `config.json` to change your site title, description, avatar, and social media links. You can also toggle entire navigation pages on or off by modifying the `enabled: true/false` flags inside the `pages` object.
+### Site Metadata
+Edit `src/site.config.ts` — title, description, author, social links, GA ID.
 
-### 2. Modifying Site Structure
-Open `_layout.html`. This file acts as the primary layout template for every single page built. 
+### Styles
+Edit `src/styles/global.css` — CSS custom properties at the top of the file control the entire color scheme. The file extends `oat.min.css` with layout, component, and animation styles.
 
-### 3. Modifying Styles
-Open `styles.css`. The entire aesthetic of the site is powered by CSS variables (Custom Properties) written in `HSL/HEX` color format. You can drastically alter the entire site's color scheme in seconds simply by altering the variables located at the top of the file. After tweaking styles or layouts, re-run `node build-index.js` locally to see the changes.
+### Adding a New Page
+Create `src/pages/your-page.astro` and wrap content in `<BaseLayout>`.
+
+### Adding a New Collection
+1. Define schema in `src/content/config.ts`
+2. Add `src/pages/collection-name/index.astro` using `PostList`
+3. Add `src/pages/collection-name/[slug].astro` using `PostLayout`
