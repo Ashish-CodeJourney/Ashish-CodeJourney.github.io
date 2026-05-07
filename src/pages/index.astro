@@ -1,0 +1,59 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import SocialLinks from '../components/SocialLinks.astro';
+import { SITE } from '../site.config';
+import { toSlug } from '../utils/slug';
+
+const [homePage, rawWritings] = await Promise.all([
+  getEntry('pages', 'home'),
+  getCollection('writings'),
+]);
+
+if (!homePage) throw new Error('Missing required content: pages/home.md');
+
+const recentWritings = [...rawWritings]
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .slice(0, 3);
+
+const { Content } = await render(homePage);
+---
+
+<BaseLayout>
+  <section class="hero text-center stagger-item">
+    <img
+      src="/avatar.jpg"
+      alt={SITE.author}
+      class="hero-avatar"
+      width="120"
+      height="120"
+      loading="eager"
+    />
+    <p class="hero-desc">{SITE.description}</p>
+    <SocialLinks />
+  </section>
+
+  <section class="home-content post-content stagger-item">
+    <Content />
+  </section>
+
+  {recentWritings.length > 0 && (
+    <section class="recent-writings stagger-item">
+      <div class="section-header">
+        <h2>Recent writings</h2>
+        <a href="/writings/" class="button outline view-all-link">All writings →</a>
+      </div>
+      {recentWritings.map(post => (
+        <PostCard
+          title={post.data.title}
+          date={post.data.date}
+          description={post.data.description}
+          tags={post.data.tags}
+          banner={post.data.banner}
+          href={`/writings/${toSlug(post.id)}/`}
+        />
+      ))}
+    </section>
+  )}
+</BaseLayout>

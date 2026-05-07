@@ -1,0 +1,21 @@
+---
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const nowPage = await getEntry('pages', 'now');
+if (!nowPage) throw new Error('Missing required content: pages/now.md');
+const { Content } = await render(nowPage);
+---
+
+<BaseLayout title="Now" description="What I'm focused on at this moment.">
+  <article>
+    <header class="collection-header stagger-item">
+      <p class="section-eyebrow">Present</p>
+      <h1>Now</h1>
+      <p class="text-light collection-subtitle">What I'm focused on at this moment.</p>
+    </header>
+    <div class="post-content stagger-item">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

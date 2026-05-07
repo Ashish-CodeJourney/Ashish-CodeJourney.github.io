@@ -1,0 +1,11 @@
+---
+import { SITE } from '../site.config';
+---
+
+<nav class="hstack gap-2 justify-center" aria-label="Social links">
+  {Object.entries(SITE.socials).map(([platform, url]) => (
+    <a href={url} target="_blank" rel="noopener noreferrer" class="social-pill">
+      {platform}
+    </a>
+  ))}
+</nav>

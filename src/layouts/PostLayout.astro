@@ -1,0 +1,45 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { formatDate, readingTime } from '../utils/date';
+
+interface Props {
+  title: string;
+  date: string;
+  description?: string;
+  tags: string[];
+  banner?: string;
+  body?: string;
+  backHref: string;
+  backLabel: string;
+}
+
+const { title, date, description, tags, banner, body, backHref, backLabel } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <article>
+    <header class="post-header stagger-item">
+      <a href={backHref} class="back-link">← {backLabel}</a>
+      {banner && (
+        <img
+          src={banner}
+          alt={title}
+          class="banner-img"
+          width="700"
+          height="360"
+          loading="lazy"
+          decoding="async"
+        />
+      )}
+      <h1>{title}</h1>
+      <div class="post-meta">
+        {date && <span class="badge primary">{formatDate(date)}</span>}
+        {body && <span class="badge primary">{readingTime(body)}</span>}
+        {tags.map(tag => <span class="badge secondary post-tag">{tag}</span>)}
+      </div>
+    </header>
+    <div class="post-content stagger-item">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>

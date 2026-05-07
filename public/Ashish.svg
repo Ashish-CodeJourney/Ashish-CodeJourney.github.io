@@ -1,0 +1,14 @@
+<svg width="160" height="48" viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .shadow { fill: currentColor; opacity: 0.12; }
+        .text { fill: currentColor; }
+        .accent { fill: var(--primary, #D4A87A); }
+    </style>
+    <text x="2" y="57" class="shadow"
+          style="font-family:'DM Serif Display',Georgia,serif;font-size:58px;font-weight:400;letter-spacing:-1px;">Ashish</text>
+    <text x="0" y="54" class="text"
+          style="font-family:'DM Serif Display',Georgia,serif;font-size:58px;font-weight:400;letter-spacing:-1px;">Ashish</text>
+    <text x="0" y="54" class="accent"
+          style="font-family:'DM Serif Display',Georgia,serif;font-size:58px;font-weight:400;font-style:italic;letter-spacing:-1px;">A</text>
+    <rect x="0" y="60" width="36" height="3" rx="1.5" class="accent"/>
+</svg>

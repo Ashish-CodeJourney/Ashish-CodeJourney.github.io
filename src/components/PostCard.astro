@@ -1,0 +1,44 @@
+---
+import { formatDate } from '../utils/date';
+
+interface Props {
+  title: string;
+  date: string;
+  description?: string;
+  tags: string[];
+  banner?: string;
+  href: string;
+  readingTime?: string;
+}
+
+const { title, date, description, tags, banner, href, readingTime } = Astro.props;
+---
+
+<div class="post-item stagger-item">
+  <a href={href}>
+    {banner && (
+      <img
+        src={banner}
+        alt={title}
+        class="post-card-banner"
+        width="700"
+        height="180"
+        loading="lazy"
+        decoding="async"
+      />
+    )}
+    <div class="post-card-title-row">
+      <h3>{title}</h3>
+      <div class="post-card-right">
+        {readingTime && <span class="post-card-reading-time">{readingTime}</span>}
+        <span class="post-card-date">{formatDate(date)}</span>
+      </div>
+    </div>
+    {description && <p class="post-card-desc">{description}</p>}
+    {tags.length > 0 && (
+      <div class="post-card-tags">
+        {tags.map(tag => <span class="badge secondary post-tag">{tag}</span>)}
+      </div>
+    )}
+  </a>
+</div>

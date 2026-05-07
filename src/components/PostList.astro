@@ -1,0 +1,49 @@
+---
+import PostCard from './PostCard.astro';
+import { toSlug } from '../utils/slug';
+import { readingTime } from '../utils/date';
+
+interface PostItem {
+  id: string;
+  body: string;
+  data: {
+    title: string;
+    date: string;
+    description?: string;
+    tags: string[];
+    banner?: string;
+  };
+}
+
+interface Props {
+  eyebrow: string;
+  heading: string;
+  subtitle: string;
+  posts: PostItem[];
+  basePath: string;
+}
+
+const { eyebrow, heading, subtitle, posts, basePath } = Astro.props;
+---
+
+<header class="collection-header stagger-item">
+  <p class="section-eyebrow">{eyebrow}</p>
+  <h1>{heading}</h1>
+  <p class="text-light collection-subtitle">{subtitle}</p>
+</header>
+<div class="stagger-item">
+  {posts.length === 0
+    ? <p class="text-light">Nothing here yet.</p>
+    : posts.map(post => (
+        <PostCard
+          title={post.data.title}
+          date={post.data.date}
+          description={post.data.description}
+          tags={post.data.tags}
+          banner={post.data.banner}
+          readingTime={readingTime(post.body)}
+          href={`${basePath}${toSlug(post.id)}/`}
+        />
+      ))
+  }
+</div>

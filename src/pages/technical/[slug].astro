@@ -1,0 +1,20 @@
+---
+import { getCollection, render } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+import { toSlug } from '../../utils/slug';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('technical');
+  return posts.map(post => ({
+    params: { slug: toSlug(post.id) },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<PostLayout {...post.data} body={post.body} backHref="/technical/" backLabel="Technical">
+  <Content />
+</PostLayout>
