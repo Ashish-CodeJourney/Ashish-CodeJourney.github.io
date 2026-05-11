@@ -75,47 +75,61 @@ function isActive(href: string): boolean {
 </nav>
 
 <script>
+  import theme from '../utils/theme.js';
+
   function setup() {
-    const toggle = document.getElementById('mobile-menu-toggle') as HTMLButtonElement;
-    const nav = document.getElementById('mobile-nav') as HTMLElement;
-    const mobileSwitch = document.getElementById('mobile-theme-switch') as HTMLInputElement;
-    const mobileLabel = document.getElementById('mobile-theme-label') as HTMLElement;
+    const toggle = document.getElementById('mobile-menu-toggle');
+    const nav = document.getElementById('mobile-nav');
+    const mobileSwitch = document.getElementById('mobile-theme-switch');
+    const mobileLabel = document.getElementById('mobile-theme-label');
+
+    if (
+      !(toggle instanceof HTMLButtonElement) ||
+      !(nav instanceof HTMLElement) ||
+      !(mobileSwitch instanceof HTMLInputElement) ||
+      !(mobileLabel instanceof HTMLElement)
+    ) {
+      return;
+    }
 
     const mq = window.matchMedia('(max-width: 640px)');
 
-    function syncVisibility(e: MediaQueryList | MediaQueryListEvent) {
+    const syncVisibility = (e: MediaQueryList | MediaQueryListEvent) => {
       toggle.style.display = e.matches ? 'inline-flex' : 'none';
       if (!e.matches) nav.hidden = true;
-    }
+    };
 
-    function syncTheme() {
-      const isDark = document.documentElement.classList.contains('dark');
-      mobileSwitch.checked = isDark;
-      mobileLabel.textContent = isDark ? 'Dark mode' : 'Light mode';
-    }
+    const syncTheme = () => {
+      const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+      mobileSwitch.checked = currentTheme === 'dark';
+      mobileLabel.textContent = currentTheme === 'dark' ? 'Dark mode' : 'Light mode';
+    };
 
     syncVisibility(mq);
     syncTheme();
 
     mq.addEventListener('change', syncVisibility);
 
-    toggle.addEventListener('click', () => {
+    toggle.onclick = () => {
       const opening = nav.hidden;
       nav.hidden = !opening;
       toggle.setAttribute('aria-expanded', String(opening));
-    });
+    };
 
-    nav.addEventListener('click', (e) => {
-      if ((e.target as HTMLElement).tagName === 'A') nav.hidden = true;
-    });
+    nav.onclick = (e: MouseEvent) => {
+      const target = e.target;
 
-    mobileSwitch.addEventListener('change', () => {
-      const dark = mobileSwitch.checked;
-      document.documentElement.classList.toggle('dark', dark);
-      document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
-      localStorage.setItem('theme', dark ? 'dark' : 'light');
-      mobileLabel.textContent = dark ? 'Dark mode' : 'Light mode';
-    });
+      if (target instanceof HTMLElement && target.tagName === 'A') {
+        nav.hidden = true;
+      }
+    };
+
+    mobileSwitch.onchange = () => {
+      const nextTheme = mobileSwitch.checked ? 'dark' : 'light';
+      theme.applyTheme(document.documentElement, nextTheme);
+      localStorage.setItem('theme', nextTheme);
+      mobileLabel.textContent = nextTheme === 'dark' ? 'Dark mode' : 'Light mode';
+    };
   }
 
   document.addEventListener('astro:page-load', setup);

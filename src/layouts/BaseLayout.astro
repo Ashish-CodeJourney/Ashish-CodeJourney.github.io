@@ -28,15 +28,13 @@ const gaScriptUrl = `https://www.googletagmanager.com/gtag/js?id=${SITE.ga}`;
   <link rel="canonical" href={canonicalURL} />
   <link rel="icon" type="image/jpeg" href="/avatar.jpg" />
 
-  <script is:inline>
-    (function () {
-      const stored = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (stored === 'dark' || (!stored && prefersDark)) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.style.colorScheme = 'dark';
-      }
-    })();
+  <script>
+    import theme from '../utils/theme.js';
+
+    const stored = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    theme.applyTheme(document.documentElement, theme.resolveTheme({ storedTheme: stored, prefersDark }));
   </script>
 
   <link rel="stylesheet" href="/oat.min.css" />

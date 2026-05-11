@@ -38,15 +38,13 @@ try {
     rel="stylesheet"
   />
 
-  <script is:inline>
-    (function () {
-      const stored = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (stored === 'dark' || (!stored && prefersDark)) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.style.colorScheme = 'dark';
-      }
-    })();
+  <script>
+    import theme from '../utils/theme.js';
+
+    const stored = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    theme.applyTheme(document.documentElement, theme.resolveTheme({ storedTheme: stored, prefersDark }));
   </script>
 
   <style>
