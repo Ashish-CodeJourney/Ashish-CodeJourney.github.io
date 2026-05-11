@@ -16,4 +16,14 @@ export const collections = {
   technical: defineCollection({ type: 'content', schema: postSchema }),
   writings: defineCollection({ type: 'content', schema: postSchema }),
   pages: defineCollection({ type: 'content', schema: pageSchema }),
+  sponsors: defineCollection({
+    type: 'content',
+    schema: z.object({
+      name: z.string(),
+      url: z.string().optional(),
+      logo: z.string().optional(),
+      linkedin: z.string().optional(),
+      x: z.string().optional(),
+    }),
+  }),
 };

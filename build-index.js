@@ -1,11 +1,10 @@
-'use strict';
-
-const fs   = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // ─── Paths ────────────────────────────────────────────────────────────────────
 
-const ROOT       = __dirname;
+const ROOT       = path.dirname(fileURLToPath(import.meta.url));
 const CONTENT    = path.join(ROOT, 'content');
 const DIST       = path.join(ROOT, 'dist');
 const LAYOUT     = path.join(ROOT, '_layout.html');

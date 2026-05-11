@@ -5,6 +5,13 @@ export default defineConfig({
   site: 'https://ashish-codejourney.github.io',
   trailingSlash: 'always',
   integrations: [sitemap()],
+  vite: {
+    server: {
+      watch: {
+        ignored: ['**/node_modules/**', '**/.git/**', '**/dist/**', '**/content/**', '**/public/**'],
+      },
+    },
+  },
   markdown: {
     shikiConfig: {
       themes: {

@@ -1,0 +1,43 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const rawSponsors = await getCollection('sponsors');
+// Render each sponsor's content so we can include the body HTML
+const sponsors = await Promise.all(
+  rawSponsors.map(async (s) => {
+	const { Content } = await render(s);
+	return { entry: s, Content };
+  })
+);
+---
+
+<BaseLayout title="Sponsors" description="Supporters who help keep this site running.">
+  <section class="sponsors-list">
+	{sponsors.length === 0 ? (
+	  <p>No sponsors yet — you can add one by creating a markdown file under <code>src/content/sponsors/</code>.</p>
+	) : (
+	  sponsors.map(({ entry, Content }) => (
+		<article class="sponsor-card">
+		  <a href={entry.data.url ?? '#'} target={entry.data.url ? '_blank' : undefined} rel="noopener noreferrer">
+			{entry.data.logo ? (
+			  <img src={entry.data.logo} alt={entry.data.name} class="sponsor-logo" />
+			) : (
+			  <div class="sponsor-fallback">{entry.data.name}</div>
+			)}
+		  </a>
+
+		  <h3>{entry.data.name}</h3>
+
+		  <div class="sponsor-body"><Content /></div>
+			<div class="sponsor-links">
+			  {entry.data.linkedin && <a href={entry.data.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>}
+			  {entry.data.x && <a href={entry.data.x} target="_blank" rel="noopener noreferrer">X</a>}
+			</div>
+		</article>
+	  ))
+	)}
+  </section>
+</BaseLayout>
+
+
