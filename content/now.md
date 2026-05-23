@@ -4,7 +4,7 @@
 - Learning Ngnix and Docker  
 - Trying to contribute to Open Source Projects I use everyday
 - Saving money for new phone (Iphone or Samsung IDK not sure yet)  
-- Plainning a small trip....
+- Planning a small trip....
 
 ---
 
