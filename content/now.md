@@ -1,10 +1,10 @@
 ## What I'm doing right now
-*Updated April, 1st, 2026*
+*Updated June, 4th, 2026*
 
-- Learning Ngnix and Docker  
-- Trying to contribute to Open Source Projects I use everyday
-- Saving money for new phone (Iphone or Samsung IDK not sure yet)  
-- Planning a small trip....
+- Learning Ngnix and Docker
+- Taking flight for the first time
+- Attending Open Source Summit in mumbai(Thanks to The Linux Foundation)
+- and some unplanned chaos..............
 
 ---
 
