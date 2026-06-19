@@ -3,7 +3,7 @@ import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://ashish-codejourney.github.io',
-  trailingSlash: 'always',
+  trailingSlash: 'ignore',
   integrations: [sitemap()],
   vite: {
     server: {
