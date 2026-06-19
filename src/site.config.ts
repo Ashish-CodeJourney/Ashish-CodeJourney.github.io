@@ -19,6 +19,6 @@ export const LINKS = [
   { label: 'LinkedIn', username: 'ashish-codejourney', url: SITE.socials.linkedin, icon: 'linkedin' },
   { label: 'X', username: '@codejourney_', url: SITE.socials.twitter, icon: 'x' },
   { label: 'Instagram', username: '@heyyy_ashish', url: SITE.socials.instagram, icon: 'instagram' },
-  { label: 'Dev.to', username: '@codejourney', url: 'https://dev.to/codejourney', icon: 'devto' },
+  { label: 'Dev.to', username: '@Ashish-CodeJourney', url: 'https://dev.to/Ashish-CodeJourney', icon: 'devto' },
   { label: 'GitHub', username: '@Ashish-CodeJourney', url: SITE.socials.github, icon: 'github' },
 ] as const;
