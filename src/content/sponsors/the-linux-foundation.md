@@ -1,5 +1,8 @@
 ---
 name: "The Linux Foundation"
+date: "2026-06-16"
+current: false
+description: "Sponsoring my attendance at Open Source Summit India 2026 in Mumbai."
 url: "https://www.linuxfoundation.org/"
 logo: "https://www.linuxfoundation.org/hubfs/LF%20Logo%20White.svg"
 ---

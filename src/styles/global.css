@@ -203,6 +203,117 @@ h1, h2, h3, h4 { font-family: var(--font-serif); letter-spacing: -0.02em; }
 .collection-header h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); line-height: 1.2; }
 .collection-subtitle { margin-top: 0.4rem; font-size: var(--text-6); }
 
+/* ─── Sponsors ───────────────────────────────────────────────── */
+.sponsor-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-weight: var(--font-medium);
+  text-align: center;
+}
+
+.sponsor-featured {
+  position: relative;
+  text-align: center;
+  padding: var(--space-10) var(--space-8);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-medium);
+  background: var(--card);
+  box-shadow: var(--shadow-medium);
+  margin-bottom: var(--space-12);
+}
+
+.sponsor-featured-badge { position: absolute; top: var(--space-5); left: 50%; transform: translateX(-50%); }
+
+.sponsor-featured-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 90px;
+  margin: var(--space-6) auto var(--space-5);
+  padding: var(--space-3);
+  background: #15171c;
+  border-radius: var(--radius-medium);
+  overflow: hidden;
+}
+.sponsor-featured-logo { max-width: 100%; max-height: 100%; object-fit: contain; }
+.sponsor-featured-fallback { border-radius: var(--radius-medium); font-size: var(--text-5); }
+
+.sponsor-featured h2 { font-size: var(--text-1); margin-bottom: var(--space-3); }
+.sponsor-featured .sponsor-body { max-width: 560px; margin: 0 auto; color: var(--muted-foreground); }
+.sponsor-featured .sponsor-links { display: flex; gap: var(--space-3); justify-content: center; margin-top: var(--space-6); }
+
+.sponsor-detail-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 90px;
+  margin: var(--space-4) 0 var(--space-5);
+  padding: var(--space-3);
+  background: #15171c;
+  border-radius: var(--radius-medium);
+  overflow: hidden;
+}
+.sponsor-detail-logo { max-width: 100%; max-height: 100%; object-fit: contain; }
+.sponsor-detail-fallback { border-radius: var(--radius-medium); font-size: var(--text-5); }
+
+.sponsor-links { display: flex; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-10); }
+
+.timeline-heading { font-size: var(--text-3); margin-bottom: var(--space-6); }
+
+.timeline { list-style: none; position: relative; padding-left: var(--space-8); }
+.timeline::before { content: ''; position: absolute; left: 5px; top: 6px; bottom: 6px; width: 2px; background: var(--border); }
+
+.timeline-item { position: relative; padding-bottom: var(--space-6); }
+.timeline-item:last-child { padding-bottom: 0; }
+
+.timeline-marker {
+  position: absolute;
+  left: calc(-1 * var(--space-8) + 1px);
+  top: 6px;
+  width: 11px;
+  height: 11px;
+  border-radius: var(--radius-full);
+  background: var(--background);
+  border: 2px solid var(--primary);
+}
+
+.timeline-date { display: block; font-size: var(--text-8); color: var(--muted-foreground); margin-bottom: var(--space-2); }
+
+.timeline-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-medium);
+  background: var(--card);
+  color: var(--foreground);
+  text-decoration: none;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+.timeline-card:hover { border-color: var(--primary); transform: translateY(-1px); text-decoration: none; }
+
+.timeline-card-logo, .timeline-card-fallback {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  object-fit: contain;
+  background: #15171c;
+  border-radius: var(--radius-small);
+  padding: var(--space-2);
+}
+.timeline-card-fallback { font-size: var(--text-8); padding: var(--space-1); }
+
+.timeline-card-text h3 { font-size: var(--text-6); display: flex; align-items: center; gap: var(--space-2); margin-bottom: 0; }
+.timeline-card-text p { font-size: var(--text-7); color: var(--muted-foreground); margin: var(--space-1) 0 0; }
+
 /* ─── Post Content ───────────────────────────────────────────── */
 .post-content { line-height: 1.85; }
 .post-content h2 { margin: var(--space-10) 0 var(--space-4); }
@@ -298,7 +409,7 @@ pre { border-radius: var(--radius-medium); border: 1px solid var(--border); padd
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: var(--space-7) 0 0;
+  margin: var(--space-6) 0 0;
   padding: var(--space-5);
   background: #FFFFFF;
   border: 1px solid var(--border);

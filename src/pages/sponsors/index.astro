@@ -1,43 +1,74 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate } from '../../utils/date';
+import { toSlug } from '../../utils/slug';
 
 const rawSponsors = await getCollection('sponsors');
-// Render each sponsor's content so we can include the body HTML
-const sponsors = await Promise.all(
-  rawSponsors.map(async (s) => {
-	const { Content } = await render(s);
-	return { entry: s, Content };
-  })
+const sponsors = [...rawSponsors].sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
 );
+
+const featured = sponsors.find(s => s.data.current);
+const FeaturedContent = featured ? (await render(featured)).Content : undefined;
 ---
 
-<BaseLayout title="Sponsors" description="Supporters who help keep this site running.">
-  <section class="sponsors-list">
-	{sponsors.length === 0 ? (
-	  <p>No sponsors yet — you can add one by creating a markdown file under <code>src/content/sponsors/</code>.</p>
-	) : (
-	  sponsors.map(({ entry, Content }) => (
-		<article class="sponsor-card">
-		  <a href={entry.data.url ?? '#'} target={entry.data.url ? '_blank' : undefined} rel="noopener noreferrer">
-			{entry.data.logo ? (
-			  <img src={entry.data.logo} alt={entry.data.name} class="sponsor-logo" />
-			) : (
-			  <div class="sponsor-fallback">{entry.data.name}</div>
-			)}
-		  </a>
+<BaseLayout title="Sponsors" description="People and organizations who've sponsored me to attend conferences and other events.">
+  <header class="collection-header stagger-item">
+    <p class="section-eyebrow">Support</p>
+    <h1>Sponsors</h1>
+    <p class="text-light collection-subtitle">The generous folks who've funded my plane tickets, conference badges, and questionable airport coffee — so I could show up, learn, and meet people as curious as I am.</p>
+  </header>
 
-		  <h3>{entry.data.name}</h3>
+  {sponsors.length === 0 ? (
+    <p>No sponsors yet — you can add one by creating a markdown file under <code>src/content/sponsors/</code>.</p>
+  ) : (
+    <>
+      {featured && FeaturedContent && (
+        <article class="sponsor-featured stagger-item">
+          <span class="badge primary sponsor-featured-badge">Current Sponsor</span>
+          <a class="sponsor-featured-logo-wrap" href={`/sponsors/${toSlug(featured.id)}/`}>
+            {featured.data.logo ? (
+              <img src={featured.data.logo} alt={featured.data.name} class="sponsor-featured-logo" />
+            ) : (
+              <div class="sponsor-fallback sponsor-featured-fallback">{featured.data.name}</div>
+            )}
+          </a>
+          <h2><a href={`/sponsors/${toSlug(featured.id)}/`}>{featured.data.name}</a></h2>
+          <div class="sponsor-body"><FeaturedContent /></div>
+          <div class="sponsor-links">
+            <a href={`/sponsors/${toSlug(featured.id)}/`} class="button">About this sponsorship</a>
+          </div>
+        </article>
+      )}
 
-		  <div class="sponsor-body"><Content /></div>
-			<div class="sponsor-links">
-			  {entry.data.linkedin && <a href={entry.data.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>}
-			  {entry.data.x && <a href={entry.data.x} target="_blank" rel="noopener noreferrer">X</a>}
-			</div>
-		</article>
-	  ))
-	)}
-  </section>
+      <section class="sponsor-timeline-section stagger-item">
+        <h2 class="timeline-heading">Sponsorship timeline</h2>
+        <ol class="timeline">
+          {sponsors.map(s => (
+            <li class="timeline-item">
+              <span class="timeline-marker" aria-hidden="true"></span>
+              <div class="timeline-content">
+                <span class="timeline-date">{formatDate(s.data.date)}</span>
+                <a class="timeline-card" href={`/sponsors/${toSlug(s.id)}/`}>
+                  {s.data.logo ? (
+                    <img src={s.data.logo} alt={s.data.name} class="timeline-card-logo" />
+                  ) : (
+                    <div class="sponsor-fallback timeline-card-fallback">{s.data.name}</div>
+                  )}
+                  <div class="timeline-card-text">
+                    <h3>
+                      {s.data.name}
+                      {s.data.current && <span class="badge secondary">Current</span>}
+                    </h3>
+                    {s.data.description && <p>{s.data.description}</p>}
+                  </div>
+                </a>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </>
+  )}
 </BaseLayout>
-
-

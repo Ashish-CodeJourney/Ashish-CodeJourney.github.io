@@ -1,0 +1,52 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate } from '../../utils/date';
+import { toSlug } from '../../utils/slug';
+
+export async function getStaticPaths() {
+  const sponsors = await getCollection('sponsors');
+  return sponsors.map(sponsor => ({
+    params: { slug: toSlug(sponsor.id) },
+    props: { sponsor },
+  }));
+}
+
+const { sponsor } = Astro.props;
+const { Content } = await render(sponsor);
+---
+
+<BaseLayout
+  title={sponsor.data.name}
+  description={sponsor.data.description ?? `About ${sponsor.data.name}'s sponsorship.`}
+>
+  <article>
+    <header class="post-header stagger-item">
+      <a href="/sponsors/" class="back-link">← Sponsors</a>
+
+      <div class="sponsor-detail-logo-wrap">
+        {sponsor.data.logo ? (
+          <img src={sponsor.data.logo} alt={sponsor.data.name} class="sponsor-detail-logo" />
+        ) : (
+          <div class="sponsor-fallback sponsor-detail-fallback">{sponsor.data.name}</div>
+        )}
+      </div>
+
+      <h1>{sponsor.data.name}</h1>
+      <div class="post-meta">
+        <span class="badge primary">{formatDate(sponsor.data.date)}</span>
+        {sponsor.data.current && <span class="badge secondary">Current Sponsor</span>}
+      </div>
+    </header>
+
+    <div class="post-content stagger-item">
+      <Content />
+    </div>
+
+    <div class="sponsor-links stagger-item">
+      {sponsor.data.url && <a href={sponsor.data.url} target="_blank" rel="noopener noreferrer" class="button outline">Visit website</a>}
+      {sponsor.data.linkedin && <a href={sponsor.data.linkedin} target="_blank" rel="noopener noreferrer" class="button outline">LinkedIn</a>}
+      {sponsor.data.x && <a href={sponsor.data.x} target="_blank" rel="noopener noreferrer" class="button outline">X</a>}
+    </div>
+  </article>
+</BaseLayout>

@@ -20,6 +20,9 @@ export const collections = {
     type: 'content',
     schema: z.object({
       name: z.string(),
+      date: z.string(),
+      current: z.boolean().default(false),
+      description: z.string().optional(),
       url: z.string().optional(),
       logo: z.string().optional(),
       linkedin: z.string().optional(),
