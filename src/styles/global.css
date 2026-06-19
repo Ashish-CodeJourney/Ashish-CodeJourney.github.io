@@ -281,6 +281,57 @@ pre { border-radius: var(--radius-medium); border: 1px solid var(--border); padd
   mix-blend-mode: normal;
 }
 
+/* ─── Links page ─────────────────────────────────────────────── */
+.links-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: var(--space-10) 0;
+}
+.links-title { font-size: var(--text-2); }
+.links-page .hero-desc { margin-bottom: 0; }
+
+.qr-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: var(--space-7) 0 0;
+  padding: var(--space-5);
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-medium);
+  box-shadow: var(--shadow-medium);
+}
+.qr-card svg { display: block; width: 160px; height: 160px; }
+
+.qr-caption { font-size: var(--text-8); color: var(--muted-foreground); margin: var(--space-3) 0 var(--space-8); word-break: break-all; }
+
+.links-list { display: flex; flex-direction: column; gap: var(--space-3); width: 100%; }
+
+.link-button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-medium);
+  background: var(--card);
+  color: var(--foreground);
+  font-weight: var(--font-medium);
+  text-decoration: none;
+  transition: border-color var(--transition-fast), transform var(--transition-fast), background var(--transition-fast);
+}
+.link-button:hover { border-color: var(--primary); color: var(--primary); background: color-mix(in srgb, var(--primary) 8%, transparent); transform: translateY(-1px); text-decoration: none; }
+.link-icon { width: 20px; height: 20px; flex-shrink: 0; }
+
+.link-text { display: flex; flex-direction: column; gap: 0.1rem; text-align: left; min-width: 0; }
+.link-label { font-size: var(--text-6); }
+.link-username { font-size: var(--text-8); font-weight: var(--font-normal); color: var(--muted-foreground); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.link-button:hover .link-username { color: inherit; opacity: 0.8; }
+
 /* ─── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .site-content { padding: var(--space-10) 0; }

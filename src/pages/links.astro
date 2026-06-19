@@ -1,0 +1,37 @@
+---
+import QRCode from 'qrcode';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LinkIcon from '../components/LinkIcon.astro';
+import { SITE, LINKS } from '../site.config';
+
+const linksUrl = `${SITE.url}/links/`;
+
+const qrSvg = await QRCode.toString(linksUrl, {
+  type: 'svg',
+  margin: 1,
+  width: 180,
+  color: { dark: '#111210', light: '#FFFFFF' },
+});
+---
+
+<BaseLayout title="Links" description={`Find ${SITE.author} on the web.`}>
+  <section class="links-page stagger-item">
+    <h1 class="links-title">{SITE.author}</h1>
+    <p class="hero-desc">{SITE.description}</p>
+
+    <div class="qr-card" set:html={qrSvg} />
+    <p class="qr-caption">Scan to open this page — {linksUrl}</p>
+
+    <nav class="links-list" aria-label="Links">
+      {LINKS.map(({ label, username, url, icon }) => (
+        <a href={url} target="_blank" rel="noopener noreferrer" class="link-button">
+          <LinkIcon name={icon} />
+          <span class="link-text">
+            <span class="link-label">{label}</span>
+            <span class="link-username">{username}</span>
+          </span>
+        </a>
+      ))}
+    </nav>
+  </section>
+</BaseLayout>

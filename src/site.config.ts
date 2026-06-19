@@ -12,3 +12,13 @@ export const SITE = {
     github: 'https://github.com/Ashish-CodeJourney',
   },
 } as const;
+
+// Configure the /links linktree page here — add, remove, or reorder entries freely.
+export const LINKS = [
+  { label: 'Website', username: 'ashish-codejourney.github.io', url: SITE.url, icon: 'website' },
+  { label: 'LinkedIn', username: 'ashish-codejourney', url: SITE.socials.linkedin, icon: 'linkedin' },
+  { label: 'X', username: '@codejourney_', url: SITE.socials.twitter, icon: 'x' },
+  { label: 'Instagram', username: '@heyyy_ashish', url: SITE.socials.instagram, icon: 'instagram' },
+  { label: 'Dev.to', username: '@codejourney', url: 'https://dev.to/codejourney', icon: 'devto' },
+  { label: 'GitHub', username: '@Ashish-CodeJourney', url: SITE.socials.github, icon: 'github' },
+] as const;
