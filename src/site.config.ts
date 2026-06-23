@@ -4,7 +4,6 @@ export const SITE = {
   author: 'Ashish Vaghela',
   email: 'vaghelaashish111@gmail.com',
   url: 'https://ashish-codejourney.github.io',
-  ga: 'G-ERND4QRRN0',
   socials: {
     twitter: 'https://twitter.com/codejourney_',
     linkedin: 'https://linkedin.com/in/ashish-codejourney',

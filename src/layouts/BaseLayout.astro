@@ -15,7 +15,6 @@ interface Props {
 const { title, description = SITE.description, ogImage } = Astro.props;
 const pageTitle = title ? `${title} — ${SITE.title}` : SITE.title;
 const canonicalURL = new URL(Astro.url.pathname, SITE.url);
-const gaScriptUrl = `https://www.googletagmanager.com/gtag/js?id=${SITE.ga}`;
 ---
 
 <!doctype html>
@@ -51,13 +50,9 @@ const gaScriptUrl = `https://www.googletagmanager.com/gtag/js?id=${SITE.ga}`;
   <meta property="og:type" content="website" />
   {ogImage && <meta property="og:image" content={ogImage} />}
 
-  <script async is:inline src={gaScriptUrl}></script>
-  <script is:inline define:vars={{ gaId: SITE.ga }}>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', gaId);
-  </script>
+  <!-- Cloudflare Web Analytics -->
+  <script defer is:inline src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "dd7ad3e3ae3643efaa8e648ff0a81477"}'></script>
+  <!-- End Cloudflare Web Analytics -->
 
   <ClientRouter />
 </head>
