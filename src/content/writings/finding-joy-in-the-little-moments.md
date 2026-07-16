@@ -5,8 +5,6 @@ description: "A personal reflection on appreciating the small victories and ever
 tags: ["personal", "mindfulness", "life"]
 ---
 
-# Finding Joy in the Little Moments
-
 In our fast-paced world, we often get caught up chasing the big milestones and grand achievements. But sometimes, the most meaningful experiences are the ones that go unnoticed—the small, quiet moments that shape who we are.
 
 ## The Overlooked Beauty

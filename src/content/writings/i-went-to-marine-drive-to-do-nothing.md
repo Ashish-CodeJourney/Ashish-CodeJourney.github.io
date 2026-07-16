@@ -5,8 +5,6 @@ description: "A couple of hours at Marine Drive, no phone, no music, no plan, an
 tags: ["reflection", "slow-living"]
 ---
 
-# The Art of Sitting Still
-
 I went to Marine Drive for the first time today. Just sat there. Two hours, no phone, no music, no one to talk to. Just me, the sea, and whatever was rattling around in my head.
 
 I didn't plan it that way. I went with the usual intention of taking a few pictures, maybe putting on a podcast, scrolling a bit while I "took in the view." But something about the place made all of that feel unnecessary. So I put the phone away and just sat.
