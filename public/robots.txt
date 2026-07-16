@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ashish-codejourney.github.io/sitemap-index.xml

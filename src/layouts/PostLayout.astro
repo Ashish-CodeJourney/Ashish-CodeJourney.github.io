@@ -1,6 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import { formatDate, readingTime } from '../utils/date';
+import { SITE } from '../site.config';
 
 interface Props {
   title: string;
@@ -14,9 +15,25 @@ interface Props {
 }
 
 const { title, date, description, tags, banner, body, backHref, backLabel } = Astro.props;
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  image: banner ? new URL(banner, SITE.url).toString() : undefined,
+  datePublished: date,
+  author: {
+    '@type': 'Person',
+    name: SITE.author,
+    url: SITE.url,
+  },
+  keywords: tags.join(', ') || undefined,
+};
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} ogImage={banner}>
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />
   <article>
     <header class="post-header stagger-item">
       <a href={backHref} class="back-link">← {backLabel}</a>
