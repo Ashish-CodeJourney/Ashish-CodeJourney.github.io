@@ -2,7 +2,9 @@
 
 Personal website and blog — fast, minimal, content-first. Built with Astro 5 and deployed to GitHub Pages.
 
-![Astro](https://img.shields.io/badge/astro-5-BC52EE?style=flat-oval&logo=astro) [![pages-build-deployment](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/pages/pages-build-deployment) ![TypeScript](https://img.shields.io/badge/typescript-strict-3178C6?style=flat-oval&logo=typescript)
+![Astro](https://img.shields.io/badge/astro-5-BC52EE?style=flat-oval&logo=astro) 
+[![Deploy to GitHub Pages](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/deploy.yml)
+![TypeScript](https://img.shields.io/badge/typescript-strict-3178C6?style=flat-oval&logo=typescript)
 
 ## Features
 
