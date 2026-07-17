@@ -18,13 +18,13 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: make ci
 
       - name: Type check
-        run: npm run check
+        run: make check
 
       - name: Test
-        run: npm test
+        run: make test
 
       - name: Build site
-        run: npm run build
+        run: make build
