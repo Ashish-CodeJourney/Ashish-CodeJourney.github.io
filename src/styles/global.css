@@ -223,10 +223,12 @@ h1, .post-card h3, .collection-header h1 { font-family: var(--font-display); fon
 /* ─── Hero ───────────────────────────────────────────────────── */
 .hero { padding: 0 0 var(--space-6); border-bottom: 1px solid var(--border); margin-bottom: var(--space-10); }
 
+.hero-overlap { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4); margin-bottom: var(--space-5); }
+
 .hero-avatar {
   display: block;
   position: relative;
-  margin: -60px 0 var(--space-4);
+  margin: -60px 0 0;
   background: var(--card);
   border-radius: var(--radius-full);
   object-fit: cover;
@@ -236,7 +238,14 @@ h1, .post-card h3, .collection-header h1 { font-family: var(--font-display); fon
 }
 .hero-avatar:hover { border-color: var(--primary); transform: scale(1.05); box-shadow: 0 0 0 8px color-mix(in srgb, var(--primary) 18%, transparent); }
 
-.hero-name { font-family: var(--font-display); font-size: var(--text-3); font-weight: var(--font-semibold); margin: 0 0 var(--space-2); }
+.hero-social {
+  margin: -26px 0 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-medium);
+}
 
 .hero-desc { font-size: var(--text-5); color: var(--foreground); opacity: 0.8; line-height: 1.7; max-width: 500px; margin: 0 0 var(--space-5); }
 
@@ -517,9 +526,8 @@ pre { border-radius: var(--radius-medium); border: 1px solid var(--border); padd
 @media (max-width: 640px) {
   .site-content { padding: var(--space-10) 0; }
   .hero { padding: 0 0 var(--space-5); margin-bottom: var(--space-8); }
-  .hero-avatar { margin-bottom: var(--space-6); }
-  .hero-name { margin-bottom: var(--space-2); }
-  .hero-desc { margin-bottom: var(--space-6); }
+  .hero-overlap { margin-bottom: var(--space-6); }
+  .hero-social { margin: var(--space-4) 0 0; }
   .theme-toggle { bottom: var(--space-4); right: var(--space-4); }
   .desktop-nav { display: none; }
   .mobile-menu-toggle { display: inline-flex; }

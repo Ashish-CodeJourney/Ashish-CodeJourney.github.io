@@ -37,17 +37,20 @@ const { Content } = await render(homePage);
   </section>
 
   <section class="hero stagger-item">
-    <img
-      src="/avatar.jpg"
-      alt={SITE.author}
-      class="hero-avatar"
-      width="120"
-      height="120"
-      loading="eager"
-    />
-    <p class="hero-name">{SITE.author}</p>
+    <div class="hero-overlap">
+      <img
+        src="/avatar.jpg"
+        alt={SITE.author}
+        class="hero-avatar"
+        width="120"
+        height="120"
+        loading="eager"
+      />
+      <div class="hero-social">
+        <SocialLinks />
+      </div>
+    </div>
     <p class="hero-desc">{SITE.description}</p>
-    <SocialLinks />
   </section>
 
   <section class="home-content post-content stagger-item">
