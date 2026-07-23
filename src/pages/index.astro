@@ -21,6 +21,21 @@ const { Content } = await render(homePage);
 ---
 
 <BaseLayout>
+  <section class="banner stagger-item">
+    <video
+      class="banner-video"
+      src="/videos/hero-coastal-mountains.mp4"
+      poster="/videos/hero-coastal-mountains-poster.jpg"
+      autoplay
+      muted
+      loop
+      playsinline
+    />
+    <div class="banner-overlay">
+      <p class="banner-quote">Simplicity over Everything.</p>
+    </div>
+  </section>
+
   <section class="hero text-center stagger-item">
     <img
       src="/avatar.jpg"
