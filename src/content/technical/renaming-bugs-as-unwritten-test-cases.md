@@ -41,4 +41,4 @@ Seeing bugs as "missing tests" changes the way you develop software. This leads 
 
 Meanwhile, we can connect over:
 - [LinkedIn](https://www.linkedin.com/in/ashish-codejourney/)
-- [Twitter / X](https://x.com/codejourney_)
+- [Twitter / X](https://x.com/ashishvaghelaa)

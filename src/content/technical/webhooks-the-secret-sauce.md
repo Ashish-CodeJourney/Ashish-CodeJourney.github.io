@@ -54,4 +54,4 @@ In this example, if a POST request is sent to the `/webhook` endpoint with a JSO
 
 Meanwhile we can connect over:
 - [LinkedIn](https://www.linkedin.com/in/ashish-codejourney/)
-- [Twitter/X](https://x.com/codejourney_)
+- [Twitter/X](https://x.com/ashishvaghelaa)
