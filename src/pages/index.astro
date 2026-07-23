@@ -36,7 +36,7 @@ const { Content } = await render(homePage);
     </div>
   </section>
 
-  <section class="hero text-center stagger-item">
+  <section class="hero stagger-item">
     <img
       src="/avatar.jpg"
       alt={SITE.author}
@@ -45,6 +45,7 @@ const { Content } = await render(homePage);
       height="120"
       loading="eager"
     />
+    <p class="hero-name">{SITE.author}</p>
     <p class="hero-desc">{SITE.description}</p>
     <SocialLinks />
   </section>
