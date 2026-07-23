@@ -98,6 +98,21 @@ h1, .post-card h3, .collection-header h1 { font-family: var(--font-display); fon
 }
 .theme-toggle:hover { transform: translateY(-2px); border-color: var(--primary); }
 .moon-icon { display: none; }
+
+/* ─── Oneko (cursor-chasing cat) ─────────────────────────────── */
+.oneko {
+  width: 32px; height: 32px;
+  position: fixed;
+  pointer-events: none;
+  image-rendering: pixelated;
+  background-image: url('/oneko.gif');
+  left: 16px; top: 16px;
+  z-index: var(--z-dropdown);
+}
+
+@media (max-width: 640px) {
+  .oneko { display: none; }
+}
 .dark .sun-icon { display: none; }
 .dark .moon-icon { display: block !important; }
 

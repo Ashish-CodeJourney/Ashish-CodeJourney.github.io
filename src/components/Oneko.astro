@@ -1,0 +1,161 @@
+---
+---
+
+<div id="oneko" class="oneko" aria-hidden="true"></div>
+
+<script>
+  const FRAME_SIZE = 32;
+  const SPEED = 10;
+  const SETTLE_DISTANCE = 48;
+  const TICK_MS = 100;
+
+  const SPRITES: Record<string, [number, number][]> = {
+    idle: [[-3, -3]],
+    alert: [[-7, -3]],
+    scratchSelf: [[-5, 0], [-6, 0], [-7, 0]],
+    scratchWallN: [[0, 0], [0, -1]],
+    scratchWallS: [[-7, -1], [-6, -2]],
+    scratchWallE: [[-2, -2], [-2, -3]],
+    scratchWallW: [[-4, 0], [-4, -1]],
+    tired: [[-3, -2]],
+    sleeping: [[-2, 0], [-2, -1]],
+    N: [[-1, -2], [-1, -3]],
+    NE: [[0, -2], [0, -3]],
+    E: [[-3, 0], [-3, -1]],
+    SE: [[-5, -1], [-5, -2]],
+    S: [[-6, -3], [-7, -2]],
+    SW: [[-5, -3], [-6, -1]],
+    W: [[-4, -2], [-4, -3]],
+    NW: [[-1, 0], [-1, -1]],
+  };
+
+  let raf = 0;
+
+  function setup() {
+    const el = document.getElementById('oneko');
+    if (!(el instanceof HTMLElement)) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let nekoX = 32;
+    let nekoY = 32;
+    let mouseX = nekoX;
+    let mouseY = nekoY;
+    let frameCount = 0;
+    let idleTicks = 0;
+    let idleAnimation: string | null = null;
+    let idleAnimationFrame = 0;
+    let lastTick = 0;
+
+    function setSprite(name: string, frame: number) {
+      const variants = SPRITES[name];
+      const [x, y] = variants[frame % variants.length];
+      el!.style.backgroundPosition = `${x * FRAME_SIZE}px ${y * FRAME_SIZE}px`;
+    }
+
+    function resetIdleAnimation() {
+      idleAnimation = null;
+      idleAnimationFrame = 0;
+    }
+
+    function idle() {
+      idleTicks += 1;
+
+      if (idleTicks > 10 && Math.floor(Math.random() * 200) === 0 && !idleAnimation) {
+        const candidates = ['sleeping', 'scratchSelf'];
+        if (nekoX < FRAME_SIZE) candidates.push('scratchWallW');
+        if (nekoY < FRAME_SIZE) candidates.push('scratchWallN');
+        if (nekoX > window.innerWidth - FRAME_SIZE) candidates.push('scratchWallE');
+        if (nekoY > window.innerHeight - FRAME_SIZE) candidates.push('scratchWallS');
+        idleAnimation = candidates[Math.floor(Math.random() * candidates.length)];
+      }
+
+      switch (idleAnimation) {
+        case 'sleeping':
+          if (idleAnimationFrame < 8) {
+            setSprite('tired', 0);
+          } else {
+            setSprite('sleeping', Math.floor(idleAnimationFrame / 4));
+            if (idleAnimationFrame > 192) resetIdleAnimation();
+          }
+          break;
+        case 'scratchWallN':
+        case 'scratchWallS':
+        case 'scratchWallE':
+        case 'scratchWallW':
+        case 'scratchSelf':
+          setSprite(idleAnimation, idleAnimationFrame);
+          if (idleAnimationFrame > 9) resetIdleAnimation();
+          break;
+        default:
+          setSprite('idle', 0);
+          return;
+      }
+
+      idleAnimationFrame += 1;
+    }
+
+    function tick() {
+      frameCount += 1;
+
+      const dx = nekoX - mouseX;
+      const dy = nekoY - mouseY;
+      const distance = Math.hypot(dx, dy);
+
+      if (distance < SETTLE_DISTANCE) {
+        idle();
+        return;
+      }
+
+      resetIdleAnimation();
+
+      if (idleTicks > 1) {
+        setSprite('alert', 0);
+        idleTicks = Math.max(idleTicks - 1, 0);
+        return;
+      }
+
+      const direction =
+        (dy / distance > 0.5 ? 'N' : '') +
+        (dy / distance < -0.5 ? 'S' : '') +
+        (dx / distance > 0.5 ? 'W' : '') +
+        (dx / distance < -0.5 ? 'E' : '');
+
+      setSprite(direction, frameCount);
+
+      nekoX -= (dx / distance) * SPEED;
+      nekoY -= (dy / distance) * SPEED;
+      nekoX = Math.min(Math.max(FRAME_SIZE / 2, nekoX), window.innerWidth - FRAME_SIZE / 2);
+      nekoY = Math.min(Math.max(FRAME_SIZE / 2, nekoY), window.innerHeight - FRAME_SIZE / 2);
+
+      el!.style.left = `${nekoX - FRAME_SIZE / 2}px`;
+      el!.style.top = `${nekoY - FRAME_SIZE / 2}px`;
+    }
+
+    function onMouseMove(e: MouseEvent) {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    }
+
+    function loop(timestamp: number) {
+      if (timestamp - lastTick > TICK_MS) {
+        lastTick = timestamp;
+        tick();
+      }
+      raf = requestAnimationFrame(loop);
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+    raf = requestAnimationFrame(loop);
+
+    document.addEventListener(
+      'astro:before-swap',
+      () => {
+        cancelAnimationFrame(raf);
+        document.removeEventListener('mousemove', onMouseMove);
+      },
+      { once: true },
+    );
+  }
+
+  document.addEventListener('astro:page-load', setup);
+</script>
