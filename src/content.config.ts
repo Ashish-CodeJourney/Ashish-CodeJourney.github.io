@@ -15,19 +15,19 @@ const pageSchema = z.object({
 
 export const collections = {
   technical: defineCollection({
-    loader: glob({ pattern: '[^_]*.md', base: '../content/technical' }),
+    loader: glob({ pattern: '[^_]*.md', base: './content/technical' }),
     schema: postSchema,
   }),
   writings: defineCollection({
-    loader: glob({ pattern: '[^_]*.md', base: '../content/writings' }),
+    loader: glob({ pattern: '[^_]*.md', base: './content/writings' }),
     schema: postSchema,
   }),
   pages: defineCollection({
-    loader: glob({ pattern: '[^_]*.md', base: '../content/pages' }),
+    loader: glob({ pattern: '[^_]*.md', base: './content/pages' }),
     schema: pageSchema,
   }),
   sponsors: defineCollection({
-    loader: glob({ pattern: '[^_]*.md', base: '../content/sponsors' }),
+    loader: glob({ pattern: '[^_]*.md', base: './content/sponsors' }),
     schema: z.object({
       name: z.string(),
       date: z.string(),
