@@ -1,23 +1,20 @@
+import data from '../content/site.json';
+
 export const SITE = {
-  title: 'Ashish',
-  description: "This is where I think out loud. You're welcome to listen.",
-  author: 'Ashish Vaghela',
-  email: 'vaghelaashish111@gmail.com',
-  url: 'https://ashish-codejourney.github.io',
-  socials: {
-    twitter: 'https://twitter.com/ashishvaghelaa',
-    linkedin: 'https://linkedin.com/in/ashish-codejourney',
-    instagram: 'https://instagram.com/heyyy_ashish',
-    github: 'https://github.com/Ashish-CodeJourney',
-  },
+  title: data.title,
+  description: data.description,
+  author: data.author,
+  email: data.email,
+  url: data.url,
+  socials: data.socials,
 } as const;
 
-// Configure the /links linktree page here — add, remove, or reorder entries freely.
-export const LINKS = [
-  { label: 'Website', username: 'ashish-codejourney.github.io', url: SITE.url, icon: 'website' },
-  { label: 'LinkedIn', username: 'ashish-codejourney', url: SITE.socials.linkedin, icon: 'linkedin' },
-  { label: 'X', username: '@ashishvaghelaa', url: SITE.socials.twitter, icon: 'x' },
-  { label: 'Instagram', username: '@heyyy_ashish', url: SITE.socials.instagram, icon: 'instagram' },
-  { label: 'Dev.to', username: '@Ashish-CodeJourney', url: 'https://dev.to/Ashish-CodeJourney', icon: 'devto' },
-  { label: 'GitHub', username: '@Ashish-CodeJourney', url: SITE.socials.github, icon: 'github' },
-] as const;
+type LinkIconName = 'website' | 'linkedin' | 'x' | 'instagram' | 'devto' | 'github';
+
+// Configure the /links linktree page in content/site.json — add, remove, or reorder entries freely.
+export const LINKS = data.links as ReadonlyArray<{
+  label: string;
+  username: string;
+  url: string;
+  icon: LinkIconName;
+}>;

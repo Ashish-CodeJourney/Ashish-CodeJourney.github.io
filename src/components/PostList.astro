@@ -5,7 +5,7 @@ import { readingTime } from '../utils/date';
 
 interface PostItem {
   id: string;
-  body: string;
+  body?: string;
   data: {
     title: string;
     date: string;
@@ -41,7 +41,7 @@ const { eyebrow, heading, subtitle, posts, basePath } = Astro.props;
           description={post.data.description}
           tags={post.data.tags}
           banner={post.data.banner}
-          readingTime={readingTime(post.body)}
+          readingTime={readingTime(post.body ?? '')}
           href={`${basePath}${toSlug(post.id)}/`}
         />
       ))
