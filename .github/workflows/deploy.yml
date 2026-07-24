@@ -25,9 +25,9 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v7
-        with:
-          submodules: true
-          persist-credentials: false
+
+      - name: Checkout content submodule
+        run: git submodule update --init --depth=1
 
       - name: Setup Node
         uses: actions/setup-node@v7
