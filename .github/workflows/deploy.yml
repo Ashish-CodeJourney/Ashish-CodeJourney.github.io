@@ -18,6 +18,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up content repo deploy key
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.CONTENT_DEPLOY_KEY }}
+
       - name: Checkout
         uses: actions/checkout@v7
         with:
