@@ -1,36 +1,89 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const messages = [
+  {
+    title: 'Journey Interrupted',
+    text: "You've wandered into unmapped territory. This page doesn't exist.",
+  },
+  {
+    title: 'Lost in Compilation',
+    text: 'This route failed to build. Try a different path.',
+  },
+  {
+    title: 'Off the Map',
+    text: "There's nothing here but 404s and tumbleweeds.",
+  },
+  {
+    title: 'Segmentation Fault',
+    text: "You tried to access a page that doesn't exist in this universe.",
+  },
+  {
+    title: 'Dead End',
+    text: "Even the best explorers hit dead ends sometimes. Let's turn back.",
+  },
+];
 ---
 
 <BaseLayout title="404 — Not Found" description="Page not found">
   <div class="error-container">
-    <video
-      class="error-illustration"
-      src="/videos/404.mp4"
-      width="324"
-      height="324"
-      id="error-video"
-      autoplay
-      muted
-      loop
-      playsinline
-    />
+    <div class="error-video-wrap">
+      <video
+        id="error-video"
+        class="error-illustration"
+        src="/videos/404.mp4"
+        width="324"
+        height="324"
+        autoplay
+        muted
+        loop
+        playsinline
+      />
+      <span id="sound-hint" class="sound-hint">🔈 Tap for sound</span>
+    </div>
     <span class="error-code">404</span>
-    <h2 class="error-title">Journey Interrupted</h2>
-    <p class="error-text">
+    <h2 id="error-title" class="error-title">Journey Interrupted</h2>
+    <p id="error-text" class="error-text">
       You've wandered into unmapped territory. This page doesn't exist.
     </p>
-    <a href="/" class="button">← Go Home</a>
+    <div class="error-actions hstack gap-3">
+      <a href="/" class="button">← Go Home</a>
+      <a href="/writings/" class="button outline">Writings</a>
+      <a href="/technical/" class="button outline">Technical</a>
+    </div>
   </div>
 
-  <script>
-    function unmuteOnFirstInteraction() {
-      const video = document.getElementById('error-video');
-      if (!(video instanceof HTMLVideoElement)) return;
+  <script is:inline define:vars={{ messages }}>
+    function pickRandomMessage() {
+      const titleEl = document.getElementById('error-title');
+      const textEl = document.getElementById('error-text');
+      if (!titleEl || !textEl) return;
 
-      document.addEventListener('click', () => { video.muted = false; }, { once: true });
+      const { title, text } = messages[Math.floor(Math.random() * messages.length)];
+      titleEl.textContent = title;
+      textEl.textContent = text;
     }
 
-    document.addEventListener('astro:page-load', unmuteOnFirstInteraction);
+    function unmuteOnFirstInteraction() {
+      const video = document.getElementById('error-video');
+      const hint = document.getElementById('sound-hint');
+      if (!(video instanceof HTMLVideoElement)) return;
+
+      document.addEventListener(
+        'click',
+        () => {
+          video.muted = false;
+          hint?.classList.add('sound-hint-hidden');
+        },
+        { once: true },
+      );
+    }
+
+    function initErrorPage() {
+      pickRandomMessage();
+      unmuteOnFirstInteraction();
+    }
+
+    document.addEventListener('astro:page-load', initErrorPage);
   </script>
 </BaseLayout>

@@ -433,7 +433,16 @@ h1, .post-card h3, .collection-header h1 { font-family: var(--font-display); fon
 .error-code { font-family: var(--font-serif); font-size: 6rem; font-weight: var(--font-bold); color: var(--border); line-height: 1; }
 .error-title { font-size: var(--text-2); }
 .error-text { color: var(--muted-foreground); max-width: 400px; font-size: var(--text-6); }
-.error-illustration { max-width: 324px; width: 100%; height: auto; margin-bottom: var(--space-4); border-radius: var(--radius-medium); }
+.error-video-wrap { position: relative; display: inline-block; margin-bottom: var(--space-4); }
+.error-illustration { display: block; max-width: 324px; width: 100%; height: auto; border-radius: var(--radius-medium); }
+.sound-hint {
+  position: absolute; bottom: var(--space-3); left: 50%; transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.65); color: #fff; font-size: var(--text-7);
+  padding: var(--space-1) var(--space-3); border-radius: var(--radius-full);
+  pointer-events: none; transition: opacity var(--transition-fast), visibility var(--transition-fast);
+}
+.sound-hint-hidden { opacity: 0; visibility: hidden; }
+.error-actions { flex-wrap: wrap; justify-content: center; }
 
 /* ─── Shiki dual-theme (light/dark code blocks) ──────────────── */
 code[data-theme*=" "],
