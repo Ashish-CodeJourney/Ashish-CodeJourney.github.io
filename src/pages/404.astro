@@ -4,12 +4,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 <BaseLayout title="404 — Not Found" description="Page not found">
   <div class="error-container">
-    <img
-      src="/404-illustration.png"
-      alt="Lost Explorer"
+    <video
       class="error-illustration"
-      width="200"
-      height="200"
+      src="/videos/404.mp4"
+      width="324"
+      height="324"
+      id="error-video"
+      autoplay
+      muted
+      loop
+      playsinline
     />
     <span class="error-code">404</span>
     <h2 class="error-title">Journey Interrupted</h2>
@@ -18,4 +22,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </p>
     <a href="/" class="button">← Go Home</a>
   </div>
+
+  <script>
+    function unmuteOnFirstInteraction() {
+      const video = document.getElementById('error-video');
+      if (!(video instanceof HTMLVideoElement)) return;
+
+      document.addEventListener('click', () => { video.muted = false; }, { once: true });
+    }
+
+    document.addEventListener('astro:page-load', unmuteOnFirstInteraction);
+  </script>
 </BaseLayout>
