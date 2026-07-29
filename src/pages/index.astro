@@ -50,8 +50,10 @@ const { Content } = await render(homePage);
         <SocialLinks />
       </div>
     </div>
-    <p class="hero-desc">{SITE.description}</p>
-    <a href="/resume/" class="button outline">Resume</a>
+    <div class="hero-desc-wrap">
+      <p class="hero-desc">{SITE.description}</p>
+      <a href="/resume/" class="resume-tab" aria-label="View résumé" title="View résumé">Résumé →</a>
+    </div>
   </section>
 
   <section class="home-content post-content stagger-item">
