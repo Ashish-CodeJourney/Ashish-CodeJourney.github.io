@@ -4,6 +4,9 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://ashish-codejourney.github.io',
   trailingSlash: 'ignore',
+  redirects: {
+    '/resume': '/resume.pdf',
+  },
   integrations: [sitemap()],
   vite: {
     server: {
