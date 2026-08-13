@@ -155,7 +155,17 @@ h1, .post-card h3, .collection-header h1 { font-family: var(--font-display); fon
 .post-card, .post-card *, .post-card:hover, .post-card:hover * { color: inherit; text-decoration: none; }
 .post-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: var(--shadow-medium); }
 
-.post-card-banner { width: 100%; height: 180px; object-fit: cover; border-radius: var(--radius-medium) var(--radius-medium) 0 0; display: block; border-bottom: 1px solid var(--border); }
+.post-card-banner {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  object-position: center;
+  background: var(--muted);
+  border-radius: var(--radius-medium) var(--radius-medium) 0 0;
+  display: block;
+  border-bottom: 1px solid var(--border);
+}
 
 .post-card-body { padding: var(--space-6); }
 
@@ -472,7 +482,17 @@ h1, .post-card h3, .collection-header h1 { font-family: var(--font-display); fon
 .post-meta { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); }
 
 /* ─── Banner image ──────────────────────────────────────────── */
-.banner-img { width: 100%; max-height: 360px; object-fit: cover; border-radius: var(--radius-medium); margin-bottom: var(--space-8); border: 1px solid var(--border); }
+.banner-img {
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+  object-position: center;
+  background: var(--muted);
+  border-radius: var(--radius-medium);
+  margin-bottom: var(--space-8);
+  border: 1px solid var(--border);
+}
 
 /* ─── Error ──────────────────────────────────────────────────── */
 .error-container { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: var(--space-18) 0; gap: var(--space-4); }
