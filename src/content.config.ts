@@ -27,6 +27,20 @@ export const collections = {
     loader: glob({ pattern: '[^_]*.md', base: './content/pages' }),
     schema: pageSchema,
   }),
+  projects: defineCollection({
+    loader: glob({ pattern: '[^_]*.md', base: './content/projects' }),
+    schema: z.object({
+      title: z.string(),
+      description: z.string(),
+      tags: z.array(z.string()).default([]),
+      url: z.string().optional(),
+      github: z.string().optional(),
+      banner: z.string().optional(),
+      logo: z.string().optional(),
+      status: z.enum(['active', 'archived', 'maintenance']).default('active'),
+      date: z.string(),
+    }),
+  }),
   sponsors: defineCollection({
     loader: glob({ pattern: '[^_]*.md', base: './content/sponsors' }),
     schema: z.object({

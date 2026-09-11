@@ -1,0 +1,41 @@
+---
+import { formatDate } from '../utils/date';
+
+interface Props {
+  title: string;
+  description: string;
+  tags: string[];
+  url?: string;
+  banner?: string;
+  logo?: string;
+  status: 'active' | 'archived' | 'maintenance';
+  date: string;
+  href: string;
+}
+
+const { title, description, tags, url, banner, logo, status, date, href } = Astro.props;
+
+const statusLabel: Record<string, string> = {
+  active: 'Active',
+  archived: 'Archived',
+  maintenance: 'Maintenance',
+};
+---
+
+<a href={href} class="project-card stagger-item">
+  {banner && (
+    <img src={banner} alt={title} class="project-card-banner" width="640" height="360" loading="lazy" decoding="async" />
+  )}
+  <div class="project-card-body">
+    <div class="project-card-header">
+      <h3>{title}</h3>
+      <span class={`badge ${status === 'active' ? 'primary' : 'secondary'}`}>{statusLabel[status]}</span>
+    </div>
+    <p class="project-card-desc">{description}</p>
+    {tags.length > 0 && (
+      <div class="project-card-tags">
+        {tags.map(tag => <span class="badge secondary post-tag">{tag}</span>)}
+      </div>
+    )}
+  </div>
+</a>
