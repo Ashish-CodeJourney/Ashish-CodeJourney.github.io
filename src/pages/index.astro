@@ -15,7 +15,7 @@ if (!homePage) throw new Error('Missing required content: pages/home.md');
 
 const recentWritings = [...rawWritings]
   .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
-  .slice(0, 3);
+  .slice(0, 2);
 
 const { Content } = await render(homePage);
 ---
