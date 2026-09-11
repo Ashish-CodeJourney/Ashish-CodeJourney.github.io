@@ -1,0 +1,53 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate } from '../../utils/date';
+import { toSlug } from '../../utils/slug';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map(project => ({
+    params: { slug: toSlug(project.id) },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+
+const statusLabel: Record<string, string> = {
+  active: 'Active',
+  archived: 'Archived',
+  maintenance: 'Maintenance',
+};
+---
+
+<BaseLayout title={project.data.title} description={project.data.description}>
+  <article>
+    <header class="post-header stagger-item">
+      <a href="/projects/" class="back-link">← Projects</a>
+      <h1>{project.data.title}</h1>
+      <div class="post-meta">
+        <span class="badge primary">{formatDate(project.data.date)}</span>
+        <span class={`badge ${project.data.status === 'active' ? 'primary' : 'secondary'}`}>
+          {statusLabel[project.data.status]}
+        </span>
+      </div>
+    </header>
+
+    <div class="post-content stagger-item">
+      <Content />
+    </div>
+
+    {(project.data.url || project.data.github) && (
+      <div class="sponsor-links stagger-item">
+        {project.data.url && (
+          <a href={project.data.url} target="_blank" rel="noopener noreferrer" class="button">Live site →</a>
+        )}
+        {project.data.github && (
+          <a href={project.data.github} target="_blank" rel="noopener noreferrer" class="button outline">GitHub →</a>
+        )}
+      </div>
+    )}
+  </article>
+</BaseLayout>

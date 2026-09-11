@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { toSlug } from '../../utils/slug';
+
+const projects = [...(await getCollection('projects'))].sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+---
+
+<BaseLayout title="Projects" description="Things I've built, maintained, or am currently working on.">
+  <header class="collection-header stagger-item">
+    <p class="section-eyebrow">Build</p>
+    <h1>Projects</h1>
+    <p class="text-light collection-subtitle">Things I've built, maintained, or am currently working on.</p>
+  </header>
+  <div class="projects-grid">
+    {projects.length === 0
+      ? <p class="text-light">Nothing here yet.</p>
+      : projects.map(project => (
+          <ProjectCard
+            title={project.data.title}
+            description={project.data.description}
+            tags={project.data.tags}
+            url={project.data.url}
+            banner={project.data.banner}
+            logo={project.data.logo}
+            status={project.data.status}
+            date={project.data.date}
+            href={`/projects/${toSlug(project.id)}/`}
+          />
+        ))
+    }
+  </div>
+</BaseLayout>
