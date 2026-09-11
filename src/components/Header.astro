@@ -3,6 +3,7 @@ const navItems = [
   { label: 'Home', href: '/' },
   { label: 'Writings', href: '/writings/' },
   { label: 'Technical', href: '/technical/' },
+  { label: 'Projects', href: '/projects/', accent: true },
   { label: 'Sponsors', href: '/sponsors/' },
   { label: 'Now', href: '/now/' },
 ] as const;
@@ -30,10 +31,10 @@ function isActive(href: string): boolean {
 
   <div class="hstack gap-4">
     <nav class="desktop-nav hstack gap-4" aria-label="Main navigation">
-      {navItems.map(({ label, href }) => (
+      {navItems.map(({ label, href, accent }) => (
         <a
           href={href}
-          class:list={['nav-link', { active: isActive(href) }]}
+          class:list={['nav-link', { active: isActive(href), accent }]}
           aria-current={isActive(href) ? 'page' : undefined}
         >
           {label}
@@ -59,10 +60,10 @@ function isActive(href: string): boolean {
 </header>
 
 <nav id="mobile-nav" class="mobile-nav" hidden aria-label="Mobile navigation">
-  {navItems.map(({ label, href }) => (
+  {navItems.map(({ label, href, accent }) => (
     <a
       href={href}
-      class:list={['nav-link', { active: isActive(href) }]}
+      class:list={['nav-link', { active: isActive(href), accent }]}
       aria-current={isActive(href) ? 'page' : undefined}
     >
       {label}
