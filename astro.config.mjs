@@ -5,7 +5,7 @@ export default defineConfig({
   site: 'https://ashish-codejourney.github.io',
   trailingSlash: 'ignore',
   redirects: {
-    '/resume': '/resume.pdf',
+    '/resume': '/Ashish_Vaghela_Software_Engineer.pdf',
   },
   integrations: [sitemap()],
   vite: {
