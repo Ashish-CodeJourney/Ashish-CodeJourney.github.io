@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TalkCard from '../../components/TalkCard.astro';
+import { toSlug } from '../../utils/slug';
+import { readingTime } from '../../utils/date';
+
+const posts = [...(await getCollection('talks'))].sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+---
+
+<BaseLayout title="Talks" description="Conference talks, meetups, and presentations.">
+  <header class="collection-header stagger-item">
+    <p class="section-eyebrow">Speaking</p>
+    <h1>Talks</h1>
+    <p class="text-light collection-subtitle">Conference talks, meetups, and presentations.</p>
+  </header>
+  <div class="stagger-item">
+    {posts.length === 0
+      ? <p class="text-light">Nothing here yet.</p>
+      : posts.map(post => (
+          <TalkCard
+            title={post.data.title}
+            date={post.data.date}
+            description={post.data.description}
+            tags={post.data.tags}
+            banner={post.data.banner}
+            slides={post.data.slides}
+            readingTime={readingTime(post.body ?? '')}
+            href={`/talks/${toSlug(post.id)}/`}
+          />
+        ))
+    }
+  </div>
+</BaseLayout>

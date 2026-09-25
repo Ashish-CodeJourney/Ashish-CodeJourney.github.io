@@ -1,0 +1,91 @@
+---
+import { formatDate } from '../utils/date';
+import { toThumbnailSrc } from '../utils/slides';
+
+interface Props {
+  title: string;
+  date: string;
+  description?: string;
+  tags: string[];
+  banner?: string;
+  slides?: string;
+  href: string;
+  readingTime?: string;
+}
+
+const { title, date, description, tags, banner, slides, href, readingTime } = Astro.props;
+
+const thumbnailSrc = toThumbnailSrc(slides);
+const showSlidesThumbnail = Boolean(thumbnailSrc);
+const showBanner = !showSlidesThumbnail && Boolean(banner);
+---
+
+<div class="post-item stagger-item">
+  <a href={href} class="post-card">
+    {readingTime && <span class="post-bookmark" aria-hidden="true">{readingTime.replace(' read', '').replace(' ', '\n')}</span>}
+    {showSlidesThumbnail && thumbnailSrc && (
+      <div class="post-card-banner talk-thumbnail" aria-hidden="true">
+        <iframe
+          src={thumbnailSrc}
+          loading="lazy"
+          title={`Preview of ${title}`}
+          tabindex="-1"
+          aria-hidden="true"
+        />
+        <div class="talk-thumbnail-overlay"></div>
+      </div>
+    )}
+    {showBanner && banner && (
+      <img
+        src={banner}
+        alt={title}
+        class="post-card-banner"
+        width="1280"
+        height="720"
+        loading="lazy"
+        decoding="async"
+      />
+    )}
+    <div class="post-card-body">
+      <span class="post-card-date">{formatDate(date)}</span>
+      <h3>{title}</h3>
+      {description && <p class="post-card-desc">{description}</p>}
+      {tags.length > 0 && (
+        <div class="post-card-tags">
+          {tags.map(tag => <span class="badge secondary post-tag">{tag}</span>)}
+        </div>
+      )}
+    </div>
+  </a>
+</div>
+
+<style>
+  .talk-thumbnail {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--muted);
+    border-bottom: 1px solid var(--border);
+    /* prevent iframe interaction - clicks go to card link */
+    pointer-events: none;
+  }
+
+  .talk-thumbnail iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    /* Scale slightly to hide embed chrome if any */
+    transform: scale(1.01);
+    transform-origin: center;
+  }
+
+  .talk-thumbnail-overlay {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+  }
+</style>
