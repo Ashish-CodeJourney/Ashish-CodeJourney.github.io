@@ -14,6 +14,22 @@ const pageSchema = z.object({
   title: z.string(),
 });
 
+const talksSchema = z.object({
+  title: z.string(),
+  date: z.string(),
+  event: z.string(),
+  description: z.string().optional(),
+  tags: z.array(z.string()).default([]),
+  banner: z.string().optional(),
+  slides: z.string().optional(),
+  slidesFile: z.string().optional(),
+  video: z.string().optional(),
+  github: z.string().optional(),
+  live: z.string().optional(),
+  slideshare: z.string().optional(),
+  registration: z.string().optional(),
+});
+
 export const collections = {
   technical: defineCollection({
     loader: glob({ pattern: '[^_]*.md', base: './content/technical' }),
@@ -53,5 +69,9 @@ export const collections = {
       linkedin: z.string().optional(),
       x: z.string().optional(),
     }),
+  }),
+  talks: defineCollection({
+    loader: glob({ pattern: '[^_]*.md', base: './content/talks' }),
+    schema: talksSchema,
   }),
 };
