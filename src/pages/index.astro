@@ -11,13 +11,11 @@ const [homePage, rawWritings] = await Promise.all([
   getCollection('writings'),
 ]);
 
-if (!homePage) throw new Error('Missing required content: pages/home.md');
-
 const recentWritings = [...rawWritings]
   .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
   .slice(0, 2);
 
-const { Content } = await render(homePage);
+const renderedHome = homePage ? await render(homePage) : null;
 ---
 
 <BaseLayout>
@@ -57,7 +55,7 @@ const { Content } = await render(homePage);
   </section>
 
   <section class="home-content post-content stagger-item">
-    <Content />
+    {renderedHome ? <renderedHome.Content /> : <p class="text-light">Welcome — the <code>pages/home.md</code> content is missing. If you’re developing locally, run <code>git submodule update --init</code>.</p>}
   </section>
 
   {recentWritings.length > 0 && (
