@@ -2,6 +2,7 @@
 const navItems = [
   { label: 'Writings', href: '/writings/' },
   { label: 'Technical', href: '/technical/' },
+  { label: 'Talks', href: '/talks/' },
   { label: 'Projects', href: '/projects/', accent: true },
   { label: 'Sponsors', href: '/sponsors/' },
   { label: 'Now', href: '/now/' },
@@ -30,13 +31,13 @@ function isActive(href: string): boolean {
 
   <div class="hstack gap-4">
     <nav class="desktop-nav hstack gap-4" aria-label="Main navigation">
-      {navItems.map(({ label, href, accent }) => (
+      {navItems.map((item) => (
         <a
-          href={href}
-          class:list={['nav-link', { active: isActive(href), accent }]}
-          aria-current={isActive(href) ? 'page' : undefined}
+          href={item.href}
+          class:list={['nav-link', { active: isActive(item.href), accent: (item as { accent?: boolean }).accent }]}
+          aria-current={isActive(item.href) ? 'page' : undefined}
         >
-          {label}
+          {item.label}
         </a>
       ))}
     </nav>
@@ -59,13 +60,13 @@ function isActive(href: string): boolean {
 </header>
 
 <nav id="mobile-nav" class="mobile-nav" hidden aria-label="Mobile navigation">
-  {navItems.map(({ label, href, accent }) => (
+  {navItems.map((item) => (
     <a
-      href={href}
-      class:list={['nav-link', { active: isActive(href), accent }]}
-      aria-current={isActive(href) ? 'page' : undefined}
+      href={item.href}
+      class:list={['nav-link', { active: isActive(item.href), accent: (item as { accent?: boolean }).accent }]}
+      aria-current={isActive(item.href) ? 'page' : undefined}
     >
-      {label}
+      {item.label}
     </a>
   ))}
   <label class="mobile-theme-wrapper hstack justify-between" style="margin-top: 1rem;">
