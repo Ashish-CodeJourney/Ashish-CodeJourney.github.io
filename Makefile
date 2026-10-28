@@ -1,5 +1,5 @@
 .ONESHELL:
-.PHONY: install ci run dev build preview check test clean help content-status publish
+.PHONY: install ci run dev build preview check test devto-snapshot clean help content-status publish
 
 help:
 	@echo "install        - install deps"
@@ -9,6 +9,7 @@ help:
 	@echo "preview        - preview build"
 	@echo "check          - astro type check"
 	@echo "test           - run tests"
+	@echo "devto-snapshot - refresh src/data/devto-snapshot.json from dev.to"
 	@echo "clean          - remove dist, .astro, node_modules"
 	@echo "content-status - show pending changes in content/ and its pointer"
 	@echo "publish        - commit+push content/, then bump the submodule pointer"
@@ -36,6 +37,9 @@ check:
 
 test:
 	npm run test
+
+devto-snapshot:
+	npm run devto:snapshot
 
 clean:
 	rm -rf dist .astro node_modules
