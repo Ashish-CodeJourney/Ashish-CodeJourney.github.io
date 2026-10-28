@@ -32,7 +32,6 @@ export const toPostEntry = (article, body, id = slugFromPath(article.path)) => (
     date: article.published_at.slice(0, 10),
     description: article.description,
     tags: article.tag_list,
-    ...(article.cover_image ? { banner: article.cover_image } : {}),
   },
   body,
 });

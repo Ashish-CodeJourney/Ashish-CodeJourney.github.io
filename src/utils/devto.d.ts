@@ -15,7 +15,6 @@ export type DevtoEntry = {
     date: string;
     description: string;
     tags: string[];
-    banner?: string;
   };
   body: string;
 };
