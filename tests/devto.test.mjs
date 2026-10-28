@@ -29,7 +29,6 @@ test('toPostEntry maps a dev.to article onto the technical post shape', () => {
       date: '2026-07-16',
       description: 'Shell config after two years',
       tags: ['dotfiles', 'linux'],
-      banner: 'https://media.dev.to/banner.png',
     },
     body: '# Body',
   });
@@ -41,8 +40,8 @@ test('toPostEntry uses the given id so mapped articles keep their existing URL',
   assert.equal(entry.id, 'dot-files-two-years-later');
 });
 
-test('toPostEntry leaves banner unset when the article has no cover image', () => {
-  const entry = toPostEntry(article({ cover_image: null }), 'Body');
+test('toPostEntry does not carry the dev.to cover image over as a banner', () => {
+  const entry = toPostEntry(article({ cover_image: 'https://media.dev.to/banner.png' }), 'Body');
 
   assert.equal(entry.data.banner, undefined);
 });

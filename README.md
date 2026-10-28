@@ -146,6 +146,7 @@ How it works (`src/content.config.ts` → `src/utils/devto.js`):
    retrying on HTTP 429 with backoff.
 3. An article is skipped if its title (ignoring case and punctuation) matches a
    local post.
+   Cover images are not used: posts show no banner image.
 4. Articles in `DEVTO_OVERRIDES` keep the slug they had before the migration,
    so existing `/technical/<slug>/` URLs still work. Other articles use their
    dev.to slug.
