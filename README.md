@@ -27,8 +27,8 @@ Personal website and blog — fast, minimal, content-first. Built with Astro 7 a
 │   ├── site.json              # personal details, socials, /links entries
 │   ├── assets/                # avatar, hero video — symlinked into public/
 │   ├── pages/                 # home.md, now.md
-│   ├── technical/             # Engineering blog posts
-│   ├── writings/               # Essays and personal writing
+│   ├── technical/             # Local-only technical posts (the rest come from dev.to)
+│   ├── writings/              # Essays and personal writing
 │   └── sponsors/              # Sponsor entries
 ├── src/
 │   ├── content.config.ts      # Zod schemas + glob() loaders pointing at content/
@@ -48,10 +48,17 @@ Personal website and blog — fast, minimal, content-first. Built with Astro 7 a
 │   │   ├── technical/[slug].astro
 │   │   └── writings/[slug].astro
 │   ├── styles/global.css      # Theme overrides, layout, component styles
+│   ├── data/
+│   │   └── devto-snapshot.json # Last good dev.to fetch, used when dev.to is unreachable
 │   ├── utils/
 │   │   ├── date.ts            # formatDate, readingTime
+│   │   ├── devto.js           # dev.to fetch, mapping, dedupe, retry (see dev.to Integration)
+│   │   ├── devto.d.ts         # Types for devto.js
 │   │   └── slug.ts            # toSlug — strips .md extension from entry IDs
 │   └── site.config.ts         # Thin wrapper re-exporting content/site.json
+├── scripts/
+│   └── refresh-devto-snapshot.mjs  # Rewrites src/data/devto-snapshot.json
+├── tests/                     # node --test suites (theme, dev.to)
 ├── public/
 │   ├── oat.min.css            # oat.ink UI library
 │   ├── avatar.jpg             # symlink → content/assets/avatar.jpg
@@ -86,13 +93,19 @@ git submodule update --init
 
 ## Publishing Content
 
-New posts/pages/sponsors go in `content/`, not `src/`. `content/` is its own
-git repository (checked out at `content/` in this working tree), so publishing
-is a two-step push: one to `content`, one to bump this repo's pointer at it.
+New pages, writings, projects, talks and sponsors go in `content/`, not `src/`.
+`content/` is its own git repository (checked out at `content/` in this working
+tree), so publishing is a two-step push: one to `content`, one to bump this
+repo's pointer at it.
 
-`make publish` wraps both steps:
+**Technical posts are not written here.** Publish them on dev.to. The site
+pulls them in at build time (see [dev.to Integration](#devto-integration)).
+Only `content/technical/` files that have no dev.to copy belong in the content
+repo.
 
-1. Create a new `.md` file in `content/technical/` or `content/writings/`
+To publish a writing or other local entry:
+
+1. Create a new `.md` file in `content/writings/` (or the relevant collection)
    ```yaml
    ---
    title: "My Post Title"
@@ -115,6 +128,50 @@ is a two-step push: one to `content`, one to bump this repo's pointer at it.
 
 Personal details, socials, and the `/links` page entries live in
 `content/site.json` — edit them the same way (edit in `content/`, then `make publish`).
+
+---
+
+## dev.to Integration
+
+The `technical` collection is built from two sources:
+
+- **dev.to** (primary): every published article on the account is fetched from
+  the public API at build time (`https://dev.to/api/articles`).
+- **Local files** in `content/technical/`: used for posts with no dev.to copy.
+
+How it works (`src/content.config.ts` → `src/utils/devto.js`):
+
+1. The local glob loader runs first, which also clears entries it didn't load.
+2. Articles are fetched as a list, then each body is fetched one at a time,
+   retrying on HTTP 429 with backoff.
+3. An article is skipped if its title (ignoring case and punctuation) matches a
+   local post.
+4. Articles in `DEVTO_OVERRIDES` keep the slug they had before the migration,
+   so existing `/technical/<slug>/` URLs still work. Other articles use their
+   dev.to slug.
+5. If dev.to can't be reached, the build uses `src/data/devto-snapshot.json`
+   and logs `dev.to articles skipped: …`. The build does not fail.
+
+**Changing the account:** edit `DEVTO_USERNAME` in `src/utils/devto.js`. The
+username is not read from an environment variable. `DEVTO_OVERRIDES` and the
+snapshot belong to the current account, so change them too.
+
+**Adding an override:** when a migrated post should keep an old URL, add
+`<dev.to article id>: '<old slug>'` to `DEVTO_OVERRIDES`, then run
+`npm run devto:snapshot`.
+
+**Refreshing the snapshot:** run `npm run devto:snapshot` (or `make devto-snapshot`).
+It writes `src/data/devto-snapshot.json` only if every request succeeds, and
+exits non-zero otherwise. Commit the result. The snapshot is used only when
+dev.to is unreachable, so a stale snapshot is safe, just out of date.
+
+**Schedule:** `.github/workflows/deploy.yml` also runs daily at 03:00 UTC, so
+new dev.to articles appear without a push. The schedule only runs on the
+default branch.
+
+**Tests:** `npm test` runs `tests/devto.test.mjs`, which covers mapping, dedupe,
+overrides, retry and the snapshot fallback. Those tests inject `fetch`, so they
+don't need network access.
 
 ---
 
