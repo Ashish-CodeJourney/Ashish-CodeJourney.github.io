@@ -1,5 +1,5 @@
 .ONESHELL:
-.PHONY: install ci run dev build preview check test test-build lighthouse redirect-stub devto-snapshot clean help content-status publish
+.PHONY: install ci run dev build preview check test test-build lighthouse devto-snapshot clean help content-status publish
 
 help:
 	@echo "install        - install deps"
@@ -11,7 +11,6 @@ help:
 	@echo "test           - run unit tests"
 	@echo "test-build     - verify built dist/ output (run after build)"
 	@echo "lighthouse     - enforce Lighthouse perf/a11y/SEO budgets on dist/"
-	@echo "redirect-stub  - write github.io redirect stub to redirect-stub/"
 	@echo "devto-snapshot - refresh src/data/devto-snapshot.json from dev.to"
 	@echo "clean          - remove dist, .astro, node_modules"
 	@echo "content-status - show pending changes in content/ and its pointer"
@@ -46,9 +45,6 @@ test-build:
 
 lighthouse:
 	npx lhci autorun
-
-redirect-stub:
-	node scripts/build-redirect-stub.mjs redirect-stub https://ashishvaghela.in
 
 devto-snapshot:
 	npm run devto:snapshot

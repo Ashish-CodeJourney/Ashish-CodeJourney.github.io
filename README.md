@@ -215,7 +215,7 @@ All three run in CI on every PR.
 ## Deployment
 
 - **Production:** `https://ashishvaghela.in` (and `www.`) served by the Cloudflare Worker `ashishvaghela` with static assets from `dist/`, configured in `wrangler.jsonc` (custom domains are attached by the config). Deployed by `.github/workflows/deploy.yml` (`wrangler deploy`) on push to `trunk` and nightly (to pick up new dev.to posts). Manual deploy: `make build && npx wrangler deploy`.
-- **Old address:** `ashish-codejourney.github.io` serves only a redirect stub (`scripts/build-redirect-stub.mjs`) that forwards every path, query and hash to the custom domain.
+- **Old address:** `ashish-codejourney.github.io` serves only `github-pages/` (a tiny standalone page, kept separate from the site and deployed only to GitHub Pages as `index.html` and `404.html`) that forwards every path, query and hash to the custom domain. Edit both files together; `tests/redirect-stub.test.mjs` checks they match.
 - **Site URL** lives in one place: `site` in `astro.config.mjs`. `SITE.url` is derived from it — `url` in `content/site.json` is no longer read.
 
 Required repository secrets: `CONTENT_DEPLOY_KEY`, `CLOUDFLARE_API_TOKEN` ("Edit Cloudflare Workers" template + Zone DNS: Edit on `ashishvaghela.in`), `CLOUDFLARE_ACCOUNT_ID`.
