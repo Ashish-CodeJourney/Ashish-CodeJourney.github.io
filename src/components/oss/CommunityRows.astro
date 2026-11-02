@@ -1,0 +1,26 @@
+---
+import Row from './Row.astro';
+import { describeWhen, roleLine, type CommunityRow } from '../../utils/community.js';
+
+type Props = { rows: ReadonlyArray<CommunityRow> };
+
+const { rows } = Astro.props;
+---
+
+<ol class="rows">
+  {rows.map((row) => {
+    const when = describeWhen(row);
+    const role = roleLine(row);
+    const linksOrganisation = row.href;
+    return (
+      <Row>
+        <Fragment slot="name">{linksOrganisation ? <a href={row.href}>{row.organisation}</a> : row.organisation}</Fragment>
+        <Fragment slot="meta">
+          {role && <p class="meta">{role}</p>}
+          {row.start && when && <p class="meta"><time datetime={row.start}>{when}</time></p>}
+        </Fragment>
+        {row.description && <p class="quiet">{row.description}</p>}
+      </Row>
+    );
+  })}
+</ol>

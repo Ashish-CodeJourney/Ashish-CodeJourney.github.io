@@ -1,0 +1,49 @@
+---
+import { statSync } from 'node:fs';
+import { join } from 'node:path';
+import { RESUME_PDF } from '../site.config';
+import { formatFileSize } from '../utils/resume.js';
+
+interface Props {
+  layout?: 'panel' | 'inline';
+}
+
+const { layout = 'inline' } = Astro.props;
+const size = formatFileSize(statSync(join(process.cwd(), 'public', RESUME_PDF)).size);
+---
+
+<div class:list={['resume', layout]}>
+  {layout === 'panel' && <p class="label">Résumé</p>}
+  <p class="meta">PDF, {size}</p>
+  <p class="actions">
+    <a class="primary" href="/resume" target="_blank" rel="noopener">View résumé</a>
+    <a href={RESUME_PDF} download>Download PDF</a>
+  </p>
+</div>
+
+<style>
+  .resume { margin-top: var(--space-5); }
+  .panel {
+    max-width: 18rem;
+    padding: var(--space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .label { font-weight: 650; font-size: var(--step-1); letter-spacing: -0.015em; }
+  .meta { color: var(--ink-2); font-size: var(--step--1); }
+  .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-3); }
+  .actions a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding-inline: var(--space-4);
+    border: 1px solid var(--lamp);
+    border-radius: var(--radius);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .actions .primary { background: var(--lamp); color: var(--bg); }
+  .actions a:hover { border-color: var(--ink); }
+  .actions .primary:hover { background: var(--ink); color: var(--bg); }
+</style>

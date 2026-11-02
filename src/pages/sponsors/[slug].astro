@@ -6,47 +6,57 @@ import { toSlug } from '../../utils/slug';
 
 export async function getStaticPaths() {
   const sponsors = await getCollection('sponsors');
-  return sponsors.map(sponsor => ({
-    params: { slug: toSlug(sponsor.id) },
-    props: { sponsor },
-  }));
+  return sponsors.map((sponsor) => ({ params: { slug: toSlug(sponsor.id) }, props: { sponsor } }));
 }
 
 const { sponsor } = Astro.props;
 const { Content } = await render(sponsor);
+const { name, date, current, description, url, logo, linkedin, x } = sponsor.data;
+
+const links = [
+  { href: url, label: `${name} website` },
+  { href: linkedin, label: `${name} on LinkedIn` },
+  { href: x, label: `${name} on X` },
+].filter((link): link is { href: string; label: string } => Boolean(link.href));
 ---
 
-<BaseLayout
-  title={sponsor.data.name}
-  description={sponsor.data.description ?? `About ${sponsor.data.name}'s sponsorship.`}
->
-  <article>
-    <header class="post-header stagger-item">
-      <a href="/sponsors/" class="back-link">← Sponsors</a>
-
-      <div class="sponsor-detail-logo-wrap">
-        {sponsor.data.logo ? (
-          <img src={sponsor.data.logo} alt={sponsor.data.name} class="sponsor-detail-logo" />
-        ) : (
-          <div class="sponsor-fallback sponsor-detail-fallback">{sponsor.data.name}</div>
-        )}
-      </div>
-
-      <h1>{sponsor.data.name}</h1>
-      <div class="post-meta">
-        <span class="badge primary">{formatDate(sponsor.data.date)}</span>
-        {sponsor.data.current && <span class="badge secondary">Current Sponsor</span>}
-      </div>
+<BaseLayout title={name} description={description ?? `About ${name}'s sponsorship.`}>
+  <article class="wrap sponsor">
+    <header class="page-head">
+      <a class="back" href="/sponsors/">All sponsors</a>
+      <h1>{name}</h1>
+      <p>{current ? 'Currently sponsoring me, since' : 'Sponsored me on'} <time datetime={date}>{formatDate(date)}</time>.</p>
+      {description && <p class="summary">{description}</p>}
     </header>
 
-    <div class="post-content stagger-item">
-      <Content />
-    </div>
+    {logo && (
+      <div class="logo">
+        <img src={logo} alt={`${name} logo`} width="240" height="80" loading="eager" decoding="async" />
+      </div>
+    )}
 
-    <div class="sponsor-links stagger-item">
-      {sponsor.data.url && <a href={sponsor.data.url} target="_blank" rel="noopener noreferrer" class="button outline">Visit website</a>}
-      {sponsor.data.linkedin && <a href={sponsor.data.linkedin} target="_blank" rel="noopener noreferrer" class="button outline">LinkedIn</a>}
-      {sponsor.data.x && <a href={sponsor.data.x} target="_blank" rel="noopener noreferrer" class="button outline">X</a>}
-    </div>
+    <div class="prose"><Content /></div>
+
+    {links.length > 0 && (
+      <ul class="rows links">
+        {links.map((link) => <li><a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a></li>)}
+      </ul>
+    )}
   </article>
 </BaseLayout>
+
+<style>
+  .sponsor { padding-bottom: var(--space-8); }
+  .back { display: inline-block; margin-bottom: var(--space-5); font-weight: 600; }
+  .page-head .summary { color: var(--ink); }
+  .logo {
+    display: inline-flex;
+    padding: var(--space-5) var(--space-6);
+    margin-bottom: var(--space-6);
+    background: var(--night);
+    border-radius: var(--radius);
+  }
+  .logo img { width: auto; height: 3rem; max-width: 15rem; object-fit: contain; }
+  .links { margin-top: var(--space-7); max-width: var(--measure-tech); }
+  .links a { display: block; padding-block: var(--space-3); font-weight: 600; }
+</style>

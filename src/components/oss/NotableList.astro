@@ -1,0 +1,54 @@
+---
+import { starsLabel, type NotableProject } from '../../utils/featured.js';
+
+type Props = { projects: ReadonlyArray<NotableProject> };
+
+const { projects } = Astro.props;
+---
+
+<div class="notable">
+  <h3 id="also-contributed">I've also contributed to these projects, and more</h3>
+  <ul aria-labelledby="also-contributed">
+    {projects.map((project) => (
+      <li data-notable={project.key}>
+        <a href={project.url}>{project.name}</a>
+        {project.description && <p>{project.description}</p>}
+        {project.stars !== null && <p class="stars">{starsLabel(project.stars)}</p>}
+      </li>
+    ))}
+  </ul>
+  <p class="more"><a href="https://github.com/Ashish-CodeJourney">More on my GitHub profile</a></p>
+</div>
+
+<style>
+  .more { margin-top: var(--space-4); font-weight: 600; font-size: var(--step--1); }
+
+  .notable { margin-top: var(--space-7); }
+
+  h3 { font-size: var(--step-0); margin-bottom: var(--space-3); }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-6);
+  }
+
+  li {
+    border-top: 1px solid var(--line);
+    padding-block: var(--space-3);
+    font-size: var(--step--1);
+    line-height: 1.5;
+  }
+
+  a { font-weight: 600; font-size: var(--step-0); color: var(--ink); text-decoration: none; }
+  a:hover { color: var(--lamp); text-decoration: underline; }
+
+  p { color: var(--ink-2); }
+  .stars { margin-top: var(--space-1); font-variant-numeric: tabular-nums; }
+
+  @media (max-width: 760px) {
+    ul { grid-template-columns: 1fr; }
+  }
+</style>

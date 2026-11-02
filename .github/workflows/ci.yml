@@ -36,3 +36,11 @@ jobs:
 
       - name: Build site
         run: make build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify build output
+        run: make test-build
+
+      - name: Lighthouse budgets
+        run: make lighthouse

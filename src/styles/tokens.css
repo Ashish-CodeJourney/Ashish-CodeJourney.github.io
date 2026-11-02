@@ -1,0 +1,74 @@
+:root {
+  color-scheme: light;
+  --bg: #edf1f2;
+  --surface: #f8fafa;
+  --ink: #0f212c;
+  --ink-2: #4a5a63;
+  --line: #c9d3d7;
+  --lamp: #8f5400;
+  --lamp-glow: #f5a524;
+  --night: #0b1c26;
+  --night-ink: #e4ecef;
+  --night-ink-2: #93a6b0;
+  --night-line: #23404f;
+
+  --sky: #cfe3ec;
+  --sky-ink: #0f212c;
+  --sky-ink-2: #3f5866;
+  --sky-line: #9bb5c1;
+  --sky-accent: #7a4700;
+  --celestial: #f5a524;
+  --light-talk: #e5484d;
+  --cat: #0f212c;
+  --footer-band: #1e3440;
+
+  --font-ui: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Newsreader Variable', Georgia, 'Times New Roman', serif;
+  --font-code: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --step--1: 0.85rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.33rem;
+  --step-2: 1.66rem;
+  --step-3: 2.07rem;
+  --step-4: 2.59rem;
+  --step-5: 3.24rem;
+  --display: clamp(3.25rem, 11vw, 8.5rem);
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2.25rem;
+  --space-7: 3.5rem;
+  --space-8: 5rem;
+  --space-9: 8rem;
+
+  --wrap: 72rem;
+  --measure-tech: 42rem;
+  --measure-serif: 36rem;
+  --radius: 4px;
+}
+
+html.dark {
+  color-scheme: dark;
+  --bg: #0b1c26;
+  --surface: #10283a;
+  --ink: #e4ecef;
+  --ink-2: #93a6b0;
+  --line: #23404f;
+  --lamp: #ffb547;
+  --lamp-glow: #ffb547;
+  --night: #071621;
+
+  --sky: #071621;
+  --sky-ink: #e4ecef;
+  --sky-ink-2: #93a6b0;
+  --sky-line: #23404f;
+  --sky-accent: #ffb547;
+  --celestial: #e4ecef;
+  --light-talk: #ff7a70;
+  --cat: #03101a;
+  --footer-band: #071621;
+}

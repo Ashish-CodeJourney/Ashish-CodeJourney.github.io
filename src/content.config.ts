@@ -1,10 +1,10 @@
 import { defineCollection } from 'astro:content';
-import { glob, type Loader } from 'astro/loaders';
+import { file, glob, type Loader } from 'astro/loaders';
 import { z } from 'astro/zod';
 import devto, { DEVTO_OVERRIDES, DEVTO_USERNAME } from './utils/devto.js';
 import devtoSnapshot from './data/devto-snapshot.json';
 
-const { loadDevtoEntries, fetchJsonWithRetry } = devto;
+const { loadDevtoEntries, fetchJsonWithRetry, resizeDevtoImages } = devto;
 
 const postSchema = z.object({
   title: z.string(),
@@ -29,7 +29,9 @@ const withDevtoArticles = (localLoader: Loader): Loader => ({
     });
 
     await Promise.all(
-      entries.map(async ({ id, data, body }) =>
+      entries
+        .map((entry) => ({ ...entry, body: resizeDevtoImages(entry.body) }))
+        .map(async ({ id, data, body }) =>
         context.store.set({
           id,
           data: await context.parseData({ id, data }),
@@ -105,5 +107,53 @@ export const collections = {
   talks: defineCollection({
     loader: glob({ pattern: '[^_]*.md', base: './content/talks' }),
     schema: talksSchema,
+  }),
+  resume: defineCollection({
+    loader: file('./content/resume.json'),
+    schema: z.discriminatedUnion('kind', [
+      z.object({
+        kind: z.literal('summary'),
+        text: z.array(z.string()).min(1),
+      }),
+      z.object({
+        kind: z.literal('experience'),
+        role: z.string(),
+        company: z.string(),
+        url: z.string().optional(),
+        location: z.string(),
+        start: z.string(),
+        end: z.string().optional(),
+        highlights: z.array(z.string()).default([]),
+      }),
+      z.object({
+        kind: z.literal('skills'),
+        group: z.string(),
+        order: z.number(),
+        items: z.array(z.string()).min(1),
+      }),
+      z.object({
+        kind: z.literal('education'),
+        degree: z.string(),
+        school: z.string(),
+        note: z.string().optional(),
+        start: z.string(),
+        end: z.string().optional(),
+      }),
+    ]),
+  }),
+  community: defineCollection({
+    loader: glob({ pattern: '[^_]*.md', base: './content/community' }),
+    schema: z.object({
+      title: z.string(),
+      organisation: z.string(),
+      role: z.enum(['organiser', 'maintainer', 'volunteer', 'mentor', 'speaker', 'contributor', 'attendee']),
+      date: z.string().optional(),
+      endDate: z.string().optional(),
+      location: z.string().optional(),
+      url: z.string().optional(),
+      description: z.string().optional(),
+      order: z.number().optional(),
+      note: z.boolean().optional(),
+    }),
   }),
 };

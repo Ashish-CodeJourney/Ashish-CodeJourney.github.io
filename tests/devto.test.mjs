@@ -168,3 +168,24 @@ test('fetchJsonWithRetry throws on a non-rate-limit error without retrying', asy
     /500 from https:\/\/dev\.to\/api\/articles/,
   );
 });
+
+const resized = (url) =>
+  `https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/${encodeURIComponent(url)}`;
+
+test('resizeDevtoImages serves markdown images through the dev.to resizing CDN', () => {
+  const url = 'https://dev-to-uploads.s3.amazonaws.com/uploads/articles/abc.png';
+  assert.equal(devto.resizeDevtoImages(`Intro\n\n![The pipeline](${url})\n`), `Intro\n\n![The pipeline](${resized(url)})\n`);
+});
+
+test('resizeDevtoImages handles regional upload buckets and HTML img tags', () => {
+  const url = 'https://dev-to-uploads.s3.us-east-2.amazonaws.com/uploads/articles/x.gif';
+  assert.equal(devto.resizeDevtoImages(`<img src="${url}" alt="x">`), `<img src="${resized(url)}" alt="x">`);
+});
+
+test('resizeDevtoImages leaves links and images hosted elsewhere untouched', () => {
+  const body = [
+    '![Logo](https://example.com/logo.png)',
+    '[the raw file](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/raw.png)',
+  ].join('\n');
+  assert.equal(devto.resizeDevtoImages(body), body);
+});

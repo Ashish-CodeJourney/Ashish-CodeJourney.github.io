@@ -1,9 +1,9 @@
 # Ashish CodeJourney
 
-Personal website and blog — fast, minimal, content-first. Built with Astro 7 and deployed to GitHub Pages.
+Personal website and blog at **[ashishvaghela.in](https://ashishvaghela.in)** — fast, minimal, content-first. Built with Astro 7 and deployed to Cloudflare Pages.
 
 ![Astro](https://img.shields.io/badge/astro-7-BC52EE?style=flat-oval&logo=astro) 
-[![Deploy to GitHub Pages](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/deploy.yml)
+[![Deploy](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/deploy.yml)
 ![TypeScript](https://img.shields.io/badge/typescript-strict-3178C6?style=flat-oval&logo=typescript)
 
 ## Features
@@ -15,7 +15,8 @@ Personal website and blog — fast, minimal, content-first. Built with Astro 7 a
 - **Light / Dark mode** — system preference detection, `localStorage` persistence, no flash
 - **Reading time** — auto-calculated from post body word count
 - **Sitemap** — generated automatically via `@astrojs/sitemap`
-- **Powered by oat.ink** — minimal CSS framework for base styling
+- **Design system "Queen's Necklace"** — tokens, type and layout rules in `plans/design-system.md`; no CSS framework
+- **Open source page** — merged PRs pulled from GitHub at build time (`/oss/`)
 
 ---
 
@@ -25,7 +26,7 @@ Personal website and blog — fast, minimal, content-first. Built with Astro 7 a
 .
 ├── content/                   # git submodule → Ashish-CodeJourney/content (private)
 │   ├── site.json              # personal details, socials, /links entries
-│   ├── assets/                # avatar, hero video — symlinked into public/
+│   ├── assets/                # avatar, résumé — symlinked into public/
 │   ├── pages/                 # home.md, now.md
 │   ├── technical/             # Local-only technical posts (the rest come from dev.to)
 │   ├── writings/              # Essays and personal writing
@@ -60,9 +61,8 @@ Personal website and blog — fast, minimal, content-first. Built with Astro 7 a
 │   └── refresh-devto-snapshot.mjs  # Rewrites src/data/devto-snapshot.json
 ├── tests/                     # node --test suites (theme, dev.to)
 ├── public/
-│   ├── oat.min.css            # oat.ink UI library
 │   ├── avatar.jpg             # symlink → content/assets/avatar.jpg
-│   └── videos/                # symlinks → content/assets/hero-*
+│   └── _headers               # Cloudflare Pages cache + security headers
 ├── astro.config.mjs
 └── tsconfig.json
 ```
@@ -176,6 +176,18 @@ don't need network access.
 
 ---
 
+## GitHub Integration
+
+`/oss/` is curated in the content repo: `content/oss.json` lists my own projects and the projects I contribute to (role, summary, optional description), and `content/community/*.md` lists community roles (talks are added automatically).
+At build time the site fetches GitHub metadata (description, language, stars) for each listed repo (`src/utils/github.js`, validated by `src/utils/featured.js`).
+No token is required; if `GITHUB_TOKEN` is set (CI passes the workflow token) it's sent to avoid rate limits.
+If GitHub is unreachable the build falls back to `src/data/github-snapshot.json` and logs a warning.
+Refresh the snapshot with `npm run github:snapshot` (the file is left untouched if the fetch fails).
+
+dev.to post images are rewritten to dev.to's resizing CDN (`resizeDevtoImages` in `src/utils/devto.js`) so posts never ship full-size uploads.
+
+---
+
 ## Local Development
 
 ```bash
@@ -188,6 +200,28 @@ npm run preview    # preview dist/ locally
 
 Or via the Makefile: `make dev`, `make build`, `make preview`, `make check`, `make test` (see `make help`).
 
+### Quality gates
+
+| Command | What it checks |
+|---|---|
+| `make test` | Unit tests (`tests/*.test.mjs`) |
+| `make test-build` | Built `dist/` output (`tests/build/*.spec.mjs`): custom-domain canonical/sitemap/robots, no video, no third-party fonts, cache headers. Run after `make build` |
+| `make lighthouse` | Lighthouse CI budgets from `lighthouserc.json` (perf, LCP, CLS, TBT, JS size, a11y, SEO). Budgets are a ratchet — tighten them as each revamp phase lands, never loosen |
+
+All three run in CI on every PR.
+
+---
+
+## Deployment
+
+- **Production:** `https://ashishvaghela.in` on Cloudflare Pages (project `ashishvaghela`), deployed by `.github/workflows/deploy.yml` on push to `trunk` and nightly (to pick up new dev.to posts).
+- **Old address:** `ashish-codejourney.github.io` serves only a redirect stub (`scripts/build-redirect-stub.mjs`) that forwards every path, query and hash to the custom domain.
+- **Site URL** lives in one place: `site` in `astro.config.mjs`. `SITE.url` is derived from it — `url` in `content/site.json` is no longer read.
+
+Required repository secrets: `CONTENT_DEPLOY_KEY`, `CLOUDFLARE_API_TOKEN` (Pages: Edit), `CLOUDFLARE_ACCOUNT_ID`.
+
+Fonts are self-hosted via `@fontsource-variable/*` packages imported in `BaseLayout.astro` — never link Google Fonts (a build spec enforces this).
+
 ---
 
 ## Customization
@@ -196,7 +230,7 @@ Or via the Makefile: `make dev`, `make build`, `make preview`, `make check`, `ma
 Edit `content/site.json` — title, description, author, social links, `/links` entries — then `make publish`. `src/site.config.ts` just re-exports it typed.
 
 ### Styles
-Edit `src/styles/global.css` — CSS custom properties at the top of the file control the entire color scheme. The file extends `oat.min.css` with layout, component, and animation styles.
+Colours, type scale and spacing live in `src/styles/tokens.css`; shared base styles in `src/styles/base.css`. Page and component styles are Astro-scoped `<style>` blocks. Read `plans/design-system.md` before changing anything visual.
 
 ### Adding a New Page
 Create `src/pages/your-page.astro` and wrap content in `<BaseLayout>`.

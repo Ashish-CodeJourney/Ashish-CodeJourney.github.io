@@ -1,0 +1,31 @@
+---
+import Row from './Row.astro';
+import type { FeaturedProject } from '../../utils/featured.js';
+
+type Props = { projects: ReadonlyArray<FeaturedProject> };
+
+const { projects } = Astro.props;
+---
+
+<ol class="rows">
+  {projects.map((project) => (
+    <Row project={project.key}>
+      <Fragment slot="name">
+        {project.url ? (
+          <a href={project.url}>
+            {project.owner && <span class="owner">{project.owner}/</span>}<wbr />{project.name}
+          </a>
+        ) : (
+          project.name
+        )}
+      </Fragment>
+      <p class="meta" slot="meta">{project.role}</p>
+      {project.description && <p>{project.description}</p>}
+      {project.summary && <p class="quiet">{project.summary}</p>}
+    </Row>
+  ))}
+</ol>
+
+<style>
+  .owner { color: var(--ink-2); font-weight: 450; }
+</style>

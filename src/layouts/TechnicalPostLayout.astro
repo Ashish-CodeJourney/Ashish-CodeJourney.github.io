@@ -1,0 +1,325 @@
+---
+import '@fontsource-variable/jetbrains-mono/wght.css';
+import BaseLayout from './BaseLayout.astro';
+import TocList from '../components/TocList.astro';
+import { formatDate, readingTime } from '../utils/date';
+import { nestHeadings, type Heading } from '../utils/technical-archive.js';
+import { SITE } from '../site.config';
+
+type Neighbour = { href: string; title: string };
+
+interface Props {
+  title: string;
+  date: string;
+  description?: string;
+  tags: ReadonlyArray<string>;
+  filterTags: ReadonlyArray<string>;
+  banner?: string;
+  body: string;
+  headings: ReadonlyArray<Heading>;
+  older?: Neighbour;
+  newer?: Neighbour;
+}
+
+const { title, date, description, tags, filterTags, banner, body, headings, older, newer } = Astro.props;
+
+const toc = nestHeadings(headings);
+const pageUrl = new URL(Astro.url.pathname, SITE.url).toString();
+const bannerUrl = banner ? new URL(banner, SITE.url).toString() : undefined;
+
+const blogPosting = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  image: bannerUrl,
+  datePublished: date,
+  mainEntityOfPage: pageUrl,
+  author: { '@type': 'Person', name: SITE.author, url: SITE.url },
+  keywords: tags.length > 0 ? tags.join(', ') : undefined,
+};
+
+const tagHref = (tag: string) =>
+  filterTags.includes(tag.toLowerCase()) ? `/technical/?tag=${encodeURIComponent(tag.toLowerCase())}` : undefined;
+---
+
+<BaseLayout title={title} description={description} ogImage={bannerUrl} voice="tech">
+  <Fragment slot="head">
+    <link rel="alternate" type="application/rss+xml" title="Ashish Vaghela: technical posts" href="/technical/rss.xml" />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(blogPosting)} />
+  </Fragment>
+
+  <article class:list={['wrap', 'post', { 'has-toc': toc.length > 0 }]}>
+    <header class="post-head">
+      {banner && <img class="banner" src={banner} alt="" width="1280" height="720" decoding="async" />}
+      <h1>{title}</h1>
+      <p class="meta">
+        <time datetime={date}>{formatDate(date)}</time>
+        <span>{readingTime(body)}</span>
+      </p>
+      {tags.length > 0 && (
+        <ul class="tags" aria-label="Tags">
+          {tags.map((tag) => {
+            const href = tagHref(tag);
+            return <li>{href ? <a href={href}>{tag}</a> : <span>{tag}</span>}</li>;
+          })}
+        </ul>
+      )}
+    </header>
+
+    {toc.length > 0 && (
+      <details class="toc-small">
+        <summary>On this page</summary>
+        <nav aria-label="On this page">
+          <TocList entries={toc} />
+        </nav>
+      </details>
+      <aside class="toc-wide">
+        <nav aria-label="On this page">
+          <p class="toc-label">On this page</p>
+          <TocList entries={toc} />
+        </nav>
+      </aside>
+    )}
+
+    <div class="prose post-body" data-post-body>
+      <slot />
+    </div>
+
+    <footer class="post-foot">
+      {(older || newer) && (
+        <nav aria-label="More technical posts" class="neighbours">
+          {older && (
+            <a href={older.href} rel="prev">
+              <span class="direction">Older post</span>
+              <span class="neighbour-title">{older.title}</span>
+            </a>
+          )}
+          {newer && (
+            <a href={newer.href} rel="next">
+              <span class="direction">Newer post</span>
+              <span class="neighbour-title">{newer.title}</span>
+            </a>
+          )}
+        </nav>
+      )}
+      <a class="all" href="/technical/">All technical posts</a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<script>
+  const COPY = 'Copy code';
+  const COPIED = 'Copied';
+  const RESET_AFTER_MS = 2000;
+
+  const copyButton = (pre: HTMLPreElement) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy';
+    button.textContent = COPY;
+    button.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(pre.querySelector('code')?.innerText ?? pre.innerText);
+      button.textContent = COPIED;
+      window.setTimeout(() => { button.textContent = COPY; }, RESET_AFTER_MS);
+    });
+    return button;
+  };
+
+  const addCopyButtons = () => {
+    if (!navigator.clipboard) return;
+    document.querySelectorAll<HTMLPreElement>('[data-post-body] pre:not([data-copy])').forEach((pre) => {
+      const frame = document.createElement('div');
+      frame.className = 'code-frame';
+      pre.dataset.copy = '';
+      pre.replaceWith(frame);
+      frame.append(pre, copyButton(pre));
+    });
+  };
+
+  document.addEventListener('astro:page-load', addCopyButtons);
+</script>
+
+<style>
+  .post-body :global(img:not([width])) {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+    background: var(--surface);
+  }
+
+  .post {
+    padding-top: var(--space-7);
+  }
+
+  .post-head {
+    max-width: var(--measure-tech);
+  }
+  .banner {
+    border-radius: var(--radius);
+    margin-bottom: var(--space-6);
+  }
+  h1 {
+    font-size: var(--step-5);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+    color: var(--ink-2);
+    font-size: var(--step--1);
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-3);
+    font-size: var(--step--1);
+  }
+  .tags a,
+  .tags span {
+    display: inline-block;
+    padding: 0 var(--space-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+  .tags a:hover {
+    color: var(--lamp);
+    border-color: var(--lamp);
+  }
+
+  .toc-small {
+    max-width: var(--measure-tech);
+    margin-top: var(--space-6);
+    border-block: 1px solid var(--line);
+    padding-block: var(--space-3);
+  }
+  .toc-small summary {
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .toc-small nav {
+    padding-block: var(--space-3) var(--space-2);
+  }
+  .toc-wide {
+    display: none;
+  }
+  .toc-label {
+    font-weight: 600;
+    margin-bottom: var(--space-3);
+  }
+
+  .post-body {
+    margin-top: var(--space-6);
+  }
+  .post-body :global(h2),
+  .post-body :global(h3) {
+    scroll-margin-top: var(--space-5);
+  }
+  .post-body :global(.code-frame) {
+    position: relative;
+  }
+  .post-body :global(.code-frame pre) {
+    padding-top: var(--space-6);
+  }
+  .post-body :global(.copy) {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    font: inherit;
+    font-size: var(--step--1);
+    line-height: 1.4;
+    color: var(--ink-2);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 0 var(--space-2);
+    cursor: pointer;
+  }
+  .post-body :global(.copy:hover) {
+    color: var(--ink);
+    border-color: var(--ink-2);
+  }
+
+  .post-foot {
+    max-width: var(--measure-tech);
+    margin-top: var(--space-8);
+  }
+  .neighbours {
+    display: grid;
+    border-top: 1px solid var(--line);
+  }
+  .neighbours a {
+    display: grid;
+    gap: var(--space-1);
+    padding-block: var(--space-4);
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .direction {
+    color: var(--ink-2);
+    font-size: var(--step--1);
+  }
+  .neighbour-title {
+    font-weight: 600;
+    font-size: var(--step-1);
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+  .neighbours a:hover .neighbour-title {
+    color: var(--lamp);
+  }
+  .all {
+    display: inline-block;
+    margin-top: var(--space-5);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .post {
+      padding-top: var(--space-6);
+    }
+    h1 {
+      font-size: var(--step-3);
+      letter-spacing: -0.03em;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .post.has-toc {
+      display: grid;
+      grid-template-columns: minmax(0, var(--measure-tech)) minmax(0, 16rem);
+      column-gap: var(--space-8);
+      align-items: start;
+    }
+    .post-head,
+    .post-body,
+    .post-foot {
+      grid-column: 1;
+    }
+    .toc-small {
+      display: none;
+    }
+    .toc-wide {
+      display: block;
+      grid-column: 2;
+      grid-row: 2 / span 2;
+      position: sticky;
+      top: var(--space-5);
+      margin-top: var(--space-6);
+      max-height: calc(100dvh - var(--space-6));
+      overflow-y: auto;
+      padding-left: var(--space-5);
+      border-left: 1px solid var(--line);
+    }
+  }
+</style>

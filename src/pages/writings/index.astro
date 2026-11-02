@@ -1,19 +1,86 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PostList from '../../components/PostList.astro';
+import PostRows from '../../components/PostRows.astro';
+import { SITE } from '../../site.config';
+import { toSlug } from '../../utils/slug';
+import { groupByYear } from '../../utils/writings.js';
 
-const posts = [...(await getCollection('writings'))].sort(
-  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
-);
+const writings = await getCollection('writings');
+
+const essays = writings.map((post) => ({
+  href: `/writings/${toSlug(post.id)}/`,
+  title: post.data.title,
+  date: post.data.date,
+  summary: post.data.description,
+}));
+
+const years = groupByYear(essays);
+const newest = years[0]?.essays[0];
+const description = 'Personal essays about slowing down, the sea, and the questions I keep coming back to.';
 ---
 
-<BaseLayout title="Writings" description="Personal thoughts, stories, and reflections.">
-  <PostList
-    eyebrow="Essays"
-    heading="Writings"
-    subtitle="Personal thoughts, stories, and reflections."
-    posts={posts}
-    basePath="/writings/"
-  />
+<BaseLayout title="Writings" description={description} voice="notebook">
+  <link slot="head" rel="alternate" type="application/rss+xml" title={`${SITE.author}: writings`} href="/writings/rss.xml" />
+  <div class="wrap">
+    <header class="page-head">
+      <h1>Writings</h1>
+      <p>{description}</p>
+      {newest && (
+        <p class="random">
+          <a href={newest.href} data-random data-essays={JSON.stringify(essays.map((essay) => essay.href))}>Read something at random</a>
+        </p>
+      )}
+    </header>
+
+    {years.map(({ year, essays: inYear }) => (
+      <section class="year" aria-labelledby={`year-${year}`}>
+        <h2 id={`year-${year}`}>{year}</h2>
+        <PostRows items={inYear} voice="notebook" />
+      </section>
+    ))}
+  </div>
 </BaseLayout>
+
+<script>
+  const parseHrefs = (raw: string | undefined): string[] => {
+    const parsed: unknown = JSON.parse(raw ?? '[]');
+    return Array.isArray(parsed) ? parsed.filter((href): href is string => typeof href === 'string') : [];
+  };
+
+  const pickRandom = () =>
+    document.querySelectorAll<HTMLAnchorElement>('a[data-random]').forEach((link) => {
+      const hrefs = parseHrefs(link.dataset.essays);
+      const choice = hrefs[Math.floor(Math.random() * hrefs.length)];
+      if (choice) link.href = choice;
+    });
+
+  document.addEventListener('astro:page-load', pickRandom);
+</script>
+
+<style>
+  .page-head h1 {
+    font-family: var(--font-serif);
+    font-weight: 450;
+    letter-spacing: -0.02em;
+  }
+  .page-head p {
+    font-family: var(--font-serif);
+    max-width: var(--measure-serif);
+  }
+  .page-head .random { margin-top: var(--space-4); font-family: var(--font-ui); font-size: var(--step-0); }
+
+  .year {
+    max-width: 50rem;
+    padding-bottom: var(--space-7);
+  }
+  .year h2 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-style: italic;
+    font-size: var(--step-1);
+    letter-spacing: 0;
+    color: var(--ink-2);
+    padding-bottom: var(--space-3);
+  }
+</style>

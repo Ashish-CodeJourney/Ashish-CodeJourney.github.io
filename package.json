@@ -8,16 +8,22 @@
     "preview": "astro preview",
     "check": "astro check",
     "test": "node --test",
-    "devto:snapshot": "node scripts/refresh-devto-snapshot.mjs"
+    "devto:snapshot": "node scripts/refresh-devto-snapshot.mjs",
+    "github:snapshot": "node scripts/refresh-github-snapshot.mjs",
+    "test:build": "node --test 'tests/build/**/*.spec.mjs'"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/newsreader": "^5.3.0",
     "astro": "^7.3.2",
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@lhci/cli": "^0.15.1",
     "@types/qrcode": "^1.5.6",
     "typescript": "^6.0.3"
   }

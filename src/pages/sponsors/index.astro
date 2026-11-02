@@ -1,74 +1,51 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { formatDate } from '../../utils/date';
+import PostRows from '../../components/PostRows.astro';
+import { SITE } from '../../site.config';
 import { toSlug } from '../../utils/slug';
 
-const rawSponsors = await getCollection('sponsors');
-const sponsors = [...rawSponsors].sort(
-  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
-);
-
-const featured = sponsors.find(s => s.data.current);
+const sponsors = [...(await getCollection('sponsors'))].sort((a, b) => b.data.date.localeCompare(a.data.date));
+const featured = sponsors.find((sponsor) => sponsor.data.current);
 const FeaturedContent = featured ? (await render(featured)).Content : undefined;
+
+const rows = sponsors.map((sponsor) => ({
+  href: `/sponsors/${toSlug(sponsor.id)}/`,
+  title: sponsor.data.current ? `${sponsor.data.name} (current)` : sponsor.data.name,
+  date: sponsor.data.date,
+  summary: sponsor.data.description,
+}));
 ---
 
-<BaseLayout title="Sponsors" description="People and organizations who've sponsored me to attend conferences and other events.">
-  <header class="collection-header stagger-item">
-    <p class="section-eyebrow">Support</p>
-    <h1>Sponsors</h1>
-    <p class="text-light collection-subtitle">The generous folks whose support makes it possible for me to attend conferences, contribute to open source, and keep giving back to the community. so I could show up, learn, and meet people as curious as I am.</p>
-  </header>
+<BaseLayout title="Sponsors" description="People and organisations who have sponsored me to attend conferences and other events.">
+  <div class="wrap sponsors">
+    <header class="page-head">
+      <h1>Sponsors</h1>
+      <p>The people and organisations whose support lets me travel to conferences, learn in the room, and bring what I learn back to the community. Thank you.</p>
+    </header>
 
-  {sponsors.length === 0 ? (
-    <p>No sponsors yet — you can add one by creating a markdown file under <code>src/content/sponsors/</code>.</p>
-  ) : (
-    <>
-      {featured && FeaturedContent && (
-        <article class="sponsor-featured stagger-item">
-          <span class="badge primary sponsor-featured-badge">Current Sponsor</span>
-          <a class="sponsor-featured-logo-wrap" href={`/sponsors/${toSlug(featured.id)}/`}>
-            {featured.data.logo ? (
-              <img src={featured.data.logo} alt={featured.data.name} class="sponsor-featured-logo" />
-            ) : (
-              <div class="sponsor-fallback sponsor-featured-fallback">{featured.data.name}</div>
-            )}
-          </a>
-          <h2><a href={`/sponsors/${toSlug(featured.id)}/`}>{featured.data.name}</a></h2>
-          <div class="sponsor-body"><FeaturedContent /></div>
-          <div class="sponsor-links">
-            <a href={`/sponsors/${toSlug(featured.id)}/`} class="button">About this sponsorship</a>
-          </div>
-        </article>
-      )}
-
-      <section class="sponsor-timeline-section stagger-item">
-        <h2 class="timeline-heading">Sponsorship timeline</h2>
-        <ol class="timeline">
-          {sponsors.map(s => (
-            <li class="timeline-item">
-              <span class="timeline-marker" aria-hidden="true"></span>
-              <div class="timeline-content">
-                <span class="timeline-date">{formatDate(s.data.date)}</span>
-                <a class="timeline-card" href={`/sponsors/${toSlug(s.id)}/`}>
-                  {s.data.logo ? (
-                    <img src={s.data.logo} alt={s.data.name} class="timeline-card-logo" />
-                  ) : (
-                    <div class="sponsor-fallback timeline-card-fallback">{s.data.name}</div>
-                  )}
-                  <div class="timeline-card-text">
-                    <h3>
-                      {s.data.name}
-                      {s.data.current && <span class="badge secondary">Current</span>}
-                    </h3>
-                    {s.data.description && <p>{s.data.description}</p>}
-                  </div>
-                </a>
-              </div>
-            </li>
-          ))}
-        </ol>
+    {featured && FeaturedContent && (
+      <section class="featured" aria-labelledby="featured">
+        <h2 id="featured">Currently supported by <a href={`/sponsors/${toSlug(featured.id)}/`}>{featured.data.name}</a></h2>
+        <div class="prose"><FeaturedContent /></div>
       </section>
-    </>
-  )}
+    )}
+
+    <section aria-labelledby="timeline">
+      <h2 id="timeline">Every sponsorship</h2>
+      {rows.length === 0
+        ? <p class="empty">No sponsors yet.</p>
+        : <PostRows items={rows} />}
+    </section>
+
+    <p class="ask">Want to help me get to the next event? <a href={`mailto:${SITE.email}?subject=${encodeURIComponent('Sponsoring you')}`}>Write to me</a>.</p>
+  </div>
 </BaseLayout>
+
+<style>
+  .sponsors { padding-bottom: var(--space-8); }
+  h2 { margin-bottom: var(--space-4); }
+  .featured { margin-bottom: var(--space-7); padding-left: var(--space-5); border-left: 2px solid var(--lamp-glow); }
+  .empty { color: var(--ink-2); }
+  .ask { margin-top: var(--space-7); color: var(--ink-2); max-width: var(--measure-tech); }
+</style>

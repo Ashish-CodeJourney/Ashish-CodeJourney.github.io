@@ -2,10 +2,12 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://ashish-codejourney.github.io',
+  site: 'https://ashishvaghela.in',
   trailingSlash: 'ignore',
   redirects: {
     '/resume': '/Ashish_Vaghela_Software_Engineer.pdf',
+    '/talks': '/speaking',
+    '/talks/[slug]': '/speaking/[slug]',
   },
   integrations: [sitemap()],
   vite: {
@@ -18,10 +20,10 @@ export default defineConfig({
   markdown: {
     shikiConfig: {
       themes: {
-        light: 'github-light',
+        light: 'github-light-high-contrast',
         dark: 'github-dark',
       },
-      wrap: true,
+      wrap: false,
     },
   },
 });

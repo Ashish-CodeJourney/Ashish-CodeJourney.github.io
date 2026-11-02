@@ -1,0 +1,99 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectRows from '../components/oss/ProjectRows.astro';
+import CommunityRows from '../components/oss/CommunityRows.astro';
+import NotableList from '../components/oss/NotableList.astro';
+import github, { GITHUB_USERNAME } from '../utils/github.js';
+import { parseOssFile, listedRepos, featuredProjects, notableProjects, contributingLede } from '../utils/featured.js';
+import { communityRows, communityNotes } from '../utils/community.js';
+import { toSlug } from '../utils/slug';
+import snapshot from '../data/github-snapshot.json';
+
+const PROFILE = `https://github.com/${GITHUB_USERNAME}`;
+
+const ossFiles: Record<string, unknown> = import.meta.glob('../../content/oss.json', { eager: true, import: 'default' });
+const file = parseOssFile(Object.values(ossFiles)[0]);
+
+const [projects, community] = await Promise.all([getCollection('projects'), getCollection('community')]);
+
+const { repos } = await github.loadOssData({
+  fetchJson: (url) => github.fetchJsonWithRetry(url, { fetch, token: process.env.GITHUB_TOKEN }),
+  repos: listedRepos(file),
+  snapshot,
+  warn: (message) => console.warn(message),
+});
+
+const projectPages = projects.map((project) => ({ href: `/projects/${toSlug(project.id)}/`, github: project.data.github }));
+
+const ownProjects = featuredProjects({ entries: file.ownProjects, repos }).map((project) => ({
+  ...project,
+  owner: null,
+  url: project.url && github.linkForOwnRepo({ url: project.url, projects: projectPages }),
+}));
+const contributing = featuredProjects({ entries: file.contributions, repos });
+const notable = notableProjects({ entries: file.notable, repos });
+const contributingIntro = contributingLede({ core: contributing.length, notable: notable.length });
+
+const communityEntries = community.map((entry) => entry.data);
+const rows = communityRows({ entries: communityEntries });
+const notes = communityNotes(communityEntries);
+---
+
+<BaseLayout
+  title="Open source"
+  description="The open source projects I maintain, the ones I contribute to, and the developer communities I help run."
+  voice="tech"
+>
+  <div class="wrap">
+    <header class="page-head">
+      <h1>Open source</h1>
+      <p>Things I build in the open, projects I help maintain, and the developer communities I'm part of.</p>
+      <p>Everything else is on <a href={PROFILE}>my GitHub profile</a>.</p>
+    </header>
+
+    <section aria-labelledby="my-projects">
+      <h2 id="my-projects">My projects</h2>
+      <p class="lede">Projects I started and look after.</p>
+      {ownProjects.length > 0 && <ProjectRows projects={ownProjects} />}
+      <a class="more" href={`${PROFILE}?tab=repositories`}>All my repositories on GitHub</a>
+    </section>
+
+    <section aria-labelledby="contributing">
+      <h2 id="contributing">Projects I contribute to</h2>
+      {contributingIntro ? (
+        <>
+          <p class="lede">{contributingIntro}</p>
+          {contributing.length > 0 && <ProjectRows projects={contributing} />}
+          {notable.length > 0 && <NotableList projects={notable} />}
+        </>
+      ) : (
+        <p class="lede">I'm choosing which projects to list here. <a href={PROFILE}>My GitHub profile</a> has the full picture.</p>
+      )}
+    </section>
+
+    <section aria-labelledby="community">
+      <h2 id="community">Community</h2>
+      {rows.length > 0 || notes.length > 0 ? (
+        <>
+          <p class="lede">Developer communities I help run and look after.</p>
+          {rows.length > 0 && <CommunityRows rows={rows} />}
+          {notes.map((note) => <p class="note">{note}</p>)}
+        </>
+      ) : (
+        <p class="lede">The communities I help run will be listed here.</p>
+      )}
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  section { margin-bottom: var(--space-8); }
+
+  h2 { margin-bottom: var(--space-4); }
+
+  .lede { max-width: var(--measure-tech); margin-bottom: var(--space-5); color: var(--ink-2); }
+
+  .more { display: inline-block; margin-top: var(--space-4); font-weight: 600; }
+  .note { max-width: var(--measure-tech); margin-top: var(--space-5); color: var(--ink-2); }
+</style>

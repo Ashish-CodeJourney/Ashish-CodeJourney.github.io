@@ -1,0 +1,147 @@
+{
+  "repos": [
+    {
+      "repo": "Ashish-CodeJourney/satteri-plugins",
+      "url": "https://github.com/Ashish-CodeJourney/satteri-plugins",
+      "description": "Ports of remark and rehype plugins to Sätteri, the Rust markdown engine behind Astro 7.",
+      "language": "TypeScript",
+      "stars": 11,
+      "topics": [
+        "astro",
+        "astro-integration",
+        "html-sanitizer",
+        "katex",
+        "markdown",
+        "mathjax",
+        "mdx",
+        "monorepo",
+        "plugin",
+        "rehype",
+        "rehype-plugin",
+        "remark",
+        "remark-plugin",
+        "satteri",
+        "satteri-plugin",
+        "static-site-generator",
+        "typescript"
+      ],
+      "pushedAt": "2026-10-29",
+      "fork": false,
+      "archived": false
+    },
+    {
+      "repo": "christianhujer/aceunit",
+      "url": "https://github.com/christianhujer/aceunit",
+      "description": "AceUnit (Advanced C and Embedded Unit): A comfortable C code unit test framework. AceUnit is JUnit 5.x style, easy, modular and flexible. AceUnit can be used in resource constrained environments, e.g. embedded software development.",
+      "language": "C",
+      "stars": 51,
+      "topics": [
+        "c",
+        "embedded",
+        "freestanding-environments",
+        "tdd",
+        "test",
+        "testing",
+        "unit-test",
+        "unittest"
+      ],
+      "pushedAt": "2026-10-02",
+      "fork": false,
+      "archived": false
+    },
+    {
+      "repo": "mdn/content",
+      "url": "https://github.com/mdn/content",
+      "description": "The official source for MDN Web Docs content. Home to over 14,000 pages of documentation about HTML, CSS, JS, HTTP, Web APIs, and more.",
+      "language": "Markdown",
+      "stars": 11120,
+      "topics": [
+        "css",
+        "documentation",
+        "html",
+        "http",
+        "javascript",
+        "learning",
+        "mdn",
+        "reference",
+        "web-development",
+        "web-standards"
+      ],
+      "pushedAt": "2026-10-31",
+      "fork": false,
+      "archived": false
+    },
+    {
+      "repo": "colinhacks/zod",
+      "url": "https://github.com/colinhacks/zod",
+      "description": "TypeScript-first schema validation with static type inference",
+      "language": "TypeScript",
+      "stars": 44244,
+      "topics": [
+        "runtime-validation",
+        "schema-validation",
+        "static-types",
+        "type-inference",
+        "typescript"
+      ],
+      "pushedAt": "2026-10-30",
+      "fork": false,
+      "archived": false
+    },
+    {
+      "repo": "wiremock/wiremock",
+      "url": "https://github.com/wiremock/wiremock",
+      "description": "A tool for mocking HTTP services",
+      "language": "Java",
+      "stars": 7415,
+      "topics": [
+        "apis",
+        "hacktoberfest",
+        "http",
+        "java",
+        "json",
+        "mock-server",
+        "mocking",
+        "rest",
+        "stubbing",
+        "wiremock",
+        "xml"
+      ],
+      "pushedAt": "2026-11-02",
+      "fork": false,
+      "archived": false
+    },
+    {
+      "repo": "jobrunr/jobrunr",
+      "url": "https://github.com/jobrunr/jobrunr",
+      "description": "An extremely easy way to perform background processing in Java. Backed by persistent storage. Open and free for commercial use.",
+      "language": "Java",
+      "stars": 3103,
+      "topics": [
+        "background-jobs",
+        "java",
+        "java-8",
+        "java-scheduler",
+        "parallel-processing",
+        "quartz",
+        "scheduled-jobs",
+        "scheduler",
+        "scheduling"
+      ],
+      "pushedAt": "2026-11-02",
+      "fork": false,
+      "archived": false
+    },
+    {
+      "repo": "akash-network/website",
+      "url": "https://github.com/akash-network/website",
+      "description": "Repo for the Akash Network Website.",
+      "language": "TypeScript",
+      "stars": 158,
+      "topics": [],
+      "pushedAt": "2026-11-02",
+      "fork": false,
+      "archived": false
+    }
+  ]
+}

@@ -6,15 +6,24 @@ const nowPage = await getEntry('pages', 'now');
 const rendered = nowPage ? await render(nowPage) : null;
 ---
 
-<BaseLayout title="Now" description="What I'm focused on at this moment.">
-  <article>
-    <header class="collection-header stagger-item">
-      <p class="section-eyebrow">Present</p>
+<BaseLayout title="Now" description="What I'm focused on at the moment.">
+  <article class="wrap now">
+    <header class="page-head">
       <h1>Now</h1>
-      <p class="text-light collection-subtitle">What I'm focused on at this moment.</p>
+      <p>What has my attention at the moment. If you haven't heard from me in a while, this is probably why.</p>
     </header>
-    <div class="post-content stagger-item">
-      {rendered ? <rendered.Content /> : <p class="text-light">Nothing to show right now — the <code>pages/now.md</code> content is missing. If you’re developing locally, run <code>git submodule update --init</code>.</p>}
+    <div class="prose">
+      {rendered
+        ? <rendered.Content />
+        : <p>Nothing to show right now. The <code>pages/now.md</code> content is missing; if you're developing locally, run <code>git submodule update --init</code>.</p>}
     </div>
+    <p class="about-now">This is a <a href="https://nownownow.com/about">now page</a>. You can read more <a href="/about/">about me</a> or see <a href="/speaking/">where I'm speaking</a>.</p>
   </article>
 </BaseLayout>
+
+<style>
+  .now { padding-bottom: var(--space-8); }
+  .prose :global(h2:first-child) { margin-top: 0; }
+  .prose :global(h2 + p em) { color: var(--ink-2); font-style: normal; font-size: var(--step--1); }
+  .about-now { max-width: var(--measure-tech); margin-top: var(--space-7); padding-top: var(--space-4); border-top: 1px solid var(--line); color: var(--ink-2); font-size: var(--step--1); }
+</style>

@@ -1,37 +1,76 @@
 ---
 import QRCode from 'qrcode';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import LinkIcon from '../components/LinkIcon.astro';
 import { SITE, LINKS } from '../site.config';
 
 const linksUrl = `${SITE.url}/links/`;
+const displayUrl = linksUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
-const qrSvg = await QRCode.toString(linksUrl, {
-  type: 'svg',
-  margin: 1,
-  width: 180,
-  color: { dark: '#111210', light: '#FFFFFF' },
-});
+const qrSvg = (await QRCode.toString(linksUrl, { type: 'svg', margin: 2, width: 176 })).replace(
+  '<svg ',
+  `<svg class="qr" role="img" aria-label="QR code that opens ${displayUrl}" `,
+);
 ---
 
 <BaseLayout title="Links" description={`Find ${SITE.author} on the web.`}>
-  <section class="links-page stagger-item">
-    <h1 class="links-title">{SITE.author}</h1>
-    <p class="hero-desc">{SITE.description}</p>
+  <div class="wrap links">
+    <header class="page-head">
+      <h1>{SITE.author}</h1>
+      <p>{SITE.description}</p>
+    </header>
 
-    <div class="qr-card" set:html={qrSvg} />
-    <p class="qr-caption">Scan to open this page — {linksUrl}</p>
-
-    <nav class="links-list" aria-label="Links">
-      {LINKS.map(({ label, username, url, icon }) => (
-        <a href={url} target="_blank" rel="noopener noreferrer" class="link-button">
-          <LinkIcon name={icon} />
-          <span class="link-text">
-            <span class="link-label">{label}</span>
-            <span class="link-username">{username}</span>
-          </span>
-        </a>
+    <ul class="rows list" aria-label="Where to find me">
+      {LINKS.map(({ label, username, url }) => (
+        <li>
+          <a href={url} target="_blank" rel="me noopener noreferrer">
+            <span class="label">{label}</span>
+            <span class="handle">{username}</span>
+          </a>
+        </li>
       ))}
-    </nav>
-  </section>
+    </ul>
+
+    <figure class="code">
+      <Fragment set:html={qrSvg} />
+      <figcaption>Scan to open this page on your phone: <a href={linksUrl}>{displayUrl}</a></figcaption>
+    </figure>
+  </div>
 </BaseLayout>
+
+<style>
+  .links {
+    display: grid;
+    grid-template-columns: minmax(0, var(--measure-tech)) auto;
+    grid-template-areas: 'head head' 'list code';
+    column-gap: var(--space-8);
+    align-items: start;
+    padding-bottom: var(--space-8);
+  }
+  .page-head { grid-area: head; }
+  .list { grid-area: list; }
+  .code { grid-area: code; max-width: 13rem; }
+
+  .list a {
+    display: grid;
+    grid-template-columns: 9.5rem 1fr;
+    gap: var(--space-1) var(--space-5);
+    align-items: baseline;
+    padding-block: var(--space-4);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .label { font-weight: 600; font-size: var(--step-1); letter-spacing: -0.015em; }
+  .handle { color: var(--ink-2); overflow-wrap: anywhere; }
+  .list a:hover .label { color: var(--lamp); }
+
+  .code :global(.qr) { width: 11rem; height: auto; border-radius: var(--radius); }
+  .code :global(.qr path[fill]) { fill: var(--night-ink); }
+  .code :global(.qr path[stroke]) { stroke: var(--night); }
+  .code figcaption { margin-top: var(--space-3); color: var(--ink-2); font-size: var(--step--1); line-height: 1.5; }
+
+  @media (max-width: 700px) {
+    .links { grid-template-columns: 1fr; grid-template-areas: 'head' 'list' 'code'; }
+    .code { margin-top: var(--space-7); }
+    .list a { grid-template-columns: 1fr; }
+  }
+</style>

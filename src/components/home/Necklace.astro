@@ -1,0 +1,141 @@
+---
+import { layoutNecklace, promenadePath, type NecklacePiece } from '../../utils/necklace.js';
+import { formatDate } from '../../utils/date';
+
+interface Props {
+  pieces: ReadonlyArray<NecklacePiece>;
+}
+
+const VIEW = { width: 1000, height: 190 };
+const lights = layoutNecklace({ pieces: Astro.props.pieces, ...VIEW });
+const kindLabel = { technical: 'Technical post', writing: 'Writing', talk: 'Talk' } as const;
+const defaultCaption = `Each light is something I've published, oldest on the left. ${lights.length} so far.`;
+---
+
+<figure class="necklace">
+  <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <path class="promenade" d={promenadePath(VIEW)} vector-effect="non-scaling-stroke" />
+  </svg>
+  <ol class="lights" aria-hidden="true">
+    {lights.map((light, index) => (
+      <li
+        class:list={['light', light.kind]}
+        style={`--x:${(light.x / VIEW.width) * 100}%;--y:${(light.y / VIEW.height) * 100}%;--i:${index}`}
+      >
+        <a
+          href={light.href}
+          tabindex="-1"
+          data-caption={`${kindLabel[light.kind]}, ${formatDate(light.date)}: ${light.title}`}
+        ><span class="visually-hidden">{light.title}</span></a>
+      </li>
+    ))}
+  </ol>
+  <figcaption data-default={defaultCaption}>{defaultCaption}</figcaption>
+  <p class="legend">
+    <span class="key technical"></span>technical
+    <span class="key writing"></span>writing
+    <span class="key talk"></span>talk
+  </p>
+</figure>
+
+<script>
+  function setup() {
+    const figure = document.querySelector<HTMLElement>('.necklace');
+    const caption = figure?.querySelector<HTMLElement>('figcaption');
+    if (!figure || !caption) return;
+
+    const reset = () => { caption.textContent = caption.dataset.default ?? ''; };
+    figure.querySelectorAll<HTMLAnchorElement>('.light a').forEach((link) => {
+      link.addEventListener('pointerenter', () => { caption.textContent = link.dataset.caption ?? ''; });
+      link.addEventListener('pointerleave', reset);
+    });
+  }
+
+  document.addEventListener('astro:page-load', setup);
+</script>
+
+<style>
+  .necklace {
+    position: relative;
+    margin-top: var(--space-6);
+  }
+  svg, .lights {
+    width: 100%;
+    height: clamp(110px, 18vw, 190px);
+  }
+  .lights {
+    position: absolute;
+    inset: 0 0 auto 0;
+    list-style: none;
+    padding: 0;
+  }
+  .promenade {
+    fill: none;
+    stroke: var(--sky-line);
+    stroke-width: 2;
+  }
+  .light {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    translate: -50% -50%;
+    animation: light-up 420ms ease-out both;
+    animation-delay: calc(var(--i) * 28ms + 150ms);
+  }
+  .light a {
+    display: block;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    position: relative;
+  }
+  .light a::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    background: var(--lamp-glow);
+    box-shadow: 0 0 10px 2px color-mix(in srgb, var(--lamp-glow) 60%, transparent), 0 0 28px 6px color-mix(in srgb, var(--lamp-glow) 22%, transparent);
+    transition: transform 160ms ease-out;
+  }
+  .light.writing a::before {
+    background: var(--sky-ink);
+    box-shadow: 0 0 10px 2px color-mix(in srgb, var(--sky-ink) 45%, transparent);
+  }
+  .light.talk a::before {
+    inset: 3px;
+    background: var(--light-talk);
+    box-shadow: 0 0 10px 2px color-mix(in srgb, var(--light-talk) 60%, transparent), 0 0 28px 6px color-mix(in srgb, var(--light-talk) 22%, transparent);
+  }
+  .light a:hover::before { transform: scale(1.6); }
+
+  figcaption {
+    margin-top: calc(-1 * var(--space-5));
+    min-height: 3.2em;
+    color: var(--sky-ink);
+    font-size: var(--step-0);
+    max-width: 60ch;
+  }
+  .legend {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--sky-ink-2);
+    font-size: var(--step--1);
+  }
+  .key {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--lamp-glow);
+    margin-left: var(--space-3);
+  }
+  .key:first-child { margin-left: 0; }
+  .key.writing { background: var(--sky-ink); }
+  .key.talk { width: 14px; height: 14px; background: var(--light-talk); }
+
+  @keyframes light-up {
+    from { opacity: 0; scale: 0.3; }
+    to { opacity: 1; scale: 1; }
+  }
+</style>

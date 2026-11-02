@@ -1,0 +1,82 @@
+---
+interface Props {
+  variant: 'hero' | 'footer';
+}
+
+const { variant } = Astro.props;
+
+const RIDGES = {
+  far: 'M0 240 L0 120 L15 109 L30 104 L45 93 L60 88 L75 80 L90 70 L106 72 L122 76 L138 96 L154 95 L170 105 L185 91 L200 90 L215 71 L230 65 L245 49 L260 38 L274 48 L288 49 L302 65 L316 76 L330 80 L344 77 L358 77 L372 72 L386 60 L400 62 L414 75 L428 83 L442 88 L456 94 L470 110 L485 104 L500 90 L515 84 L530 76 L545 63 L560 50 L576 49 L592 35 L608 36 L624 24 L640 18 L656 34 L672 46 L688 44 L704 57 L720 72 L734 73 L748 89 L762 85 L776 92 L790 95 L805 84 L820 78 L835 67 L850 59 L865 54 L880 44 L896 54 L912 68 L928 73 L944 85 L960 88 L976 87 L992 85 L1008 74 L1024 61 L1040 60 L1054 73 L1068 84 L1082 91 L1096 93 L1110 100 L1125 94 L1140 79 L1155 79 L1170 66 L1185 53 L1200 42 L1215 43 L1230 30 L1244 45 L1258 41 L1272 62 L1286 65 L1300 75 L1314 66 L1328 62 L1342 66 L1356 61 L1370 52 L1384 54 L1398 69 L1412 67 L1426 85 L1440 90 L1440 240 Z',
+  mid: 'M0 240 L0 170 L15 165 L30 161 L45 157 L60 154 L75 145 L90 141 L105 127 L120 125 L135 129 L150 139 L165 140 L180 146 L195 142 L210 150 L225 143 L240 133 L255 130 L270 123 L285 110 L300 108 L316 113 L331 120 L347 136 L363 141 L379 141 L394 155 L410 160 L425 151 L440 151 L455 139 L470 133 L485 137 L500 128 L514 129 L529 131 L543 144 L557 145 L571 141 L586 151 L600 150 L614 145 L629 141 L643 130 L657 134 L671 125 L686 122 L700 112 L715 121 L730 121 L745 128 L760 130 L775 136 L790 142 L805 151 L820 158 L836 153 L851 142 L867 144 L883 134 L899 129 L914 128 L930 120 L944 124 L959 127 L973 133 L987 140 L1001 137 L1016 150 L1030 150 L1044 142 L1058 147 L1072 145 L1086 133 L1100 135 L1116 144 L1132 145 L1148 154 L1164 154 L1180 165 L1196 154 L1211 148 L1227 151 L1243 134 L1259 134 L1274 129 L1290 118 L1305 127 L1320 126 L1335 131 L1350 138 L1365 146 L1380 148 L1395 140 L1410 143 L1425 139 L1440 132 L1440 240 Z',
+  near: 'M0 240 L0 212 L15 210 L29 208 L44 205 L58 209 L73 201 L87 203 L102 205 L116 198 L131 199 L145 198 L160 196 L175 195 L189 199 L204 202 L218 202 L233 206 L247 203 L262 206 L276 207 L291 211 L305 214 L320 214 L335 213 L349 213 L364 209 L378 211 L393 205 L407 205 L422 206 L436 205 L451 202 L465 199 L480 200 L495 201 L509 202 L524 204 L538 209 L553 206 L567 213 L582 214 L596 210 L611 214 L625 216 L640 218 L655 214 L669 215 L684 217 L698 210 L713 212 L727 207 L742 210 L756 210 L771 205 L785 203 L800 204 L815 203 L829 206 L844 204 L858 205 L873 209 L887 213 L902 210 L916 211 L931 213 L945 211 L960 214 L974 214 L988 211 L1002 212 L1016 214 L1030 206 L1044 210 L1058 209 L1072 206 L1086 206 L1100 206 L1117 206 L1133 203 L1150 196 L1168 193 L1187 197 L1205 196 L1223 202 L1242 201 L1260 206 L1274 205 L1289 201 L1303 202 L1317 203 L1331 201 L1346 201 L1360 198 L1376 198 L1392 202 L1408 208 L1424 208 L1440 210 L1440 240 Z',
+};
+
+const CAT_BODY =
+  'M30 120 C22 100 20 80 28 62 C32 52 38 46 44 42 L42 30 C42 22 46 16 50 14 L49 3 L57 11 C60 10 64 10 67 11 L72 2 L74 15 C78 20 79 27 76 33 C74 37 69 40 64 41 C66 50 68 60 66 72 C70 84 72 100 70 120 Z';
+const CAT_TAIL = 'M32 117 C18 120 6 114 8 100 C9 92 4 88 0 90';
+---
+
+<svg
+  class:list={['ridgeline', variant]}
+  viewBox="0 0 1440 240"
+  preserveAspectRatio="xMaxYMax slice"
+  aria-hidden="true"
+  focusable="false"
+>
+  <circle class="moon-halo" cx="1080" cy="62" r="52" />
+  <circle class="moon" cx="1080" cy="62" r="26" />
+  <path class="ridge far" d={RIDGES.far} />
+  <path class="ridge mid" d={RIDGES.mid} />
+  <path class="ridge near" d={RIDGES.near} />
+  <g class="cat" transform="translate(1150 112) scale(0.7)">
+    <path class="cat-body" d={CAT_BODY} />
+    <path class="cat-tail" d={CAT_TAIL} />
+  </g>
+</svg>
+
+<style>
+  .ridgeline {
+    display: block;
+    width: 100%;
+    height: clamp(96px, 15vw, 220px);
+    overflow: visible;
+  }
+
+  .hero {
+    --sky-far: color-mix(in srgb, var(--sky) 82%, var(--sky-ink));
+    --sky-mid: color-mix(in srgb, var(--sky) 68%, var(--sky-ink));
+    --ground: var(--bg);
+  }
+
+  .footer {
+    --sky-far: color-mix(in srgb, var(--bg) 76%, var(--footer-band));
+    --sky-mid: color-mix(in srgb, var(--bg) 48%, var(--footer-band));
+    --ground: var(--footer-band);
+  }
+  :global(html.dark) .footer {
+    --sky-far: color-mix(in srgb, var(--footer-band) 90%, var(--sky-ink));
+    --sky-mid: color-mix(in srgb, var(--footer-band) 80%, var(--sky-ink));
+  }
+
+  .far { fill: var(--sky-far); }
+  .mid { fill: var(--sky-mid); }
+  .near { fill: var(--ground); }
+  .cat-body { fill: var(--cat); }
+  .cat-tail {
+    fill: none;
+    stroke: var(--cat);
+    stroke-width: 7;
+    stroke-linecap: round;
+    transform-box: fill-box;
+    transform-origin: 100% 85%;
+    animation: tail-sway 5s ease-in-out infinite alternate;
+  }
+
+  .moon { fill: var(--celestial); }
+  .moon-halo { fill: var(--celestial); opacity: 0.14; }
+
+  @keyframes tail-sway {
+    from { rotate: -7deg; }
+    to { rotate: 6deg; }
+  }
+</style>

@@ -36,6 +36,18 @@ export const toPostEntry = (article, body, id = slugFromPath(article.path)) => (
   body,
 });
 
+const UPLOAD_URL = String.raw`https://dev-to-uploads\.s3(?:\.[a-z0-9-]+)?\.amazonaws\.com/[^\s)"']+`;
+const MARKDOWN_IMAGE = new RegExp(String.raw`(!\[[^\]]*\]\()(${UPLOAD_URL})`, 'g');
+const HTML_IMAGE = new RegExp(String.raw`(<img\b[^>]*\bsrc=")(${UPLOAD_URL})`, 'g');
+
+const viaResizingCdn = (url) =>
+  `https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/${encodeURIComponent(url)}`;
+
+export const resizeDevtoImages = (body) =>
+  body
+    .replace(MARKDOWN_IMAGE, (_, prefix, url) => `${prefix}${viaResizingCdn(url)}`)
+    .replace(HTML_IMAGE, (_, prefix, url) => `${prefix}${viaResizingCdn(url)}`);
+
 export const isPublishedLocally = (article, localEntries) => {
   const localIds = new Set(localEntries.map((entry) => entry.id));
   const localTitles = new Set(localEntries.map((entry) => normaliseTitle(entry.data.title)));
@@ -80,4 +92,4 @@ export const loadDevtoEntries = async ({ username, fetchJson, localEntries, over
   }
 };
 
-export default { toPostEntry, isPublishedLocally, loadDevtoEntries, fetchJsonWithRetry };
+export default { toPostEntry, isPublishedLocally, loadDevtoEntries, fetchJsonWithRetry, resizeDevtoImages };

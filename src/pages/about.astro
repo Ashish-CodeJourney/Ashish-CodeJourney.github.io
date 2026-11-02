@@ -1,0 +1,196 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../site.config';
+import { formatPeriod, byNewestStart } from '../utils/resume.js';
+import ResumeLinks from '../components/ResumeLinks.astro';
+
+const home = await getEntry('pages', 'home');
+const rendered = home ? await render(home) : null;
+
+const resume = (await getCollection('resume')).map((entry) => entry.data);
+const summary = resume.find((entry) => entry.kind === 'summary');
+const experience = resume.flatMap((entry) => (entry.kind === 'experience' ? [entry] : [])).toSorted(byNewestStart);
+const skills = resume.flatMap((entry) => (entry.kind === 'skills' ? [entry] : [])).toSorted((a, b) => a.order - b.order);
+const education = resume.flatMap((entry) => (entry.kind === 'education' ? [entry] : [])).toSorted(byNewestStart);
+---
+
+<BaseLayout title="About" description={`About ${SITE.author}: software engineer, open source contributor, meetup regular and friend to street cats.`}>
+  <div class="wrap about">
+    <div class="intro">
+      <div class="prose story">
+        {rendered
+          ? <rendered.Content />
+          : <><h1>About</h1><p>The intro text is missing. If you're developing locally, run <code>git submodule update --init</code>.</p></>}
+      </div>
+
+      <aside class="side" aria-label="A photo and a few true things">
+        <img class="portrait" src="/avatar.jpg" alt={SITE.author} width="400" height="400" loading="eager" decoding="async" />
+        <div class="small-print">
+          <p>Usually holding a cup of chai.</p>
+          <p>Always happy to stop for a street cat.</p>
+        </div>
+        <ResumeLinks layout="panel" />
+      </aside>
+    </div>
+
+    {summary && (
+      <section class="block" aria-labelledby="work">
+        <h2 id="work">Work</h2>
+        <div class="block-body">
+          {summary.text.map((paragraph) => <p class="lede">{paragraph}</p>)}
+          <ResumeLinks />
+        </div>
+      </section>
+    )}
+
+    {experience.length > 0 && (
+      <section class="block" aria-labelledby="experience">
+        <h2 id="experience">Experience</h2>
+        <ol class="rows timeline">
+          {experience.map((job) => (
+            <li>
+              <p class="when">
+                <span>{formatPeriod(job)}</span>
+                <span>{job.location}</span>
+              </p>
+              <div>
+                <h3>{job.role}</h3>
+                <p class="where">{job.url ? <a href={job.url}>{job.company}</a> : job.company}</p>
+                {job.highlights.length > 0 && (
+                  <ul class="highlights">{job.highlights.map((line) => <li>{line}</li>)}</ul>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
+    <section class="block" aria-labelledby="community">
+      <h2 id="community">Open source and community</h2>
+      <div class="block-body">
+        <p class="lede">
+          Outside work I'm a core contributor to AceUnit and ReqCover, maintain my own Sätteri plugins, and help run
+          Open Source Weekend and the Ahmedabad Developer Club.
+        </p>
+        <p class="cta">
+          <a href="/oss/">See my open source work and community roles</a>
+          <a href="/speaking/">My talks</a>
+        </p>
+      </div>
+    </section>
+
+    {skills.length > 0 && (
+      <section class="block" aria-labelledby="skills">
+        <h2 id="skills">Skills</h2>
+        <dl class="skills">
+          {skills.map(({ group, items }) => (
+            <div>
+              <dt>{group}</dt>
+              <dd>{items.join(', ')}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    )}
+
+    {education.length > 0 && (
+      <section class="block" aria-labelledby="education">
+        <h2 id="education">Education</h2>
+        <ol class="rows timeline">
+          {education.map((entry) => (
+            <li>
+              <p class="when"><span>{formatPeriod(entry)}</span></p>
+              <div>
+                <h3>{entry.degree}</h3>
+                <p class="where">{entry.school}{entry.note && `, ${entry.note.toLowerCase()}`}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .about { padding-block: var(--space-7) var(--space-8); }
+
+  .intro {
+    display: grid;
+    grid-template-columns: minmax(0, var(--measure-tech)) 1fr;
+    column-gap: var(--space-8);
+    align-items: start;
+  }
+  .portrait {
+    width: 100%;
+    max-width: 18rem;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--radius);
+    margin-top: var(--space-3);
+  }
+  .small-print {
+    max-width: 18rem;
+    margin-top: var(--space-4);
+    color: var(--ink-2);
+    font-family: var(--font-serif);
+    font-size: var(--step-1);
+    line-height: 1.4;
+  }
+  .small-print p + p { margin-top: var(--space-2); }
+  .story :global(h1) { font-size: var(--step-5); letter-spacing: -0.035em; margin-bottom: var(--space-5); }
+  .story :global(h1 + p) { font-size: var(--step-1); line-height: 1.45; }
+  .story :global(h3) { font-size: var(--step-2); margin-top: 1.8em; }
+
+  .block {
+    display: grid;
+    grid-template-columns: 14rem minmax(0, 1fr);
+    column-gap: var(--space-6);
+    margin-top: var(--space-8);
+    padding-top: var(--space-4);
+    border-top: 2px solid var(--ink);
+  }
+  .block > h2 { font-size: var(--step-2); letter-spacing: -0.025em; }
+  .block-body { max-width: var(--measure-tech); }
+  .lede + .lede { margin-top: var(--space-4); }
+  .lede { font-size: var(--step-1); line-height: 1.5; color: var(--ink); }
+  .cta { display: flex; flex-wrap: wrap; gap: var(--space-5); margin-top: var(--space-5); font-weight: 600; }
+
+  .timeline { border-top: 0; }
+  .timeline > li {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr);
+    column-gap: var(--space-5);
+    padding-block: var(--space-5);
+  }
+  .timeline > li:first-child { padding-top: 0; }
+  .when { display: grid; align-content: start; gap: var(--space-1); color: var(--ink-2); font-size: var(--step--1); padding-top: 0.35em; }
+  .timeline h3 { font-size: var(--step-1); letter-spacing: -0.015em; }
+  .where { color: var(--ink-2); margin-top: var(--space-1); }
+  .highlights { margin-top: var(--space-3); padding-left: 1.1em; max-width: var(--measure-tech); }
+  .highlights li + li { margin-top: var(--space-2); }
+
+  .skills { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5) var(--space-6); }
+  .skills dt { font-weight: 650; }
+  .skills dd { margin-top: var(--space-1); color: var(--ink-2); }
+
+  @media (max-width: 900px) {
+    .block { grid-template-columns: 1fr; row-gap: var(--space-5); }
+  }
+  @media (max-width: 800px) {
+    .about { padding-top: var(--space-6); }
+    .intro { grid-template-columns: 1fr; }
+    .side { order: -1; display: flex; align-items: center; gap: var(--space-5); margin-bottom: var(--space-6); }
+    .side { flex-wrap: wrap; }
+    .side :global(.panel) { flex-basis: 100%; max-width: none; margin-top: 0; }
+    .portrait { width: 7rem; flex: none; margin: 0; }
+    .small-print { margin-top: 0; font-size: var(--step-0); }
+  }
+  @media (max-width: 600px) {
+    .timeline > li { grid-template-columns: 1fr; row-gap: var(--space-2); }
+    .when { display: flex; gap: var(--space-3); padding-top: 0; }
+    .skills { grid-template-columns: 1fr; }
+  }
+</style>

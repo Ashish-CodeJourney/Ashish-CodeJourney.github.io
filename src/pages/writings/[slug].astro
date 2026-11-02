@@ -1,20 +1,22 @@
 ---
 import { getCollection, render } from 'astro:content';
-import PostLayout from '../../layouts/PostLayout.astro';
+import WritingLayout from '../../layouts/WritingLayout.astro';
 import { toSlug } from '../../utils/slug';
+import { neighbours } from '../../utils/writings.js';
 
 export async function getStaticPaths() {
   const posts = await getCollection('writings');
-  return posts.map(post => ({
-    params: { slug: toSlug(post.id) },
-    props: { post },
-  }));
+  const shelf = posts.map((post) => ({ href: `/writings/${toSlug(post.id)}/`, title: post.data.title, date: post.data.date }));
+  return posts.map((post) => {
+    const { older, newer } = neighbours({ essays: shelf, href: `/writings/${toSlug(post.id)}/` });
+    return { params: { slug: toSlug(post.id) }, props: { post, older, newer } };
+  });
 }
 
-const { post } = Astro.props;
+const { post, older, newer } = Astro.props;
 const { Content } = await render(post);
 ---
 
-<PostLayout {...post.data} body={post.body} backHref="/writings/" backLabel="Writings">
+<WritingLayout {...post.data} body={post.body} older={older} newer={newer}>
   <Content />
-</PostLayout>
+</WritingLayout>

@@ -1,89 +1,73 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import illustration from '../assets/404-illustration.jpg';
 
 const messages = [
-  {
-    title: 'Journey Interrupted',
-    text: "You've wandered into unmapped territory. This page doesn't exist.",
-  },
-  {
-    title: 'Lost in Compilation',
-    text: 'This route failed to build. Try a different path.',
-  },
-  {
-    title: 'Off the Map',
-    text: "There's nothing here but 404s and tumbleweeds.",
-  },
-  {
-    title: 'Segmentation Fault',
-    text: "You tried to access a page that doesn't exist in this universe.",
-  },
-  {
-    title: 'Dead End',
-    text: "Even the best explorers hit dead ends sometimes. Let's turn back.",
-  },
+  { title: 'Journey interrupted', text: "You've wandered into unmapped territory. This page doesn't exist." },
+  { title: 'Lost in compilation', text: 'This route failed to build. Try a different path.' },
+  { title: 'Off the map', text: "There's nothing here but 404s and tumbleweeds." },
+  { title: 'Segmentation fault', text: "You tried to reach a page that doesn't exist in this universe." },
+  { title: 'Dead end', text: "Even the best explorers hit dead ends. Let's turn back." },
+  { title: 'The cat moved it', text: 'A street cat sat on this page and it is not getting up.' },
 ];
+const [first] = messages;
 ---
 
-<BaseLayout title="404 — Not Found" description="Page not found">
-  <div class="error-container">
-    <div class="error-video-wrap">
-      <video
-        id="error-video"
-        class="error-illustration"
-        src="/videos/404.mp4"
-        width="324"
-        height="324"
-        autoplay
-        muted
-        loop
-        playsinline
-      />
-      <span id="sound-hint" class="sound-hint">🔈 Tap for sound</span>
-    </div>
-    <span class="error-code">404</span>
-    <h2 id="error-title" class="error-title">Journey Interrupted</h2>
-    <p id="error-text" class="error-text">
-      You've wandered into unmapped territory. This page doesn't exist.
-    </p>
-    <div class="error-actions hstack gap-3">
-      <a href="/" class="button">← Go Home</a>
-      <a href="/writings/" class="button outline">Writings</a>
-      <a href="/technical/" class="button outline">Technical</a>
-    </div>
+<BaseLayout title="Page not found" description="This page doesn't exist.">
+  <div class="wrap lost" data-messages={JSON.stringify(messages)}>
+    <Image class="art" src={illustration} densities={[1, 2]} alt="" width="280" height="280" loading="eager" decoding="async" />
+    <p class="code" aria-hidden="true">404</p>
+    <h1 id="error-title">{first.title}</h1>
+    <p id="error-text" class="text">{first.text}</p>
+    <ul class="ways">
+      <li><a href="/">Go to the home page</a></li>
+      <li><a href="/technical/">Technical posts</a></li>
+      <li><a href="/writings/">Writings</a></li>
+    </ul>
   </div>
 
-  <script is:inline define:vars={{ messages }}>
-    function pickRandomMessage() {
-      const titleEl = document.getElementById('error-title');
-      const textEl = document.getElementById('error-text');
-      if (!titleEl || !textEl) return;
-
-      const { title, text } = messages[Math.floor(Math.random() * messages.length)];
-      titleEl.textContent = title;
-      textEl.textContent = text;
-    }
-
-    function unmuteOnFirstInteraction() {
-      const video = document.getElementById('error-video');
-      const hint = document.getElementById('sound-hint');
-      if (!(video instanceof HTMLVideoElement)) return;
-
-      document.addEventListener(
-        'click',
-        () => {
-          video.muted = false;
-          hint?.classList.add('sound-hint-hidden');
-        },
-        { once: true },
-      );
-    }
-
-    function initErrorPage() {
-      pickRandomMessage();
-      unmuteOnFirstInteraction();
-    }
-
-    document.addEventListener('astro:page-load', initErrorPage);
+  <script is:inline>
+    document.addEventListener('astro:page-load', () => {
+      const title = document.getElementById('error-title');
+      const text = document.getElementById('error-text');
+      const source = document.querySelector('[data-messages]');
+      if (!title || !text || !source) return;
+      const messages = JSON.parse(source.getAttribute('data-messages') ?? '[]');
+      if (messages.length === 0) return;
+      const message = messages[Math.floor(Math.random() * messages.length)];
+      title.textContent = message.title;
+      text.textContent = message.text;
+    });
   </script>
 </BaseLayout>
+
+<style>
+  .lost {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-block: var(--space-7) var(--space-8);
+  }
+  .art { width: 280px; max-width: 70vw; height: auto; border-radius: var(--radius); }
+  .code {
+    margin-top: var(--space-5);
+    font-size: var(--step-1);
+    font-weight: 650;
+    color: var(--ink-2);
+    letter-spacing: -0.02em;
+  }
+  h1 { margin-top: var(--space-1); }
+  .text { margin-top: var(--space-3); max-width: 34ch; color: var(--ink-2); font-size: var(--step-1); line-height: 1.45; }
+  .ways {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2) var(--space-5);
+    margin-top: var(--space-6);
+    font-weight: 600;
+  }
+</style>

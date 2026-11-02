@@ -159,3 +159,20 @@
 
   document.addEventListener('astro:page-load', setup);
 </script>
+
+<style>
+  .oneko {
+    width: 32px;
+    height: 32px;
+    position: fixed;
+    left: 16px;
+    top: 16px;
+    pointer-events: none;
+    image-rendering: pixelated;
+    background-image: url('/oneko.gif');
+    z-index: 5;
+  }
+  @media (max-width: 640px), (prefers-reduced-motion: reduce) {
+    .oneko { display: none; }
+  }
+</style>

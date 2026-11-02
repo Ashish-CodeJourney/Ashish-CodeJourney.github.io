@@ -53,11 +53,14 @@ export const loadDevtoEntries: (options: {
   warn: (message: string) => void;
 }) => Promise<DevtoEntry[]>;
 
+export const resizeDevtoImages: (body: string) => string;
+
 declare const devto: {
   toPostEntry: typeof toPostEntry;
   isPublishedLocally: typeof isPublishedLocally;
   loadDevtoEntries: typeof loadDevtoEntries;
   fetchJsonWithRetry: typeof fetchJsonWithRetry;
+  resizeDevtoImages: typeof resizeDevtoImages;
 };
 
 export default devto;

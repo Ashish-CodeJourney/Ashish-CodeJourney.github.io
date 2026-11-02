@@ -1,19 +1,191 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PostList from '../../components/PostList.astro';
+import { toSlug } from '../../utils/slug';
+import { groupByYear, tagCounts } from '../../utils/technical-archive.js';
 
-const posts = [...(await getCollection('technical'))].sort(
-  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
-);
+const FILTER_MIN_POSTS = 2;
+
+const posts = (await getCollection('technical')).map((post) => ({
+  id: post.id,
+  href: `/technical/${toSlug(post.id)}/`,
+  title: post.data.title,
+  date: post.data.date,
+  summary: post.data.description,
+  tags: post.data.tags,
+}));
+
+const years = groupByYear(posts);
+const tags = tagCounts({ posts, min: FILTER_MIN_POSTS });
+
+const dayAndMonth = (date: string) => {
+  const [year, month, day] = date.split('-').map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+};
+
+const tagList = (postTags: ReadonlyArray<string>) => postTags.map((tag) => tag.toLowerCase()).join(' ');
+
+const description = 'Notes from the workbench: Java, testing, tooling, and the bugs I learn the most from.';
 ---
 
-<BaseLayout title="Technical" description="Deep dives on code, systems, and craft.">
-  <PostList
-    eyebrow="Engineering"
-    heading="Technical"
-    subtitle="Deep dives on code, systems, and craft."
-    posts={posts}
-    basePath="/technical/"
-  />
+<BaseLayout title="Technical" description={description} voice="tech">
+  <link slot="head" rel="alternate" type="application/rss+xml" title="Ashish Vaghela: technical posts" href="/technical/rss.xml" />
+
+  <div class="wrap">
+    <header class="page-head">
+      <h1>Technical</h1>
+      <p>{description}</p>
+    </header>
+
+    <div class="filter" data-tag-filter hidden>
+      <div role="group" aria-label="Show posts tagged">
+        <button type="button" data-tag="" aria-pressed="true">All <span class="count">{posts.length}</span></button>
+        {tags.map(({ tag, count }) => (
+          <button type="button" data-tag={tag} aria-pressed="false">{tag} <span class="count">{count}</span></button>
+        ))}
+      </div>
+      <p class="visually-hidden" aria-live="polite" data-filter-status></p>
+    </div>
+
+    {years.map(({ year, posts: yearPosts }) => (
+      <section class="year" aria-labelledby={`year-${year}`} data-year>
+        <h2 id={`year-${year}`}>{year}</h2>
+        <ul class="rows">
+          {yearPosts.map((post) => (
+            <li data-tags={tagList(post.tags)}>
+              <a href={post.href}>
+                <time datetime={post.date}>{dayAndMonth(post.date)}</time>
+                <span class="title">{post.title}</span>
+                {post.summary && <span class="summary">{post.summary}</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
 </BaseLayout>
+
+<script>
+  const label = (count: number, tag: string) =>
+    tag === '' ? `Showing all ${count} posts` : `Showing ${count} ${count === 1 ? 'post' : 'posts'} tagged ${tag}`;
+
+  const applyFilter = (root: HTMLElement, tag: string) => {
+    const rows = [...document.querySelectorAll<HTMLLIElement>('li[data-tags]')];
+    const matches = (row: HTMLLIElement) => tag === '' || (row.dataset.tags ?? '').split(' ').includes(tag);
+
+    rows.forEach((row) => { row.hidden = !matches(row); });
+    document.querySelectorAll<HTMLElement>('[data-year]').forEach((year) => {
+      year.hidden = year.querySelector('li[data-tags]:not([hidden])') === null;
+    });
+    root.querySelectorAll<HTMLButtonElement>('button[data-tag]').forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.tag === tag));
+    });
+
+    const status = root.querySelector('[data-filter-status]');
+    if (status) status.textContent = label(rows.filter(matches).length, tag);
+
+    const url = new URL(window.location.href);
+    if (tag === '') url.searchParams.delete('tag');
+    else url.searchParams.set('tag', tag);
+    history.replaceState(history.state, '', url);
+  };
+
+  const setUp = () => {
+    const root = document.querySelector<HTMLElement>('[data-tag-filter]');
+    if (!root) return;
+
+    const known = new Set([...root.querySelectorAll<HTMLButtonElement>('button[data-tag]')].map((b) => b.dataset.tag));
+    const requested = new URL(window.location.href).searchParams.get('tag') ?? '';
+
+    root.hidden = false;
+    root.addEventListener('click', (event) => {
+      const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('button[data-tag]') : null;
+      if (button) applyFilter(root, button.dataset.tag ?? '');
+    });
+    if (requested !== '' && known.has(requested)) applyFilter(root, requested);
+  };
+
+  document.addEventListener('astro:page-load', setUp);
+</script>
+
+<style>
+  .filter {
+    margin-bottom: var(--space-6);
+  }
+  .filter [role='group'] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .filter button {
+    font: inherit;
+    font-size: var(--step--1);
+    color: var(--ink-2);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: var(--space-1) var(--space-3);
+    cursor: pointer;
+  }
+  .filter button:hover {
+    color: var(--ink);
+    border-color: var(--ink-2);
+  }
+  .filter button[aria-pressed='true'] {
+    color: var(--bg);
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+  .count {
+    margin-left: var(--space-1);
+    opacity: 0.7;
+  }
+
+  .year + .year {
+    margin-top: var(--space-7);
+  }
+  .year h2 {
+    font-size: var(--step-1);
+    color: var(--ink-2);
+    margin-bottom: var(--space-3);
+  }
+
+  .rows a {
+    display: grid;
+    grid-template-columns: 9.5rem 1fr;
+    column-gap: var(--space-5);
+    row-gap: var(--space-1);
+    padding-block: var(--space-4);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  time {
+    grid-row: span 2;
+    color: var(--ink-2);
+    font-size: var(--step--1);
+    padding-top: 0.2em;
+  }
+  .title {
+    font-weight: 600;
+    font-size: var(--step-1);
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+  .summary {
+    grid-column: 2;
+    color: var(--ink-2);
+    font-size: var(--step--1);
+    line-height: 1.5;
+    max-width: var(--measure-tech);
+  }
+  .rows a:hover .title {
+    color: var(--lamp);
+  }
+
+  @media (max-width: 600px) {
+    .rows a { grid-template-columns: 1fr; }
+    time { grid-row: auto; }
+    .summary { grid-column: 1; }
+  }
+</style>

@@ -5,7 +5,7 @@ export const SITE = {
   description: data.description,
   author: data.author,
   email: data.email,
-  url: data.url,
+  url: new URL(import.meta.env.SITE).origin,
   socials: data.socials,
 } as const;
 
@@ -18,3 +18,5 @@ export const LINKS = data.links as ReadonlyArray<{
   url: string;
   icon: LinkIconName;
 }>;
+
+export const RESUME_PDF = '/Ashish_Vaghela_Software_Engineer.pdf';

@@ -1,36 +1,113 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ProjectCard from '../../components/ProjectCard.astro';
+import { formatDate } from '../../utils/date';
 import { toSlug } from '../../utils/slug';
 
-const projects = [...(await getCollection('projects'))].sort(
-  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+const STATUS_LABEL = {
+  active: 'Active',
+  maintenance: 'Maintenance',
+  archived: 'Archived',
+} as const;
+
+const listFormat = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' });
+
+const projects = (await getCollection('projects')).toSorted(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
 );
 ---
 
-<BaseLayout title="Projects" description="Things I've built, maintained, or am currently working on.">
-  <header class="collection-header stagger-item">
-    <p class="section-eyebrow">Build</p>
-    <h1>Projects</h1>
-    <p class="text-light collection-subtitle">Things I've built, maintained, or am currently working on.</p>
-  </header>
-  <div class="projects-grid">
-    {projects.length === 0
-      ? <p class="text-light">Nothing here yet.</p>
-      : projects.map(project => (
-          <ProjectCard
-            title={project.data.title}
-            description={project.data.description}
-            tags={project.data.tags}
-            url={project.data.url}
-            banner={project.data.banner}
-            logo={project.data.logo}
-            status={project.data.status}
-            date={project.data.date}
-            href={`/projects/${toSlug(project.id)}/`}
-          />
-        ))
-    }
+<BaseLayout title="Projects" description="Things I've built and still look after, from LLM gateways to Android apps." voice="tech">
+  <div class="wrap">
+    <header class="page-head">
+      <h1>Projects</h1>
+      <p>Things I've built and still look after. Each one started as a problem I had myself.</p>
+    </header>
+
+    {projects.length === 0 ? (
+      <p class="empty">Nothing here yet.</p>
+    ) : (
+      <ul class="rows projects">
+        {projects.map((project) => (
+          <li>
+            <a href={`/projects/${toSlug(project.id)}/`}>
+              <span class="when">
+                <time datetime={project.data.date}>{formatDate(project.data.date)}</time>
+                <span class="status" data-status={project.data.status}>{STATUS_LABEL[project.data.status]}</span>
+              </span>
+              <span class="text">
+                <span class="title">
+                  {project.data.logo && <img class="logo" src={project.data.logo} alt="" width="24" height="24" />}
+                  {project.data.title}
+                </span>
+                <span class="summary">{project.data.description}</span>
+                {project.data.tags.length > 0 && (
+                  <span class="tags">Built with {listFormat.format(project.data.tags)}.</span>
+                )}
+              </span>
+              {project.data.banner && (
+                <img
+                  class="thumb"
+                  src={project.data.banner}
+                  alt=""
+                  width="1200"
+                  height="630"
+                  loading="lazy"
+                  decoding="async"
+                />
+              )}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
   </div>
 </BaseLayout>
+
+<style>
+  .projects { margin-bottom: var(--space-8); }
+
+  a {
+    display: grid;
+    grid-template-columns: 9.5rem minmax(0, 1fr) 14rem;
+    column-gap: var(--space-5);
+    padding-block: var(--space-5);
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .when { display: flex; flex-direction: column; gap: var(--space-1); padding-top: 0.2em; font-size: var(--step--1); color: var(--ink-2); }
+  .status[data-status='active'] { color: var(--ink); }
+
+  .text { display: flex; flex-direction: column; gap: var(--space-2); }
+  .title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 650;
+    font-size: var(--step-2);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .logo { width: 1.5rem; height: 1.5rem; border-radius: var(--radius); }
+  .summary { color: var(--ink-2); max-width: var(--measure-tech); line-height: 1.5; }
+  .tags { color: var(--ink-2); font-size: var(--step--1); }
+
+  .thumb {
+    width: 100%;
+    aspect-ratio: 1200 / 630;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+  }
+
+  a:hover .title { color: var(--lamp); }
+
+  .empty { color: var(--ink-2); margin-bottom: var(--space-8); }
+
+  @media (max-width: 760px) {
+    a { grid-template-columns: 1fr; row-gap: var(--space-3); }
+    .when { flex-direction: row; gap: var(--space-3); padding-top: 0; }
+    .thumb { grid-row: 1; }
+  }
+</style>

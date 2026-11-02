@@ -1,0 +1,169 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostRows from '../../components/PostRows.astro';
+import { SITE } from '../../site.config';
+import { toSlug } from '../../utils/slug';
+import { topicsFromTalks, inviteMailto } from '../../utils/speaking.js';
+
+const talks = [...(await getCollection('talks'))].sort((a, b) => b.data.date.localeCompare(a.data.date));
+
+const rows = talks.map((talk) => ({
+  href: `/speaking/${toSlug(talk.id)}/`,
+  title: talk.data.title,
+  date: talk.data.date,
+  summary: talk.data.event,
+}));
+
+const topics = topicsFromTalks(talks.map((talk) => talk.data));
+const latest = talks[0];
+const invite = inviteMailto({ email: SITE.email, subject: 'Speaking invitation: [event name]' });
+
+const shortBio = `${SITE.author} is a software engineer and open source contributor. He speaks at meetups, writes about code and about life, and is usually found making friends with street cats.`;
+
+const longBio = [
+  `${SITE.author} is a software engineer and open source contributor, curious by nature and a builder by choice.`,
+  latest ? `He speaks at developer meetups; his most recent talk, “${latest.data.title}”, was at ${latest.data.event}.` : 'He speaks at developer meetups.',
+  'He writes technical posts about the tools he works with and personal essays about everything else, and spends a lot of his time at meetups and startup events.',
+  'Away from the desk he is usually making friends with street cats, with a cup of chai close by.',
+].join(' ');
+
+const bios = [
+  { id: 'short-bio', label: 'Short bio', text: shortBio },
+  { id: 'long-bio', label: 'Long bio', text: longBio },
+];
+---
+
+<BaseLayout title="Speaking" description={`Talks by ${SITE.author}, topics he speaks about, and a speaker kit for event organisers.`}>
+  <div class="wrap">
+    <header class="page-head">
+      <h1>Speaking</h1>
+      <p>I give talks at meetups about the things I work on and the things I break along the way. If you run an event, everything you need is on this page.</p>
+      <p class="invite"><a class="cta" href={invite}>Invite me to speak</a> or write to <a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+    </header>
+
+    <section class="block" aria-labelledby="talks">
+      <h2 id="talks">Talks</h2>
+      {rows.length === 0 ? <p class="empty">No talks yet. The first one is in the works.</p> : <PostRows items={rows} />}
+    </section>
+
+    <section class="block topics" aria-labelledby="topics">
+      <h2 id="topics">Topics I talk about</h2>
+      <ul>{topics.map((topic) => <li>{topic}</li>)}</ul>
+    </section>
+
+    <section class="block kit" aria-labelledby="kit">
+      <h2 id="kit">For organisers</h2>
+      <p class="lede">A photo and bios you can paste straight into your event page.</p>
+      <div class="kit-grid">
+        <figure class="headshot">
+          <img src="/avatar.jpg" alt={`Headshot of ${SITE.author}`} width="400" height="400" loading="lazy" decoding="async" />
+          <figcaption><a href="/avatar.jpg" download>Download headshot</a></figcaption>
+        </figure>
+        <div class="bios">
+          {bios.map((bio) => (
+            <div class="bio">
+              <div class="bio-head">
+                <h3 id={`${bio.id}-label`}>{bio.label}</h3>
+                <button type="button" class="copy" data-copy-bio={bio.id} hidden>Copy bio</button>
+              </div>
+              <p id={bio.id} aria-labelledby={`${bio.id}-label`}>{bio.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="block closing" aria-labelledby="invite">
+      <h2 id="invite">Have an event in mind?</h2>
+      <p>Tell me the date, the audience and what you'd like them to leave with. I reply to every invitation.</p>
+      <p><a class="cta" href={invite}>Invite me to speak</a></p>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  const copyBio = async (button: HTMLButtonElement) => {
+    const text = document.getElementById(button.dataset.copyBio ?? '')?.textContent ?? '';
+    await navigator.clipboard.writeText(text.trim());
+    button.textContent = 'Copied';
+    setTimeout(() => { button.textContent = 'Copy bio'; }, 2000);
+  };
+
+  const enableCopy = () => {
+    if (!navigator.clipboard) return;
+    document.querySelectorAll<HTMLButtonElement>('[data-copy-bio]').forEach((button) => {
+      button.hidden = false;
+      button.addEventListener('click', () => copyBio(button));
+    });
+  };
+
+  document.addEventListener('astro:page-load', enableCopy);
+</script>
+
+<style>
+  .invite { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-4); margin-top: var(--space-5); font-size: var(--step-0); }
+  .cta {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius);
+    background: var(--lamp);
+    color: var(--bg);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .cta:hover { background: var(--ink); }
+
+  .block { padding-top: var(--space-7); }
+  .block h2 { margin-bottom: var(--space-4); }
+  .empty, .lede { color: var(--ink-2); }
+  .lede { margin-top: calc(-1 * var(--space-2)); margin-bottom: var(--space-5); max-width: var(--measure-tech); }
+
+  .topics ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-6);
+    max-width: var(--measure-tech);
+    font-size: var(--step-1);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+  }
+
+  .kit-grid {
+    display: grid;
+    grid-template-columns: 14rem minmax(0, var(--measure-tech));
+    gap: var(--space-6);
+    align-items: start;
+    border-top: 1px solid var(--line);
+    padding-top: var(--space-5);
+  }
+  .headshot img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius); }
+  .headshot figcaption { margin-top: var(--space-2); font-size: var(--step--1); }
+  .bio + .bio { margin-top: var(--space-5); padding-top: var(--space-5); border-top: 1px solid var(--line); }
+  .bio-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); }
+  .bio-head h3 { font-size: var(--step-0); }
+  .bio p { margin-top: var(--space-2); }
+  .copy {
+    font: inherit;
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--lamp);
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: var(--space-1) var(--space-3);
+    cursor: pointer;
+  }
+  .copy:hover { border-color: var(--lamp); }
+
+  .closing { padding-bottom: var(--space-8); }
+  .closing p { max-width: var(--measure-tech); color: var(--ink-2); }
+  .closing p + p { margin-top: var(--space-4); }
+
+  @media (max-width: 700px) {
+    .kit-grid { grid-template-columns: 1fr; }
+    .headshot { max-width: 12rem; }
+  }
+</style>

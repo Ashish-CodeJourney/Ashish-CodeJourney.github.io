@@ -1,20 +1,40 @@
 ---
 import { getCollection, render } from 'astro:content';
-import PostLayout from '../../layouts/PostLayout.astro';
+import TechnicalPostLayout from '../../layouts/TechnicalPostLayout.astro';
 import { toSlug } from '../../utils/slug';
+import { neighbours, tagCounts } from '../../utils/technical-archive.js';
 
 export async function getStaticPaths() {
   const posts = await getCollection('technical');
-  return posts.map(post => ({
-    params: { slug: toSlug(post.id) },
-    props: { post },
-  }));
+  const archive = posts.map((post) => ({ id: post.id, title: post.data.title, date: post.data.date, tags: post.data.tags }));
+  const filterTags = tagCounts({ posts: archive, min: 2 }).map(({ tag }) => tag);
+  const link = (entry: { id: string; title: string } | undefined) =>
+    entry ? { href: `/technical/${toSlug(entry.id)}/`, title: entry.title } : undefined;
+
+  return posts.map((post) => {
+    const { older, newer } = neighbours({ posts: archive, id: post.id });
+    return {
+      params: { slug: toSlug(post.id) },
+      props: { post, filterTags, older: link(older), newer: link(newer) },
+    };
+  });
 }
 
-const { post } = Astro.props;
-const { Content } = await render(post);
+const { post, filterTags, older, newer } = Astro.props;
+const { Content, headings } = await render(post);
 ---
 
-<PostLayout {...post.data} body={post.body} backHref="/technical/" backLabel="Technical">
+<TechnicalPostLayout
+  title={post.data.title}
+  date={post.data.date}
+  description={post.data.description}
+  tags={post.data.tags}
+  banner={post.data.banner}
+  body={post.body ?? ''}
+  headings={headings}
+  filterTags={filterTags}
+  older={older}
+  newer={newer}
+>
   <Content />
-</PostLayout>
+</TechnicalPostLayout>

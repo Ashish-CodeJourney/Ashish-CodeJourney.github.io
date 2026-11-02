@@ -6,7 +6,7 @@ import { toSlug } from '../../utils/slug';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
-  return projects.map(project => ({
+  return projects.map((project) => ({
     params: { slug: toSlug(project.id) },
     props: { project },
   }));
@@ -14,40 +14,100 @@ export async function getStaticPaths() {
 
 const { project } = Astro.props;
 const { Content } = await render(project);
+const { title, description, tags, url, github, banner, logo, status, date } = project.data;
 
-const statusLabel: Record<string, string> = {
+const STATUS_LABEL = {
   active: 'Active',
-  archived: 'Archived',
   maintenance: 'Maintenance',
-};
+  archived: 'Archived',
+} as const;
+
+const listFormat = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' });
+
+const ogImage = banner ? new URL(banner, Astro.site ?? Astro.url).href : undefined;
 ---
 
-<BaseLayout title={project.data.title} description={project.data.description}>
-  <article>
-    <header class="post-header stagger-item">
-      <a href="/projects/" class="back-link">← Projects</a>
-      <h1>{project.data.title}</h1>
-      <div class="post-meta">
-        <span class="badge primary">{formatDate(project.data.date)}</span>
-        <span class={`badge ${project.data.status === 'active' ? 'primary' : 'secondary'}`}>
-          {statusLabel[project.data.status]}
-        </span>
-      </div>
+<BaseLayout title={title} description={description} ogImage={ogImage} voice="tech">
+  <article class="wrap">
+    <header class="page-head">
+      <p class="back"><a href="/projects/">All projects</a></p>
+      <h1>
+        {logo && <img class="logo" src={logo} alt="" width="48" height="48" />}
+        {title}
+      </h1>
+      <p>{description}</p>
     </header>
 
-    <div class="post-content stagger-item">
+    <dl class="facts">
+      <div>
+        <dt>Status</dt>
+        <dd>{STATUS_LABEL[status]}</dd>
+      </div>
+      <div>
+        <dt>Started</dt>
+        <dd><time datetime={date}>{formatDate(date)}</time></dd>
+      </div>
+      {tags.length > 0 && (
+        <div>
+          <dt>Built with</dt>
+          <dd>{listFormat.format(tags)}</dd>
+        </div>
+      )}
+      {(url || github) && (
+        <div>
+          <dt>Links</dt>
+          <dd class="links">
+            {url && <a href={url}>Visit the live site</a>}
+            {github && <a href={github}>Source on GitHub</a>}
+          </dd>
+        </div>
+      )}
+    </dl>
+
+    {banner && (
+      <img class="banner" src={banner} alt={`${title} banner`} width="1200" height="630" decoding="async" />
+    )}
+
+    <div class="prose">
       <Content />
     </div>
-
-    {(project.data.url || project.data.github) && (
-      <div class="sponsor-links stagger-item">
-        {project.data.url && (
-          <a href={project.data.url} target="_blank" rel="noopener noreferrer" class="button">Live site →</a>
-        )}
-        {project.data.github && (
-          <a href={project.data.github} target="_blank" rel="noopener noreferrer" class="button outline">GitHub →</a>
-        )}
-      </div>
-    )}
   </article>
 </BaseLayout>
+
+<style>
+  article { padding-bottom: var(--space-8); }
+
+  .page-head { padding-bottom: var(--space-5); }
+  .page-head .back { margin-top: 0; margin-bottom: var(--space-4); font-size: var(--step-0); }
+  h1 { display: flex; align-items: center; gap: var(--space-3); }
+  .logo { width: 3rem; height: 3rem; border-radius: var(--radius); }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, max-content));
+    gap: var(--space-4) var(--space-6);
+    padding-block: var(--space-4);
+    border-block: 1px solid var(--line);
+    max-width: var(--wrap);
+  }
+  dt { color: var(--ink-2); font-size: var(--step--1); }
+  dd { margin-top: var(--space-1); }
+  .links { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); }
+
+  .banner {
+    width: 100%;
+    max-width: 52rem;
+    aspect-ratio: 1200 / 630;
+    object-fit: cover;
+    margin-top: var(--space-6);
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+  }
+
+  .prose { margin-top: var(--space-6); }
+
+  @media (max-width: 600px) {
+    .facts { grid-template-columns: 1fr 1fr; }
+    .facts > div:nth-child(n + 3) { grid-column: 1 / -1; }
+  }
+</style>

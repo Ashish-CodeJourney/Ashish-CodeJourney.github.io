@@ -1,0 +1,198 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { formatDate, readingTime } from '../utils/date';
+import { SITE } from '../site.config';
+
+type Neighbour = { readonly href: string; readonly title: string };
+
+interface Props {
+  title: string;
+  date: string;
+  description?: string;
+  tags: ReadonlyArray<string>;
+  banner?: string;
+  body?: string;
+  older?: Neighbour;
+  newer?: Neighbour;
+}
+
+const { title, date, description, tags, banner, body = '', older, newer } = Astro.props;
+
+const bannerUrl = banner ? new URL(banner, SITE.url).toString() : undefined;
+
+const blogPosting = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  image: bannerUrl,
+  datePublished: date,
+  url: new URL(Astro.url.pathname, SITE.url).toString(),
+  author: { '@type': 'Person', name: SITE.author, url: SITE.url },
+  keywords: tags.join(', ') || undefined,
+};
+
+const onward = [
+  { label: 'Newer essay', essay: newer },
+  { label: 'Older essay', essay: older },
+].flatMap(({ label, essay }) => (essay ? [{ label, ...essay }] : []));
+---
+
+<BaseLayout title={title} description={description} ogImage={bannerUrl} voice="notebook">
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(blogPosting)} />
+    <link rel="alternate" type="application/rss+xml" title={`${SITE.author}: writings`} href="/writings/rss.xml" />
+  </Fragment>
+
+  <article class="wrap essay">
+    <header class="essay-head">
+      <h1>{title}</h1>
+      {description && <p class="standfirst">{description}</p>}
+      <p class="meta">
+        <time datetime={date}>{formatDate(date)}</time>
+        <span>{readingTime(body)}</span>
+      </p>
+    </header>
+
+    {banner && (
+      <img class="banner" src={banner} alt="" width="1280" height="720" decoding="async" fetchpriority="high" />
+    )}
+
+    <div class="prose essay-body">
+      <slot />
+    </div>
+
+    <nav class="onward" aria-labelledby="keep-reading">
+      <h2 id="keep-reading">Keep reading</h2>
+      {onward.length > 0 && (
+        <ul>
+          {onward.map(({ label, href, title: neighbourTitle }) => (
+            <li>
+              <span class="label">{label}</span>
+              <a href={href}>{neighbourTitle}</a>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p class="all"><a href="/writings/">All writings</a></p>
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .essay {
+    --essay-size: clamp(var(--step-0), 0.95rem + 0.6vw, 1.2rem);
+    padding-block: var(--space-8) var(--space-8);
+  }
+
+  .essay-head { max-width: 46rem; }
+
+  h1 {
+    font-family: var(--font-serif);
+    font-weight: 450;
+    font-size: clamp(var(--step-4), 1.6rem + 3vw, var(--step-5));
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+  }
+
+  .standfirst {
+    margin-top: var(--space-4);
+    max-width: var(--measure-serif);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--step-1);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-5);
+    margin-top: var(--space-5);
+    font-size: var(--step--1);
+    color: var(--ink-2);
+  }
+
+  .banner {
+    width: 100%;
+    max-width: 48rem;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    margin-top: var(--space-6);
+    border-radius: var(--radius);
+  }
+
+  .essay-body {
+    max-width: var(--measure-serif);
+    margin-top: var(--space-7);
+    font-family: var(--font-serif);
+    font-size: var(--essay-size);
+    line-height: 1.75;
+    font-optical-sizing: auto;
+    hanging-punctuation: first;
+  }
+
+  .essay-body :global(> * + *) { margin-top: 1.25em; }
+
+  .essay-body :global(h2),
+  .essay-body :global(h3) {
+    font-family: var(--font-serif);
+    font-weight: 550;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+  .essay-body :global(h2) { font-size: var(--step-2); margin-top: 2.2em; }
+  .essay-body :global(h3) { font-size: var(--step-1); margin-top: 1.8em; }
+  .essay-body :global(h2 + *),
+  .essay-body :global(h3 + *) { margin-top: 0.6em; }
+
+  .essay-body :global(blockquote) {
+    margin-block: 1.8em;
+    padding-left: var(--space-5);
+    border-left: 1px solid var(--lamp-glow);
+    font-style: italic;
+    font-size: var(--step-1);
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  .essay-body :global(blockquote p + p) { margin-top: 0.8em; }
+
+  .essay-body :global(hr) {
+    width: 2.75rem;
+    height: 6px;
+    margin-block: 2.5em;
+    border: 0;
+    background:
+      radial-gradient(circle, var(--lamp-glow) 2.5px, transparent 3px) 0 0 / 1rem 6px repeat-x;
+  }
+
+  .essay-body :global(strong) { font-weight: 650; }
+  .essay-body :global(li::marker) { color: var(--ink-2); }
+
+  .onward {
+    max-width: var(--measure-serif);
+    margin-top: var(--space-8);
+  }
+  .onward h2 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-style: italic;
+    font-size: var(--step-1);
+    letter-spacing: 0;
+    color: var(--ink-2);
+  }
+  .onward ul { list-style: none; padding: 0; margin-top: var(--space-4); }
+  .onward li { display: grid; gap: var(--space-1); padding-block: var(--space-4); border-bottom: 1px solid var(--line); }
+  .onward li:first-child { border-top: 1px solid var(--line); }
+  .onward .label { font-size: var(--step--1); color: var(--ink-2); }
+  .onward li a {
+    font-family: var(--font-serif);
+    font-size: var(--step-2);
+    line-height: 1.2;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .onward li a:hover { color: var(--lamp); }
+  .onward .all { margin-top: var(--space-5); }
+</style>
