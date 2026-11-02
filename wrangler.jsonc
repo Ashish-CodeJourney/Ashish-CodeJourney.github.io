@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ashishvaghela",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  },
+  "routes": [
+    { "pattern": "ashishvaghela.in", "custom_domain": true },
+    { "pattern": "www.ashishvaghela.in", "custom_domain": true }
+  ],
+  "workers_dev": false,
+  "preview_urls": false
+}

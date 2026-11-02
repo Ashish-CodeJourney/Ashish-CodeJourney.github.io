@@ -16,7 +16,6 @@ concurrency:
 
 env:
   SITE_ORIGIN: https://ashishvaghela.in
-  CLOUDFLARE_PAGES_PROJECT: ashishvaghela
 
 jobs:
   build:
@@ -64,18 +63,21 @@ jobs:
       name: production
       url: ${{ env.SITE_ORIGIN }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
       - name: Download site
         uses: actions/download-artifact@v4
         with:
           name: site
           path: dist
 
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=${{ env.CLOUDFLARE_PAGES_PROJECT }} --branch=trunk
+          command: deploy
 
   # The old *.github.io address now only serves a redirect to the custom domain.
   redirect-github-pages:

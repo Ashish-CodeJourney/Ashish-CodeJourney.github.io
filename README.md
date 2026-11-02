@@ -1,6 +1,6 @@
 # Ashish CodeJourney
 
-Personal website and blog at **[ashishvaghela.in](https://ashishvaghela.in)** — fast, minimal, content-first. Built with Astro 7 and deployed to Cloudflare Pages.
+Personal website and blog at **[ashishvaghela.in](https://ashishvaghela.in)** — fast, minimal, content-first. Built with Astro 7 and served by Cloudflare Workers static assets.
 
 ![Astro](https://img.shields.io/badge/astro-7-BC52EE?style=flat-oval&logo=astro) 
 [![Deploy](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/Ashish-CodeJourney/Ashish-CodeJourney.github.io/actions/workflows/deploy.yml)
@@ -214,11 +214,11 @@ All three run in CI on every PR.
 
 ## Deployment
 
-- **Production:** `https://ashishvaghela.in` on Cloudflare Pages (project `ashishvaghela`), deployed by `.github/workflows/deploy.yml` on push to `trunk` and nightly (to pick up new dev.to posts).
+- **Production:** `https://ashishvaghela.in` (and `www.`) served by the Cloudflare Worker `ashishvaghela` with static assets from `dist/`, configured in `wrangler.jsonc` (custom domains are attached by the config). Deployed by `.github/workflows/deploy.yml` (`wrangler deploy`) on push to `trunk` and nightly (to pick up new dev.to posts). Manual deploy: `make build && npx wrangler deploy`.
 - **Old address:** `ashish-codejourney.github.io` serves only a redirect stub (`scripts/build-redirect-stub.mjs`) that forwards every path, query and hash to the custom domain.
 - **Site URL** lives in one place: `site` in `astro.config.mjs`. `SITE.url` is derived from it — `url` in `content/site.json` is no longer read.
 
-Required repository secrets: `CONTENT_DEPLOY_KEY`, `CLOUDFLARE_API_TOKEN` (Pages: Edit), `CLOUDFLARE_ACCOUNT_ID`.
+Required repository secrets: `CONTENT_DEPLOY_KEY`, `CLOUDFLARE_API_TOKEN` ("Edit Cloudflare Workers" template + Zone DNS: Edit on `ashishvaghela.in`), `CLOUDFLARE_ACCOUNT_ID`.
 
 Fonts are self-hosted via `@fontsource-variable/*` packages imported in `BaseLayout.astro` — never link Google Fonts (a build spec enforces this).
 
