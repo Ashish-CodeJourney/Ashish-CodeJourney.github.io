@@ -47,6 +47,10 @@ const structuredData = {
   <link rel="alternate" type="application/rss+xml" title={`${SITE.author}: all posts`} href="/rss.xml" />
   <meta name="theme-color" content="#0b1c26" />
 
+  <script is:inline>
+    document.documentElement.classList.add('js');
+    document.addEventListener('astro:after-swap', () => document.documentElement.classList.add('js'));
+  </script>
   <script>
     import theme from '../utils/theme.js';
 

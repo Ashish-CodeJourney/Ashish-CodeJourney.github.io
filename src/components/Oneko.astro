@@ -37,7 +37,7 @@
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     let nekoX = 32;
-    let nekoY = 32;
+    let nekoY = window.innerHeight - 32;
     let mouseX = nekoX;
     let mouseY = nekoY;
     let frameCount = 0;
@@ -166,7 +166,7 @@
     height: 32px;
     position: fixed;
     left: 16px;
-    top: 16px;
+    top: calc(100vh - 48px);
     pointer-events: none;
     image-rendering: pixelated;
     background-image: url('/oneko.gif');

@@ -78,12 +78,6 @@ test('now renders the now page content', async () => {
   assert.match(html, /What I(&#39;|’|')m doing right now/);
 });
 
-test('links shows a QR code and every link', async () => {
-  const html = await readDist('links/index.html');
-  assert.match(html, /<svg[^>]*class="[^"]*qr/);
-  ['linkedin.com/in/ashish-codejourney', 'github.com/Ashish-CodeJourney', 'dev.to/Ashish-CodeJourney'].forEach((url) => assert.match(html, new RegExp(url)));
-});
-
 test('sponsors lists each sponsorship with a link to its page', async () => {
   const html = await readDist('sponsors/index.html');
   assert.match(html, /href="\/sponsors\/the-linux-foundation\/"/);

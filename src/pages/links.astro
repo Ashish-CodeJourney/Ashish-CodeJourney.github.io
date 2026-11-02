@@ -1,76 +1,230 @@
 ---
+import { getCollection } from 'astro:content';
 import QRCode from 'qrcode';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import BrandIcon from '../components/BrandIcon.astro';
 import { SITE, LINKS } from '../site.config';
+import { toSlug } from '../utils/slug';
+import { inviteMailto } from '../utils/speaking.js';
 
 const linksUrl = `${SITE.url}/links/`;
 const displayUrl = linksUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
-const qrSvg = (await QRCode.toString(linksUrl, { type: 'svg', margin: 2, width: 176 })).replace(
-  '<svg ',
-  `<svg class="qr" role="img" aria-label="QR code that opens ${displayUrl}" `,
-);
+const qrFor = async (className: string) =>
+  (await QRCode.toString(linksUrl, { type: 'svg', margin: 1, width: 240 })).replace(
+    '<svg ',
+    `<svg class="qr ${className}" role="img" aria-label="QR code that opens ${displayUrl}" `,
+  );
+const [inlineQr, dialogQr] = await Promise.all([qrFor('inline'), qrFor('large')]);
+
+const [technical, writings, talks] = await Promise.all([
+  getCollection('technical'),
+  getCollection('writings'),
+  getCollection('talks'),
+]);
+
+const newestOf = <T extends { data: { date: string } }>(entries: ReadonlyArray<T>) =>
+  entries.toSorted((a, b) => b.data.date.localeCompare(a.data.date))[0];
+
+const latest = [
+  { kind: 'Latest technical post', entry: newestOf(technical), base: 'technical' },
+  { kind: 'Latest essay', entry: newestOf(writings), base: 'writings' },
+  { kind: 'Latest talk', entry: newestOf(talks), base: 'speaking' },
+].flatMap(({ kind, entry, base }) => (entry ? [{ kind, title: entry.data.title, href: `/${base}/${toSlug(entry.id)}/` }] : []));
+
+type SiteLink = (typeof LINKS)[number];
+type Profile = SiteLink & { icon: Exclude<SiteLink['icon'], 'website'> };
+const isProfile = (link: SiteLink): link is Profile => link.icon !== 'website';
+const profiles = LINKS.filter(isProfile);
+
+const work = [
+  { label: 'Email me', detail: SITE.email, href: `mailto:${SITE.email}` },
+  { label: 'Invite me to speak', detail: 'Meetups, conferences, podcasts', href: inviteMailto({ email: SITE.email, subject: 'Speaking invitation: [event name]' }) },
+  { label: 'My résumé', detail: 'PDF', href: '/resume' },
+];
 ---
 
-<BaseLayout title="Links" description={`Find ${SITE.author} on the web.`}>
+<BaseLayout title="Links" description={`Find ${SITE.author} on the web: latest posts, talks, profiles and how to get in touch.`}>
   <div class="wrap links">
-    <header class="page-head">
-      <h1>{SITE.author}</h1>
-      <p>{SITE.description}</p>
+    <header class="intro">
+      <img src="/avatar.jpg" alt="" width="400" height="400" loading="eager" decoding="async" />
+      <div>
+        <h1>{SITE.author}</h1>
+        <p>Software engineer, open source contributor, meetup regular. Writes about code and about life.</p>
+      </div>
     </header>
 
-    <ul class="rows list" aria-label="Where to find me">
-      {LINKS.map(({ label, username, url }) => (
-        <li>
-          <a href={url} target="_blank" rel="me noopener noreferrer">
-            <span class="label">{label}</span>
-            <span class="handle">{username}</span>
-          </a>
-        </li>
-      ))}
-    </ul>
+    <div class="actions">
+      <button type="button" class="action" data-qr-open>Show my QR code</button>
+      <button type="button" class="action" data-share data-url={linksUrl}>Share this page</button>
+    </div>
+
+    <section aria-labelledby="latest">
+      <h2 id="latest">Latest</h2>
+      <ul class="cards">
+        {latest.map((item) => (
+          <li>
+            <a href={item.href}>
+              <span class="kind">{item.kind}</span>
+              <span class="title">{item.title}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="find-me">
+      <h2 id="find-me">Find me</h2>
+      <ul class="profiles">
+        {profiles.map(({ label, username, url, icon }) => (
+          <li>
+            <a href={url} target="_blank" rel="me noopener noreferrer">
+              <BrandIcon name={icon} />
+              <span class="label">{label}</span>
+              <span class="handle">{username}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="work-with-me">
+      <h2 id="work-with-me">Work with me</h2>
+      <ul class="cards">
+        {work.map((item) => (
+          <li>
+            <a href={item.href}>
+              <span class="title">{item.label}</span>
+              <span class="kind">{item.detail}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
 
     <figure class="code">
-      <Fragment set:html={qrSvg} />
-      <figcaption>Scan to open this page on your phone: <a href={linksUrl}>{displayUrl}</a></figcaption>
+      <Fragment set:html={inlineQr} />
+      <figcaption>Scan to open this page: <a href={linksUrl}>{displayUrl}</a></figcaption>
     </figure>
+
+    <dialog class="qr-dialog" aria-labelledby="qr-title">
+      <h2 id="qr-title">Scan to find me</h2>
+      <Fragment set:html={dialogQr} />
+      <p>{displayUrl}</p>
+      <form method="dialog"><button type="submit" class="action">Close</button></form>
+    </dialog>
   </div>
 </BaseLayout>
 
+<script>
+  function setup() {
+    const dialog = document.querySelector<HTMLDialogElement>('.qr-dialog');
+    document.querySelector('[data-qr-open]')?.addEventListener('click', () => dialog?.showModal());
+    dialog?.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    const share = document.querySelector<HTMLButtonElement>('[data-share]');
+    if (!share) return;
+    const url = share.dataset.url ?? location.href;
+    share.addEventListener('click', async () => {
+      if (navigator.share) {
+        await navigator.share({ title: document.title, url }).catch(() => undefined);
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      share.textContent = 'Link copied';
+    });
+  }
+
+  document.addEventListener('astro:page-load', setup);
+</script>
+
 <style>
   .links {
-    display: grid;
-    grid-template-columns: minmax(0, var(--measure-tech)) auto;
-    grid-template-areas: 'head head' 'list code';
-    column-gap: var(--space-8);
-    align-items: start;
-    padding-bottom: var(--space-8);
+    max-width: 40rem;
+    padding-block: var(--space-7) var(--space-8);
   }
-  .page-head { grid-area: head; }
-  .list { grid-area: list; }
-  .code { grid-area: code; max-width: 13rem; }
 
-  .list a {
+  .intro { display: flex; align-items: center; gap: var(--space-5); }
+  .intro img { width: 5.5rem; height: 5.5rem; border-radius: 50%; object-fit: cover; flex: none; }
+  .intro h1 { font-size: var(--step-4); letter-spacing: -0.035em; }
+  .intro p { margin-top: var(--space-2); color: var(--ink-2); line-height: 1.45; }
+
+  .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
+  .action {
+    min-height: 2.75rem;
+    padding-inline: var(--space-5);
+    border: 1px solid var(--lamp);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--lamp);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .action:first-child { background: var(--lamp); color: var(--bg); }
+  .action:hover { border-color: var(--ink); }
+
+  section { margin-top: var(--space-7); }
+  h2 { font-size: var(--step-0); color: var(--ink-2); font-weight: 600; letter-spacing: 0; margin-bottom: var(--space-3); }
+
+  ul { list-style: none; padding: 0; display: grid; gap: var(--space-3); }
+
+  .cards a,
+  .profiles a {
     display: grid;
-    grid-template-columns: 9.5rem 1fr;
-    gap: var(--space-1) var(--space-5);
-    align-items: baseline;
-    padding-block: var(--space-4);
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
     color: var(--ink);
     text-decoration: none;
+    transition: border-color 120ms ease-out;
   }
-  .label { font-weight: 600; font-size: var(--step-1); letter-spacing: -0.015em; }
-  .handle { color: var(--ink-2); overflow-wrap: anywhere; }
-  .list a:hover .label { color: var(--lamp); }
+  .cards a:hover,
+  .profiles a:hover { border-color: var(--lamp); }
+  .kind { color: var(--ink-2); font-size: var(--step--1); }
+  .title { font-weight: 650; font-size: var(--step-1); letter-spacing: -0.015em; line-height: 1.3; }
 
-  .code :global(.qr) { width: 11rem; height: auto; border-radius: var(--radius); }
-  .code :global(.qr path[fill]) { fill: var(--night-ink); }
-  .code :global(.qr path[stroke]) { stroke: var(--night); }
-  .code figcaption { margin-top: var(--space-3); color: var(--ink-2); font-size: var(--step--1); line-height: 1.5; }
+  .profiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .profiles a {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: var(--space-3);
+    align-items: center;
+  }
+  .profiles :global(.brand) { grid-row: span 2; width: 1.5rem; height: 1.5rem; color: var(--ink); }
+  .profiles a:hover :global(.brand) { color: var(--lamp); }
+  .label { font-weight: 650; }
+  .handle { color: var(--ink-2); font-size: var(--step--1); overflow-wrap: anywhere; }
 
-  @media (max-width: 700px) {
-    .links { grid-template-columns: 1fr; grid-template-areas: 'head' 'list' 'code'; }
-    .code { margin-top: var(--space-7); }
-    .list a { grid-template-columns: 1fr; }
+  .code { margin-top: var(--space-7); display: flex; align-items: center; gap: var(--space-5); }
+  .code :global(.qr) { width: 8rem; height: auto; border-radius: var(--radius); flex: none; }
+  .code figcaption { color: var(--ink-2); font-size: var(--step--1); line-height: 1.5; }
+
+  .qr-dialog {
+    border: 0;
+    border-radius: var(--radius);
+    padding: var(--space-6);
+    background: var(--surface);
+    color: var(--ink);
+    text-align: center;
+    width: min(26rem, 92vw);
+  }
+  .qr-dialog::backdrop { background: color-mix(in srgb, var(--night) 75%, transparent); }
+  .qr-dialog h2 { color: var(--ink); font-size: var(--step-2); letter-spacing: -0.02em; }
+  .qr-dialog :global(.qr) { width: 100%; height: auto; margin-block: var(--space-5) var(--space-3); border-radius: var(--radius); }
+  .qr-dialog p { color: var(--ink-2); margin-bottom: var(--space-5); }
+
+  :global(.qr path[fill]) { fill: #ffffff; }
+  :global(.qr path[stroke]) { stroke: #0f212c; }
+
+  @media (max-width: 600px) {
+    .intro img { width: 4.5rem; height: 4.5rem; }
+    .intro h1 { font-size: var(--step-3); }
+    .profiles { grid-template-columns: 1fr; }
+    .code { display: none; }
   }
 </style>
