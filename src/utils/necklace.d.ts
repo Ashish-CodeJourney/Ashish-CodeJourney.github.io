@@ -14,3 +14,7 @@ export function layoutNecklace(options: {
 }): NecklaceLight[];
 
 export function promenadePath(options: { readonly width: number; readonly height: number }): string;
+
+export type LampPost = { readonly x: number; readonly top: number; readonly bottom: number };
+
+export function lampPosts(options: { readonly width: number; readonly height: number }): [LampPost, LampPost];

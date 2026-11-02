@@ -14,9 +14,10 @@ interface Props {
   description?: string;
   ogImage?: string;
   voice?: 'tech' | 'notebook';
+  chrome?: boolean;
 }
 
-const { title, description = SITE.description, ogImage, voice } = Astro.props;
+const { title, description = SITE.description, ogImage, voice, chrome = true } = Astro.props;
 const pageTitle = title ? `${title} | ${SITE.author}` : `${SITE.author}, software engineer and open source contributor`;
 const canonicalURL = new URL(Astro.url.pathname, SITE.url);
 
@@ -76,11 +77,11 @@ const structuredData = {
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
-  <Header />
+  {chrome && <Header />}
   <main id="main" data-voice={voice}>
     <slot />
   </main>
-  <Footer />
-  <Oneko />
+  {chrome && <Footer />}
+  {chrome && <Oneko />}
 </body>
 </html>

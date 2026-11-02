@@ -84,3 +84,12 @@ test('input pieces are not mutated', () => {
 test('promenade path is an SVG quadratic curve spanning the full width', () => {
   assert.match(promenadePath(VIEW), /^M0 [\d.]+ Q500 [\d.]+ 1000 [\d.]+$/);
 });
+
+test('the string hangs between two lamp posts that stand where it starts and ends', async () => {
+  const { lampPosts } = await import('../src/utils/necklace.js');
+  const view = { width: 1000, height: 200 };
+  const [left, right] = lampPosts(view);
+  const [, , startY, , , endX, endY] = promenadePath(view).match(/^M(\S+) (\S+) Q(\S+) (\S+) (\S+) (\S+)$/).map(Number);
+  assert.deepEqual(left, { x: 0, top: startY - 14, bottom: 200 });
+  assert.deepEqual(right, { x: endX, top: endY - 14, bottom: 200 });
+});

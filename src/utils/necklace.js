@@ -20,3 +20,10 @@ export const layoutNecklace = ({ pieces, width, height }) =>
     const t = positionAt({ index, count: sorted.length });
     return { ...piece, x: round(width * t), y: round(curveY({ t, height })) };
   });
+
+const POST_RISE = 14;
+
+export const lampPosts = ({ width, height }) => [
+  { x: 0, top: round(START_Y * height) - POST_RISE, bottom: height },
+  { x: round(width), top: round(END_Y * height) - POST_RISE, bottom: height },
+];

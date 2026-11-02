@@ -22,7 +22,7 @@ test('home hero introduces Ashish by name', async () => {
 
 test('greeting has a no-JavaScript fallback', async () => {
   const html = await readDist('index.html');
-  assert.match(html, /id="greeting"[^>]*>Hello\.</);
+  assert.match(html, /id="greeting"[^>]*>Hi, I(&#39;|')m</);
 });
 
 test('necklace shows one light for every published piece', async () => {

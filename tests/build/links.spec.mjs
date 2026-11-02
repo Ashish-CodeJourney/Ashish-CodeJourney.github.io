@@ -1,22 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile, readdir } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { readDist } from './helpers.mjs';
 
 const site = JSON.parse(await readFile(new URL('../../content/site.json', import.meta.url), 'utf8'));
 const links = () => readDist('links/index.html');
-const sectionOf = (html, id) => html.match(new RegExp(`<section[^>]*aria-labelledby="${id}"[^>]*>([\\s\\S]*?)</section>`))?.[1] ?? '';
 
-const frontmatterOf = async (dir) =>
-  Promise.all(
-    (await readdir(new URL(`../../content/${dir}/`, import.meta.url)))
-      .filter((name) => name.endsWith('.md') && !name.startsWith('_'))
-      .map(async (name) => {
-        const text = await readFile(new URL(`../../content/${dir}/${name}`, import.meta.url), 'utf8');
-        return { slug: name.replace(/\.md$/, ''), date: text.match(/^date: "([^"]+)"/m)?.[1] ?? '' };
-      }),
-  );
-const newest = (items) => items.toSorted((a, b) => b.date.localeCompare(a.date))[0];
+test('links page is a standalone link-in-bio page without the site menu or footer', async () => {
+  const html = await links();
+  assert.doesNotMatch(html, /class="site-header/);
+  assert.doesNotMatch(html, /class="site-footer/);
+  assert.match(html, /<a[^>]+href="\/"[^>]*>ashishvaghela\.in<\/a>/);
+});
 
 test('links page introduces me with my photo and name', async () => {
   const html = await links();
@@ -24,31 +19,23 @@ test('links page introduces me with my photo and name', async () => {
   assert.match(html, /<h1[^>]*>Ashish Vaghela<\/h1>/);
 });
 
-test('latest section links to the newest writing and the latest talk', async () => {
-  const section = sectionOf(await links(), 'latest');
-  assert.match(section, new RegExp(`href="/writings/${newest(await frontmatterOf('writings')).slug}/"`));
-  assert.match(section, new RegExp(`href="/speaking/${newest(await frontmatterOf('talks')).slug}/"`));
-  assert.match(section, /href="\/technical\/[^"]+\/"/);
-});
-
-test('find me lists every profile except a link back to this website', async () => {
-  const section = sectionOf(await links(), 'find-me');
-  const profiles = site.links.filter((link) => link.icon !== 'website');
-  profiles.forEach(({ url, label }) => assert.ok(section.includes(`href="${url}"`), `${label} should be linked`));
-  assert.doesNotMatch(section, /github\.io"/);
-  assert.equal((section.match(/<svg[^>]*class="[^"]*brand/g) ?? []).length, profiles.length);
-});
-
-test('work with me offers email, résumé and a speaking invite', async () => {
-  const section = sectionOf(await links(), 'work-with-me');
-  assert.match(section, new RegExp(`href="mailto:${site.email}"`));
-  assert.match(section, /href="\/resume"/);
-  assert.match(section, /href="mailto:[^"]+\?subject=/);
-});
-
-test('QR code can be shown full screen and the page can be shared', async () => {
+test('every profile, my email and my résumé are links, with no link back to the old site', async () => {
   const html = await links();
-  assert.match(html, /<button[^>]*data-qr-open[^>]*>Show my QR code<\/button>/);
-  assert.match(html, /<dialog[^>]*class="[^"]*qr-dialog[\s\S]*?<svg[^>]*class="qr/);
-  assert.match(html, /<button[^>]*data-share[^>]*>/);
+  site.links.filter((link) => link.icon !== 'website').forEach(({ url, label }) => assert.ok(html.includes(`href="${url}"`), `${label} should be linked`));
+  assert.match(html, new RegExp(`href="mailto:${site.email}"`));
+  assert.match(html, /href="\/resume"/);
+  assert.doesNotMatch(html, /href="https:\/\/ashish-codejourney\.github\.io/);
+});
+
+test('one QR code opens this same page', async () => {
+  const html = await links();
+  assert.equal((html.match(/<svg[^>]*class="qr/g) ?? []).length, 1);
+  assert.match(html, /aria-label="QR code that opens ashishvaghela\.in\/links"/);
+  assert.match(html, /Scan to open this page/);
+});
+
+test('no blog posts, dialogs or share buttons on the link page', async () => {
+  const html = await links();
+  assert.doesNotMatch(html, /<dialog|data-qr-open|data-share|Latest technical post/);
+  assert.doesNotMatch(html, /href="\/(technical|writings|speaking)\/[^"]+\/"/);
 });

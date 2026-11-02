@@ -1,5 +1,5 @@
 ---
-import { layoutNecklace, promenadePath, type NecklacePiece } from '../../utils/necklace.js';
+import { lampPosts, layoutNecklace, promenadePath, type NecklacePiece } from '../../utils/necklace.js';
 import { formatDate } from '../../utils/date';
 
 interface Props {
@@ -8,6 +8,7 @@ interface Props {
 
 const VIEW = { width: 1000, height: 190 };
 const lights = layoutNecklace({ pieces: Astro.props.pieces, ...VIEW });
+const posts = lampPosts(VIEW);
 const kindLabel = { technical: 'Technical post', writing: 'Writing', talk: 'Talk' } as const;
 const defaultCaption = `Each light is something I've published, oldest on the left. ${lights.length} so far.`;
 ---
@@ -16,6 +17,11 @@ const defaultCaption = `Each light is something I've published, oldest on the le
   <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
     <path class="promenade" d={promenadePath(VIEW)} vector-effect="non-scaling-stroke" />
   </svg>
+  <div class="posts" aria-hidden="true">
+    {posts.map((post) => (
+      <span class="post" style={`--x:${(post.x / VIEW.width) * 100}%;--top:${(post.top / VIEW.height) * 100}%`}></span>
+    ))}
+  </div>
   <ol class="lights" aria-hidden="true">
     {lights.map((light, index) => (
       <li
@@ -59,9 +65,34 @@ const defaultCaption = `Each light is something I've published, oldest on the le
     position: relative;
     margin-top: var(--space-6);
   }
-  svg, .lights {
+  svg, .lights, .posts {
     width: 100%;
     height: clamp(110px, 18vw, 190px);
+  }
+  .posts {
+    position: absolute;
+    inset: 0 0 auto 0;
+  }
+  .post {
+    position: absolute;
+    left: var(--x);
+    top: var(--top);
+    bottom: 0;
+    width: 3px;
+    translate: -50% 0;
+    border-radius: 2px;
+    background: var(--sky-line);
+  }
+  .post::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    width: 12px;
+    height: 6px;
+    translate: -50% 0;
+    border-radius: 6px 6px 2px 2px;
+    background: var(--sky-line);
   }
   .lights {
     position: absolute;
@@ -110,7 +141,7 @@ const defaultCaption = `Each light is something I've published, oldest on the le
   .light a:hover::before { transform: scale(1.6); }
 
   figcaption {
-    margin-top: calc(-1 * var(--space-5));
+    margin-top: var(--space-4);
     min-height: 3.2em;
     color: var(--sky-ink);
     font-size: var(--step-0);
