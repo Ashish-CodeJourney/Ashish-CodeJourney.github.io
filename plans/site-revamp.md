@@ -1,6 +1,6 @@
 # Site Revamp — ashishvaghela.in
 
-Status: **Phase 0 implemented on branch `feat/phase-0-domain-hosting` — awaiting Cloudflare setup + commit approval**
+Status: **Live on ashishvaghela.in (2026-11-02).** Phases 0–5 delivered; retention features (cat hunt, passport, reactions, insights dashboard) not started.
 Date: 2026-11-02
 
 ## Goal
@@ -169,6 +169,12 @@ User feedback: Phase 0 "looks same" → rebuild every page from scratch now, mul
 - Foundation (lead): tokens/base CSS, BaseLayout, Header, Footer, ThemeToggle, PostRows, home with necklace hero (`src/utils/necklace.js`, `src/utils/greeting.js`, TDD)
 - Parallel agents: technical section · writings section · /oss + projects · speaking/about/now/links/sponsors/404/redirect
 - oat.min.css and global.css retired once all pages migrate
+
+### Launch (2026-11-02)
+- Hosting: Cloudflare Workers static assets (`wrangler.jsonc`), not classic Pages — Cloudflare now delegates new Pages projects to Workers. Custom domains attached by config. CI deploys on push to `trunk` and nightly.
+- github.io serves `github-pages/` redirect only.
+- Added after launch: day/night scenery, talk light colour, responsive menu, projector-ready `/links`, greeting copy, lamp posts.
+- **Learnings:** wrangler-action's default wrangler is too old for assets-only Workers (pin `wranglerVersion`); API token must come from the "Edit Cloudflare Workers" template; Cloudflare Workers `auto-trailing-slash` 307s `/x.html` → `/x`, so file-based Google verification fails — use DNS TXT.
 
 ## Requires user action
 - Cloudflare account access + add `ashishvaghela.in` zone (change nameservers at registrar).

@@ -8,15 +8,18 @@ Personal website and blog at **[ashishvaghela.in](https://ashishvaghela.in)** �
 
 ## Features
 
-- **Astro 7 SSG** — zero JS by default, only what's needed ships to the browser
-- **Content Collections** — type-safe Zod schemas for all markdown frontmatter
-- **View Transitions** — smooth page navigation via Astro's `ClientRouter`
-- **Dual-theme code highlighting** — Shiki with `github-light` / `github-dark` themes
-- **Light / Dark mode** — system preference detection, `localStorage` persistence, no flash
-- **Reading time** — auto-calculated from post body word count
-- **Sitemap** — generated automatically via `@astrojs/sitemap`
-- **Design system "Queen's Necklace"** — tokens, type and layout rules in `plans/design-system.md`; no CSS framework
-- **Open source page** — merged PRs pulled from GitHub at build time (`/oss/`)
+- **Astro 7 SSG** — static HTML, a few small scripts only where needed (menu, theme, greeting, necklace captions)
+- **Design system "Queen's Necklace"** — tokens, type and layout rules in `plans/design-system.md`; no CSS framework, self-hosted fonts
+- **Day/night scenery** — light theme is day (sun), dark theme is night (moon); mountain ridgelines and a sitting cat in the home hero and every footer
+- **Home necklace** — one light per published piece (technical, writing, talk), hung between two lamp posts; time-aware greeting ("Good evening, I'm")
+- **Two voices** — `/technical/` (workbench: year archive, tag filter, contents, copy-code) and `/writings/` (notebook: serif reading pages); separate RSS feeds
+- **dev.to sync** — technical posts pulled from dev.to at build time, snapshot fallback, images via dev.to's resizing CDN
+- **Open source page** (`/oss/`) — own projects, core contributions, notable projects and community roles, curated in `content/oss.json` and `content/community/`, with GitHub metadata fetched at build time
+- **Speaking** (`/speaking/`) — speaker kit with talks, topics, bios and an invite link; `/talks` redirects here
+- **About** — personal intro plus résumé (experience, skills, education) from `content/resume.json`
+- **Links** (`/links/`) — standalone link-in-bio page made for projecting after a talk: links on the left, one large QR code on the right; QR hidden on phones
+- **Responsive menu** — Menu button and panel under 860px; links still wrap without JavaScript
+- **Quality gates** — unit tests, build-output specs and Lighthouse budgets in CI
 
 ---
 
@@ -24,47 +27,34 @@ Personal website and blog at **[ashishvaghela.in](https://ashishvaghela.in)** �
 
 ```text
 .
-├── content/                   # git submodule → Ashish-CodeJourney/content (private)
-│   ├── site.json              # personal details, socials, /links entries
-│   ├── assets/                # avatar, résumé — symlinked into public/
-│   ├── pages/                 # home.md, now.md
-│   ├── technical/             # Local-only technical posts (the rest come from dev.to)
-│   ├── writings/              # Essays and personal writing
-│   └── sponsors/              # Sponsor entries
+├── content/                     # git submodule → Ashish-CodeJourney/content (private)
+│   ├── site.json                # personal details, socials, /links entries
+│   ├── resume.json              # About page résumé (summary, experience, skills, education)
+│   ├── oss.json                 # /oss curation: own projects, contributions, notable projects
+│   ├── community/               # community roles shown on /oss (note: true = one-line sentence)
+│   ├── assets/                  # avatar, résumé PDF — symlinked into public/
+│   ├── pages/                   # home.md (About intro), now.md
+│   ├── technical/ writings/     # local posts (most technical posts come from dev.to)
+│   ├── talks/ projects/ sponsors/
 ├── src/
-│   ├── content.config.ts      # Zod schemas + glob() loaders pointing at content/
-│   ├── layouts/
-│   │   ├── BaseLayout.astro   # HTML shell, fonts, analytics, theme script
-│   │   └── PostLayout.astro   # Shared post page template
-│   ├── components/
-│   │   ├── Header.astro
-│   │   ├── Footer.astro
-│   │   ├── PostCard.astro
-│   │   ├── PostList.astro
-│   │   ├── SocialLinks.astro
-│   │   └── ThemeToggle.astro
-│   ├── pages/
-│   │   ├── index.astro
-│   │   ├── now.astro
-│   │   ├── technical/[slug].astro
-│   │   └── writings/[slug].astro
-│   ├── styles/global.css      # Theme overrides, layout, component styles
-│   ├── data/
-│   │   └── devto-snapshot.json # Last good dev.to fetch, used when dev.to is unreachable
-│   ├── utils/
-│   │   ├── date.ts            # formatDate, readingTime
-│   │   ├── devto.js           # dev.to fetch, mapping, dedupe, retry (see dev.to Integration)
-│   │   ├── devto.d.ts         # Types for devto.js
-│   │   └── slug.ts            # toSlug — strips .md extension from entry IDs
-│   └── site.config.ts         # Thin wrapper re-exporting content/site.json
-├── scripts/
-│   └── refresh-devto-snapshot.mjs  # Rewrites src/data/devto-snapshot.json
-├── tests/                     # node --test suites (theme, dev.to)
-├── public/
-│   ├── avatar.jpg             # symlink → content/assets/avatar.jpg
-│   └── _headers               # Cloudflare Pages cache + security headers
-├── astro.config.mjs
-└── tsconfig.json
+│   ├── content.config.ts        # Zod schemas + loaders (glob, file, dev.to)
+│   ├── site.config.ts           # SITE (url derived from astro.config `site`), LINKS, RESUME_PDF
+│   ├── styles/                  # tokens.css (colours incl. day/night sky), base.css
+│   ├── layouts/                 # BaseLayout (chrome toggle), TechnicalPostLayout, WritingLayout
+│   ├── components/              # Header (menu), Footer, Ridgeline (scenery), PostRows, BrandIcon, ...
+│   │   ├── home/Necklace.astro  # necklace of lights + lamp posts
+│   │   └── oss/                 # rows for /oss
+│   ├── pages/                   # index, technical/, writings/, oss, speaking/, about, links, now, projects/, sponsors/, 404
+│   ├── utils/                   # pure, unit-tested logic (necklace, greeting, github, featured, community, resume, ...)
+│   └── data/                    # devto-snapshot.json, github-snapshot.json (offline fallbacks)
+├── github-pages/                # standalone redirect page for ashish-codejourney.github.io only
+├── scripts/                     # refresh-devto-snapshot.mjs, refresh-github-snapshot.mjs
+├── tests/                       # *.test.mjs unit tests; build/*.spec.mjs check built dist/
+├── public/                      # static files, _headers (cache + security headers)
+├── plans/                       # site-revamp.md (plan + progress), design-system.md
+├── wrangler.jsonc               # Cloudflare Worker serving dist/ + custom domains
+├── lighthouserc.json            # Lighthouse CI budgets
+└── astro.config.mjs
 ```
 
 Blog posts, pages, sponsors, personal details, and personal images live in a
@@ -238,5 +228,5 @@ Create `src/pages/your-page.astro` and wrap content in `<BaseLayout>`.
 ### Adding a New Collection
 1. Define the schema and a `glob()` loader (pointed at `./content/collection-name`) in `src/content.config.ts`
 2. Add the matching directory in `content/collection-name/` (in the `content` repo)
-3. Add `src/pages/collection-name/index.astro` using `PostList`
-4. Add `src/pages/collection-name/[slug].astro` using `PostLayout`
+3. Add `src/pages/collection-name/index.astro` using `PostRows` (see `src/pages/writings/index.astro`)
+4. Add `src/pages/collection-name/[slug].astro` using `WritingLayout` or `TechnicalPostLayout`, or a new layout built on `BaseLayout`

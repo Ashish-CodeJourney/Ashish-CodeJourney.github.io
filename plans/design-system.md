@@ -64,7 +64,7 @@ Scale (ratio 1.25, base 17px) — `--step--1` … `--step-5`, plus `--display` (
 - Spacing tokens `--space-1` … `--space-9` (0.25rem → 8rem, roughly ×1.5).
 - Radius: `--radius: 4px` for controls/code only. Lists have no radius, no shadow.
 - Lists of posts = rows: date column (`--ink-2`, tabular nums) + title + optional one-line summary; separated by `1px solid var(--line)`.
-- Header: name left, nav right; on mobile nav becomes a horizontally scrollable row (no hamburger JS).
+- Header: name left, nav right. Under 860px a Menu button opens a full-width panel. An inline `html.js` class (set before first paint) gates the collapsed menu so nothing shifts; without JS the links wrap onto two lines.
 - Theme toggle lives in the header (not floating).
 
 ## Motion
@@ -76,10 +76,15 @@ Scale (ratio 1.25, base 17px) — `--step--1` … `--step-5`, plus `--display` (
 Plain, first person, short. Name things by what readers get ("All technical posts", not "View archive").
 
 ## Shared building blocks (already built — reuse, don't fork)
-- `src/layouts/BaseLayout.astro` — shell, fonts, theme, SEO, header/footer. Props: `title`, `description`, `ogImage`, `voice?: 'tech' | 'notebook'` (sets `data-voice` on `<main>`).
+- `src/layouts/BaseLayout.astro` — shell, fonts, theme, SEO, header/footer. Props: `title`, `description`, `ogImage`, `voice?: 'tech' | 'notebook'` (sets `data-voice` on `<main>`), `chrome?: boolean` (false = no header/footer/cat, used by `/links`).
 - `src/styles/base.css` — reset, tokens import, typography, `.wrap`, `.rows` list pattern, `.prose` (generic markdown), focus styles.
 - `src/components/Header.astro`, `Footer.astro`, `ThemeToggle.astro`.
 - `src/components/PostRows.astro` — the row list (`items: {href,title,date,summary?}[]`, `voice`).
 - `src/utils/date.ts` — `formatDate`, `readingTime`.
 
 Page-specific styles go in the page/component `<style>` block (Astro-scoped), not in `base.css`.
+
+## Page notes
+- **Home hero:** greeting leads into the name (`Good evening, I'm` → **Ashish Vaghela**); no-JS fallback `Hi, I'm`. Necklace string hangs between two lamp posts (`lampPosts` in `src/utils/necklace.js`); talk lights use `--light-talk`.
+- **/links:** standalone link-in-bio for projecting after talks. Wide screens: links left, one large QR right (black on white for scanning, the only raw colours allowed). Phones: links only. Scales up on 1080p screens.
+- **github.io:** `github-pages/` is a separate tiny page (same day/night palette) that forwards to the same path on ashishvaghela.in.
