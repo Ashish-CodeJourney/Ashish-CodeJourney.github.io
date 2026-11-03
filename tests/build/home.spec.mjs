@@ -20,6 +20,28 @@ test('home hero introduces Ashish by name', async () => {
   assert.match(html, /<h1[^>]*id="hero-name"[^>]*>Ashish<br[^>]*>Vaghela<\/h1>/);
 });
 
+const hero = async () => (await readDist('index.html')).match(/<section class="hero[\s\S]*?<\/section>/)?.[0] ?? '';
+
+test('hero says what Ashish does, where he works from and which roles he is open to', async () => {
+  const html = await hero();
+  assert.match(html, /India · IST/);
+  assert.match(html, /Open to full-time remote roles/);
+  ['software engineering', 'developer advocacy', 'open source'].forEach((role) => assert.match(html, new RegExp(role, 'i')));
+  assert.doesNotMatch(html, /backend only/i);
+});
+
+test('hero describes the work without tying it to a single technology', async () => {
+  const intro = (await hero()).match(/<p class="intro"[^>]*>([\s\S]*?)<\/p>/)?.[1] ?? '';
+  assert.match(intro, /software engineer/);
+  assert.doesNotMatch(intro, /JVM|Java|Kotlin|Spring/);
+});
+
+test('hero offers the résumé and an email as next steps', async () => {
+  const html = await hero();
+  assert.match(html, /<a[^>]+href="\/resume"[^>]*>[^<]*résumé/i);
+  assert.match(html, /<a[^>]+href="mailto:vaghelaashish111@gmail\.com"/);
+});
+
 test('greeting has a no-JavaScript fallback', async () => {
   const html = await readDist('index.html');
   assert.match(html, /id="greeting"[^>]*>Hi, I(&#39;|')m</);

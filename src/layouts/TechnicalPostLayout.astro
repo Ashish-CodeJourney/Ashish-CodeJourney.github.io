@@ -43,7 +43,7 @@ const tagHref = (tag: string) =>
   filterTags.includes(tag.toLowerCase()) ? `/technical/?tag=${encodeURIComponent(tag.toLowerCase())}` : undefined;
 ---
 
-<BaseLayout title={title} description={description} ogImage={bannerUrl} voice="tech">
+<BaseLayout title={title} description={description} voice="tech">
   <Fragment slot="head">
     <link rel="alternate" type="application/rss+xml" title="Ashish Vaghela: technical posts" href="/technical/rss.xml" />
     <script type="application/ld+json" is:inline set:html={JSON.stringify(blogPosting)} />

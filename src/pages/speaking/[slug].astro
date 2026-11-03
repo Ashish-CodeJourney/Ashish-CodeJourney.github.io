@@ -31,7 +31,7 @@ const resources = [
 const invite = inviteMailto({ email: SITE.email, subject: `Speaking invitation: ${title}` });
 ---
 
-<BaseLayout title={title} description={description ?? `${title}, a talk by ${SITE.author} at ${event}.`} ogImage={banner}>
+<BaseLayout title={title} description={description ?? `${title}, a talk by ${SITE.author} at ${event}.`}>
   <article class="wrap talk">
     <header class="page-head">
       <a class="back" href="/speaking/">All talks</a>

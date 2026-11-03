@@ -1,6 +1,7 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 import { SITE } from '../site.config';
+import { ogImagePath } from '../utils/og.js';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Oneko from '../components/Oneko.astro';
@@ -12,14 +13,14 @@ import '../styles/base.css';
 interface Props {
   title?: string;
   description?: string;
-  ogImage?: string;
   voice?: 'tech' | 'notebook';
   chrome?: boolean;
 }
 
-const { title, description = SITE.description, ogImage, voice, chrome = true } = Astro.props;
+const { title, description = SITE.description, voice, chrome = true } = Astro.props;
 const pageTitle = title ? `${title} | ${SITE.author}` : `${SITE.author}, software engineer and open source contributor`;
 const canonicalURL = new URL(Astro.url.pathname, SITE.url);
+const shareImage = new URL(ogImagePath(Astro.url.pathname), SITE.url).href;
 
 const structuredData = {
   '@context': 'https://schema.org',
@@ -65,8 +66,12 @@ const structuredData = {
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonicalURL} />
   <meta property="og:type" content="website" />
-  {ogImage && <meta property="og:image" content={ogImage} />}
+  <meta property="og:image" content={shareImage} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={pageTitle} />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content={shareImage} />
 
   <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)} />
 

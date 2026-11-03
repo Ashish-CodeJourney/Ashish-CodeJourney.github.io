@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readdir } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { DIST, readDist } from './helpers.mjs';
 
@@ -32,11 +32,15 @@ test('speaking shows the event each talk was given at', async () => {
   assert.match(html, /Java User Group Gujarat Meetup/);
 });
 
-test('speaking lists topics taken from the talk tags', async () => {
+test('speaking lists the curated topics from site.json, in order, across more than the JVM', async () => {
+  const { speakingTopics } = JSON.parse(await readFile(new URL('../../content/site.json', import.meta.url), 'utf8'));
   const html = await readDist('speaking/index.html');
+  const section = html.match(/<section[^>]*class="block topics"[\s\S]*?<\/section>/)?.[0] ?? '';
+  const listed = [...section.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map(([, text]) => text.replace(/&amp;/g, '&').replace(/&#39;/g, "'"));
   assert.match(html, /Topics I talk about/);
-  assert.match(html, /<li[^>]*>Java<\/li>/);
-  assert.match(html, /<li[^>]*>JFR<\/li>/);
+  assert.deepEqual(listed, speakingTopics);
+  ['Kotlin', 'Open Source', 'Cloud', 'AI'].forEach((topic) => assert.ok(listed.includes(topic), topic));
+  listed.forEach((topic) => assert.ok(topic.split(' ').length <= 2, `"${topic}" should be a short tag`));
 });
 
 test('speaking has an invite-me mailto with a prefilled subject', async () => {

@@ -146,7 +146,7 @@ test('posts imported from dev.to show no banner image', async () => {
   const beforeTitle = html.slice(html.indexOf('<article'), html.indexOf('<h1'));
   assert.ok(beforeTitle.length > 0);
   assert.doesNotMatch(beforeTitle, /<img/);
-  assert.doesNotMatch(html, /<meta property="og:image"/);
+  assert.match(html, /<meta property="og:image" content="https:\/\/ashishvaghela\.in\/og\/technical\//);
 });
 
 test('technical feed contains every technical post and nothing else', async () => {
@@ -160,4 +160,11 @@ test('technical feed contains every technical post and nothing else', async () =
 test('technical pages advertise the technical feed', async () => {
   const html = await readDist('technical/index.html');
   assert.match(html, /<link rel="alternate" type="application\/rss\+xml"[^>]*href="\/technical\/rss\.xml"/);
+});
+
+test('no post summary on the technical index is cut off mid-sentence', async () => {
+  const html = await readDist('technical/index.html');
+  const summaries = [...html.matchAll(/<span class="summary"[^>]*>([^<]*)<\/span>/g)].map(([, text]) => text.trim());
+  assert.ok(summaries.length > 0);
+  summaries.forEach((summary) => assert.doesNotMatch(summary, /\.\.\.$/, summary));
 });

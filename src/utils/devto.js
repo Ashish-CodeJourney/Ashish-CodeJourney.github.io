@@ -25,12 +25,44 @@ const normaliseTitle = (title) => title.toLowerCase().replace(/[^a-z0-9]+/g, ' '
 
 const slugFromPath = (path) => path.split('/').filter(Boolean).pop();
 
+const SUMMARY_LIMIT = 200;
+
+const isProseLine = (line) => line.trim() !== '' && !/^\s*(#|!\[|<|```|---|\*\*[^*]+\*\*\s*$)/.test(line);
+
+const plainText = (markdown) =>
+  markdown
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/[*_`]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const cutAtWord = (text) => `${text.slice(0, SUMMARY_LIMIT).replace(/\s+\S*$/, '')}…`;
+
+const SENTENCE_BREAK = /(?<=[.!?])\s+(?=[\p{Lu}\p{N}"'“‘])/u;
+
+const summaryFromBody = (body) => {
+  const prose = plainText(body.split('\n').filter(isProseLine).join('\n')).replace(/\s[.!?]+(?=\s|$)/g, '');
+  const sentences = prose
+    .split(SENTENCE_BREAK)
+    .map((sentence) => sentence.trim())
+    .filter((sentence) => /\p{L}/u.test(sentence));
+  const [first = ''] = sentences;
+  if (first.length > SUMMARY_LIMIT) return cutAtWord(first);
+
+
+  const lengths = sentences.map((_, index) => sentences.slice(0, index + 1).join(' ').length);
+  const fitting = lengths.findIndex((length) => length > SUMMARY_LIMIT);
+  return sentences.slice(0, fitting === -1 ? sentences.length : fitting).join(' ');
+};
+
+const isAutoExcerpt = (description) => description?.endsWith('...') ?? false;
+
 export const toPostEntry = (article, body, id = slugFromPath(article.path)) => ({
   id,
   data: {
     title: article.title,
     date: article.published_at.slice(0, 10),
-    description: article.description,
+    description: isAutoExcerpt(article.description) ? summaryFromBody(body) : article.description,
     tags: article.tag_list,
   },
   body,

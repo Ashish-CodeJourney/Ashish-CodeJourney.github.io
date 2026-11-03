@@ -84,6 +84,7 @@ export const collections = {
       description: z.string(),
       tags: z.array(z.string()).default([]),
       url: z.string().optional(),
+      urlLabel: z.string().default('Visit the live site'),
       github: z.string().optional(),
       banner: z.string().optional(),
       logo: z.string().optional(),
@@ -124,6 +125,9 @@ export const collections = {
         start: z.string(),
         end: z.string().optional(),
         highlights: z.array(z.string()).default([]),
+        projects: z
+          .array(z.object({ name: z.string(), summary: z.string().optional(), highlights: z.array(z.string()) }))
+          .default([]),
       }),
       z.object({
         kind: z.literal('skills'),

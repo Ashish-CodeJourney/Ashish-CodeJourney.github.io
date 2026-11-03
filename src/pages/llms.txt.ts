@@ -20,9 +20,11 @@ export const GET: APIRoute = async () => {
   const technical = await getCollection('technical');
 
   const body = [
-    `# ${SITE.title}`,
+    `# ${SITE.author}`,
     '',
-    `> ${SITE.description}`,
+    `> Software engineer, open source contributor and meetup speaker. ${SITE.location}. ${SITE.availability}`,
+    '',
+    `Contact: ${SITE.email}. Résumé: ${SITE.url}/resume. About: ${SITE.url}/about/.`,
     '',
     section('Technical', technical, '/technical/'),
     '',

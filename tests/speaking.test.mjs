@@ -1,25 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { topicsFromTalks, inviteMailto, isPastEvent } from '../src/utils/speaking.js';
-
-const talk = (tags) => ({ tags });
-
-test('no talks means no topics', () => {
-  assert.deepEqual(topicsFromTalks([]), []);
-});
-
-test('topics come from talk tags, most talked about first, then alphabetical', () => {
-  const topics = topicsFromTalks([talk(['JVM', 'Java']), talk(['Java', 'Testing']), talk(['Kubernetes'])]);
-  assert.deepEqual(topics, ['Java', 'JVM', 'Kubernetes', 'Testing']);
-});
-
-test('the same tag written in different cases counts as one topic, keeping its first spelling', () => {
-  assert.deepEqual(topicsFromTalks([talk(['Java']), talk(['java', 'JFR'])]), ['Java', 'JFR']);
-});
-
-test('blank tags are ignored', () => {
-  assert.deepEqual(topicsFromTalks([talk(['', '  ', 'Java'])]), ['Java']);
-});
+import { inviteMailto, isPastEvent } from '../src/utils/speaking.js';
 
 test('the invite link opens an email to me with a ready subject line', () => {
   const href = inviteMailto({ email: 'me@example.com', subject: 'Speaking invitation: your event' });

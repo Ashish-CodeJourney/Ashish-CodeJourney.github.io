@@ -5,6 +5,7 @@ import Necklace from '../components/home/Necklace.astro';
 import Ridgeline from '../components/Ridgeline.astro';
 import PostRows from '../components/PostRows.astro';
 import { toSlug } from '../utils/slug';
+import { SITE } from '../site.config';
 import type { NecklacePiece } from '../utils/necklace.js';
 
 const [technical, writings, talks] = await Promise.all([
@@ -40,8 +41,13 @@ const latestTalk = newestFirst(talks)[0];
       <p class="greeting" id="greeting">Hi, I'm</p>
       <h1 id="hero-name">Ashish<br />Vaghela</h1>
       <p class="intro">
-        I'm a software engineer who contributes to open source, speaks at meetups, and writes about code and about life.
-        This site is where all of it lives.
+        I'm a software engineer who builds reliable systems that scale, contributes to open source, and speaks at meetups.
+        I also write, about code and about life.
+      </p>
+      <p class="status"><span class="beacon" aria-hidden="true"></span><span>{SITE.availability} <span class="where">{SITE.location}</span></span></p>
+      <p class="hero-cta">
+        <a class="primary" href="/resume" target="_blank" rel="noopener">View résumé</a>
+        <a href={`mailto:${SITE.email}`}>Email me</a>
       </p>
       <Necklace pieces={pieces} />
     </div>
@@ -125,6 +131,42 @@ const latestTalk = newestFirst(talks)[0];
     letter-spacing: -0.015em;
     color: var(--sky-ink);
   }
+
+  .status {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    column-gap: var(--space-3);
+    margin-top: var(--space-5);
+    max-width: 52ch;
+    color: var(--sky-ink);
+    font-weight: 500;
+  }
+  .beacon {
+    flex: none;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: var(--lamp-glow);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--lamp-glow) 30%, transparent);
+    transform: translateY(-0.05em);
+  }
+  .where { color: var(--sky-accent); white-space: nowrap; margin-left: var(--space-1); }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-4); }
+  .hero-cta a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: var(--space-5);
+    border: 1px solid color-mix(in srgb, var(--sky-ink) 45%, transparent);
+    border-radius: 999px;
+    color: var(--sky-ink);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .hero-cta a:hover { border-color: var(--lamp-glow); }
+  .hero-cta .primary { background: var(--sky-ink); color: var(--sky); border-color: var(--sky-ink); }
+  .hero-cta .primary:hover { box-shadow: 0 0 0 3px var(--lamp-glow); }
 
   .voices {
     display: grid;

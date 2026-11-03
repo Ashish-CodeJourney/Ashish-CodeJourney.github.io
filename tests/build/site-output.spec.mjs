@@ -64,3 +64,17 @@ test('dev.to post images go through the resizing CDN instead of full-size upload
   ).reduce((sum, count) => sum + count, 0);
   assert.equal(hotlinked, 0);
 });
+
+test('llms.txt introduces Ashish by full name, role, location and availability', async () => {
+  const llms = await readDist('llms.txt');
+  assert.match(llms, /^# Ashish Vaghela\n/);
+  assert.match(llms, /^> Software engineer/m);
+  assert.match(llms, /India · IST/);
+  assert.match(llms, /Open to full-time remote roles/);
+});
+
+test('only one résumé PDF is published; the old file name redirects to it', async () => {
+  const pdfs = (await listFiles()).filter((file) => extname(file) === '.pdf');
+  assert.deepEqual(pdfs.map((file) => file.slice(DIST.length).replace(/^\//, '')), ['Ashish_Vaghela_Software_Engineer.pdf']);
+  assert.match(await readDist('_redirects'), /^\/Ashish_Vaghela_Resume\.pdf \/Ashish_Vaghela_Software_Engineer\.pdf 301$/m);
+});

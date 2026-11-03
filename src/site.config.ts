@@ -5,6 +5,9 @@ export const SITE = {
   description: data.description,
   author: data.author,
   email: data.email,
+  location: data.location,
+  availability: data.availability,
+  speakingTopics: data.speakingTopics,
   url: new URL(import.meta.env.SITE).origin,
   socials: data.socials,
 } as const;

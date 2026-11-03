@@ -189,3 +189,56 @@ test('resizeDevtoImages leaves links and images hosted elsewhere untouched', () 
   ].join('\n');
   assert.equal(devto.resizeDevtoImages(body), body);
 });
+
+const summaryOf = (description, body) => toPostEntry(article({ description }), body).data.description;
+
+test('a hand-written dev.to description is kept as it is', () => {
+  assert.equal(summaryOf('Shell config after two years', 'Anything.'), 'Shell config after two years');
+});
+
+test('an auto-cut dev.to description is replaced by whole sentences from the post, skipping images and headings', () => {
+  const body = [
+    '',
+    '![Astro 7 Sätteri](https://dev-to-uploads.s3.amazonaws.com/x.png)',
+    '',
+    '## Intro',
+    '',
+    'Astro 7 ships [Sätteri](https://satteri.bruits.org), a **Markdown** engine written in `Rust`. It',
+    'is genuinely fast. The Astro team measured over a hundred real sites, large and small, and every single one of them built faster, some by an order of magnitude.',
+  ].join('\n');
+  assert.equal(
+    summaryOf('Astro 7 ships Sätteri, a Markdown engine written in Rust. It is genuinely fast. The Astro...', body),
+    'Astro 7 ships Sätteri, a Markdown engine written in Rust. It is genuinely fast.',
+  );
+});
+
+test('summaries stop at 200 characters, at a sentence end when possible', () => {
+  const sentence = 'This sentence is exactly fifty characters long, ok.';
+  const summary = summaryOf('Cut...', `${sentence} ${sentence} ${sentence} ${sentence} ${sentence}`);
+  assert.equal(summary, `${sentence} ${sentence} ${sentence}`);
+});
+
+test('a first sentence longer than 200 characters is cut at a word and marked with an ellipsis', () => {
+  const words = Array.from({ length: 60 }, () => 'word').join(' ');
+  const summary = summaryOf('Cut...', `${words}.`);
+  assert.ok(summary.length <= 201);
+  assert.match(summary, /word…$/);
+});
+
+test('stray punctuation and bold-only title lines are not used as the summary', () => {
+  assert.equal(
+    summaryOf('Cut...', '**The Code Crusaders Story**\nThere was a team of superheroes. ?\n\nMore.'),
+    'There was a team of superheroes. More.',
+  );
+});
+
+test('dots inside code or brackets do not end a sentence', () => {
+  assert.equal(
+    summaryOf('Cut...', 'It had everything. `.bashrc`. `.vimrc`. A section on tmux.'),
+    'It had everything. .bashrc. .vimrc. A section on tmux.',
+  );
+  assert.equal(
+    summaryOf('Cut...', 'Dotfiles start with a dot (.). They are usually hidden.'),
+    'Dotfiles start with a dot (.). They are usually hidden.',
+  );
+});

@@ -30,6 +30,7 @@ const education = resume.flatMap((entry) => (entry.kind === 'education' ? [entry
           <p>Usually holding a cup of chai.</p>
           <p>Always happy to stop for a street cat.</p>
         </div>
+        <p class="status"><strong>{SITE.availability}</strong> <span>{SITE.location}</span></p>
         <ResumeLinks layout="panel" />
       </aside>
     </div>
@@ -39,7 +40,6 @@ const education = resume.flatMap((entry) => (entry.kind === 'education' ? [entry
         <h2 id="work">Work</h2>
         <div class="block-body">
           {summary.text.map((paragraph) => <p class="lede">{paragraph}</p>)}
-          <ResumeLinks />
         </div>
       </section>
     )}
@@ -60,6 +60,13 @@ const education = resume.flatMap((entry) => (entry.kind === 'education' ? [entry
                 {job.highlights.length > 0 && (
                   <ul class="highlights">{job.highlights.map((line) => <li>{line}</li>)}</ul>
                 )}
+                {job.projects.map((project) => (
+                  <div class="client">
+                    <h4>{project.name}</h4>
+                    {project.summary && <p class="where">{project.summary}</p>}
+                    <ul class="highlights">{project.highlights.map((line) => <li>{line}</li>)}</ul>
+                  </div>
+                ))}
               </div>
             </li>
           ))}
@@ -140,6 +147,15 @@ const education = resume.flatMap((entry) => (entry.kind === 'education' ? [entry
     line-height: 1.4;
   }
   .small-print p + p { margin-top: var(--space-2); }
+  .status {
+    max-width: 18rem;
+    margin-top: var(--space-5);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--lamp-glow);
+    line-height: 1.45;
+  }
+  .status strong { font-weight: 600; }
+  .status span { display: block; color: var(--ink-2); font-size: var(--step--1); margin-top: var(--space-1); }
   .story :global(h1) { font-size: var(--step-5); letter-spacing: -0.035em; margin-bottom: var(--space-5); }
   .story :global(h1 + p) { font-size: var(--step-1); line-height: 1.45; }
   .story :global(h3) { font-size: var(--step-2); margin-top: 1.8em; }
@@ -171,6 +187,12 @@ const education = resume.flatMap((entry) => (entry.kind === 'education' ? [entry
   .where { color: var(--ink-2); margin-top: var(--space-1); }
   .highlights { margin-top: var(--space-3); padding-left: 1.1em; max-width: var(--measure-tech); }
   .highlights li + li { margin-top: var(--space-2); }
+  .client {
+    margin-top: var(--space-5);
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--line);
+  }
+  .client h4 { font-size: var(--step-0); font-weight: 650; }
 
   .skills { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5) var(--space-6); }
   .skills dt { font-weight: 650; }

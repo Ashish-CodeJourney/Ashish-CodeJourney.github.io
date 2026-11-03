@@ -1,5 +1,7 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import ogImages from './src/integrations/og-images.mjs';
+import securityHeaders from './src/integrations/security-headers.mjs';
 
 export default defineConfig({
   site: 'https://ashishvaghela.in',
@@ -9,8 +11,11 @@ export default defineConfig({
     '/talks': '/speaking',
     '/talks/[slug]': '/speaking/[slug]',
   },
-  integrations: [sitemap()],
+  integrations: [sitemap(), ogImages(), securityHeaders()],
   vite: {
+    build: {
+      assetsInlineLimit: 0,
+    },
     server: {
       watch: {
         ignored: ['**/node_modules/**', '**/.git/**', '**/dist/**', '**/content/**', '**/public/**'],

@@ -40,9 +40,25 @@ test('about lists every role with its company, period and highlights', async () 
 
 test('roles appear newest first', async () => {
   const html = await about();
-  const positions = ['>Software Crafter, ChatNCharge<', '>Software Crafter<', '>Full Stack Developer Intern<'].map((name) => html.indexOf(name));
+  const positions = ['>Software Crafter<', '>Full Stack Developer Intern<'].map((name) => html.indexOf(name));
   assert.ok(positions.every((position) => position > -1));
   assert.deepEqual([...positions].sort((a, b) => a - b), positions);
+});
+
+test('Nelkinda is one role, with client projects listed inside it', async () => {
+  const html = await about();
+  assert.equal((html.match(/>Nelkinda Software Craft</g) ?? []).length, 1);
+  assert.doesNotMatch(html, /Client project via/);
+  const nelkinda = ofKind('experience').find((job) => job.company === 'Nelkinda Software Craft');
+  assert.ok(nelkinda.projects.length > 0);
+  const item = (html.match(/<ol class="rows timeline"[\s\S]*?<\/ol>/)?.[0] ?? '');
+  const roleAt = item.indexOf('>Software Crafter<');
+  const nextRoleAt = item.indexOf('>Full Stack Developer Intern<');
+  nelkinda.projects.forEach((project) => {
+    const at = item.indexOf(`>${project.name}<`);
+    assert.ok(at > roleAt && at < nextRoleAt, `${project.name} should sit inside the Nelkinda role`);
+    project.highlights.forEach((line) => assert.match(html, new RegExp(escaped(line.slice(0, 50)))));
+  });
 });
 
 test('about lists skills by group and education', async () => {
@@ -77,4 +93,15 @@ test('about introduces me as a software engineer and claims no Kubernetes experi
   const html = await about();
   assert.match(html, /I(&#39;|')m a software engineer/);
   assert.doesNotMatch(html, /Kubernetes|Release and automation engineer/i);
+});
+
+test('about states where Ashish works from and which roles he is open to', async () => {
+  const html = await about();
+  assert.match(html, /India · IST/);
+  assert.match(html, /Open to full-time remote roles/);
+  assert.doesNotMatch(html, /somewhere on Earth/);
+});
+
+test('about offers the résumé once, not twice', async () => {
+  assert.equal(((await about()).match(/>View résumé</g) ?? []).length, 1);
 });

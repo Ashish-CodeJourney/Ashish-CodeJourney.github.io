@@ -14,7 +14,7 @@ export async function getStaticPaths() {
 
 const { project } = Astro.props;
 const { Content } = await render(project);
-const { title, description, tags, url, github, banner, logo, status, date } = project.data;
+const { title, description, tags, url, urlLabel, github, banner, logo, status, date } = project.data;
 
 const STATUS_LABEL = {
   active: 'Active',
@@ -23,11 +23,9 @@ const STATUS_LABEL = {
 } as const;
 
 const listFormat = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' });
-
-const ogImage = banner ? new URL(banner, Astro.site ?? Astro.url).href : undefined;
 ---
 
-<BaseLayout title={title} description={description} ogImage={ogImage} voice="tech">
+<BaseLayout title={title} description={description} voice="tech">
   <article class="wrap">
     <header class="page-head">
       <p class="back"><a href="/projects/">All projects</a></p>
@@ -57,7 +55,7 @@ const ogImage = banner ? new URL(banner, Astro.site ?? Astro.url).href : undefin
         <div>
           <dt>Links</dt>
           <dd class="links">
-            {url && <a href={url}>Visit the live site</a>}
+            {url && <a href={url}>{urlLabel}</a>}
             {github && <a href={github}>Source on GitHub</a>}
           </dd>
         </div>

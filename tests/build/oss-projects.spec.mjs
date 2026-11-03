@@ -238,3 +238,9 @@ test('community lists no talks, since they have their own page', async () => {
   const section = sectionOf(await ossHtml(), 'community');
   assert.doesNotMatch(section, /Speaker|\/speaking\//);
 });
+
+test('a project link says where it goes: Aether links to its docs, not a live site', async () => {
+  const html = await readDist('projects/aether-gateway/index.html');
+  assert.match(html, /<a href="https:\/\/ashish-codejourney\.github\.io\/aether-gateway\/"[^>]*>Read the documentation<\/a>/);
+  assert.doesNotMatch(html, /Visit the live site/);
+});

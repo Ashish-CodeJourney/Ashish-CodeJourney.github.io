@@ -19,6 +19,9 @@ Personal website and blog at **[ashishvaghela.in](https://ashishvaghela.in)** �
 - **About** — personal intro plus résumé (experience, skills, education) from `content/resume.json`
 - **Links** (`/links/`) — standalone link-in-bio page made for projecting after a talk: links on the left, one large QR code on the right; QR hidden on phones
 - **Responsive menu** — Menu button and panel under 860px; links still wrap without JavaScript
+- **Hiring signal up front** — hero and About state role, location and availability (`location`, `availability` in `content/site.json`)
+- **Share previews** — every page gets a generated 1200×630 `og:image` card at build time (`src/integrations/og-images.mjs`)
+- **Security headers** — HSTS and a hash-based Content-Security-Policy appended to `dist/_headers` at build time (`src/integrations/security-headers.mjs`)
 - **Quality gates** — unit tests, build-output specs and Lighthouse budgets in CI
 
 ---

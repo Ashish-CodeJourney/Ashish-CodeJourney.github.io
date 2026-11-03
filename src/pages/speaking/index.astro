@@ -4,7 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostRows from '../../components/PostRows.astro';
 import { SITE } from '../../site.config';
 import { toSlug } from '../../utils/slug';
-import { topicsFromTalks, inviteMailto } from '../../utils/speaking.js';
+import { inviteMailto } from '../../utils/speaking.js';
 
 const talks = [...(await getCollection('talks'))].sort((a, b) => b.data.date.localeCompare(a.data.date));
 
@@ -15,7 +15,6 @@ const rows = talks.map((talk) => ({
   summary: talk.data.event,
 }));
 
-const topics = topicsFromTalks(talks.map((talk) => talk.data));
 const latest = talks[0];
 const invite = inviteMailto({ email: SITE.email, subject: 'Speaking invitation: [event name]' });
 
@@ -49,7 +48,7 @@ const bios = [
 
     <section class="block topics" aria-labelledby="topics">
       <h2 id="topics">Topics I talk about</h2>
-      <ul>{topics.map((topic) => <li>{topic}</li>)}</ul>
+      <ul>{SITE.speakingTopics.map((topic) => <li>{topic}</li>)}</ul>
     </section>
 
     <section class="block kit" aria-labelledby="kit">

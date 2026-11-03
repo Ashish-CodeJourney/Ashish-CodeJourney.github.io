@@ -7,7 +7,7 @@ const header = async () => (await readDist('index.html')).match(/<header class="
 test('header has one main nav listing every section', async () => {
   const html = await header();
   assert.equal((html.match(/<nav[^>]*aria-label="Main"/g) ?? []).length, 1);
-  ['/technical/', '/writings/', '/oss/', '/speaking/', '/about/'].forEach((href) => assert.match(html, new RegExp(`href="${href}"`)));
+  ['/technical/', '/writings/', '/projects/', '/oss/', '/speaking/', '/about/'].forEach((href) => assert.match(html, new RegExp(`href="${href}"`)));
 });
 
 test('a menu button controls the nav on small screens', async () => {
