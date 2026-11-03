@@ -158,6 +158,7 @@ export const collections = {
       description: z.string().optional(),
       order: z.number().optional(),
       note: z.boolean().optional(),
+      communities: z.array(z.string()).default([]),
     }),
   }),
 };

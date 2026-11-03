@@ -46,7 +46,7 @@ export const communityNotes = (entries) =>
   entries
     .filter(isNote)
     .toSorted((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity))
-    .flatMap((entry) => (entry.description ? [entry.description] : []));
+    .flatMap((entry) => (entry.description ? [{ communities: entry.communities ?? [], description: entry.description }] : []));
 
 export const describeWhen = ({ start, end }) => {
   if (start === null) return null;

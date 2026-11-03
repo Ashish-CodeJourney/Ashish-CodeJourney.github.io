@@ -227,11 +227,22 @@ test('community shows core team roles in my words', async () => {
   assert.doesNotMatch(section, /Organiser/);
 });
 
-test('local communities I volunteer with are a sentence under the list, not a list item', async () => {
+test('communities I also volunteer with are named one by one under the rows, with what I do for them', async () => {
   const section = sectionOf(await ossHtml(), 'community');
-  const items = section.match(/<ol[\s\S]*?<\/ol>/)?.[0] ?? '';
-  assert.match(section, /<p class="note"[^>]*>I(&#39;|')m also part of GDG, Java User Group, The Hackers Meetup/);
-  assert.doesNotMatch(items, /The Hackers Meetup/);
+  const rows = section.match(/<ol[\s\S]*?<\/ol>/)?.[0] ?? '';
+  const also = section.match(/<div class="also"[\s\S]*?<\/div>\s*<\/div>/)?.[0] ?? '';
+  const names = matchesOf(also, /<li[^>]*>([^<]+)<\/li>/g);
+  assert.match(also, /<h3[^>]*>Also part of<\/h3>/);
+  assert.deepEqual(names.slice(0, 3), ['GDG', 'Java User Group', 'The Hackers Meetup']);
+  assert.match(also, /volunteer to help [^<]*run their meetups and events/);
+  assert.doesNotMatch(rows, /The Hackers Meetup/);
+});
+
+test('Ahmedabad Developer Club links to its website and says what I do there', async () => {
+  const section = sectionOf(await ossHtml(), 'community');
+  const row = section.split('<li').slice(1).find((item) => item.includes('Ahmedabad Developer Club')) ?? '';
+  assert.match(row, /<a href="https:\/\/ahmedabaddeveloperclub\.in\/"[^>]*>Ahmedabad Developer Club<\/a>/);
+  assert.match(row, /<p class="quiet"[^>]*>[^<]+<\/p>/);
 });
 
 test('community lists no talks, since they have their own page', async () => {

@@ -11,6 +11,12 @@ export type CommunityEntry = {
   readonly description?: string;
   readonly order?: number;
   readonly note?: boolean;
+  readonly communities?: ReadonlyArray<string>;
+};
+
+export type CommunityNote = {
+  readonly communities: ReadonlyArray<string>;
+  readonly description: string;
 };
 
 export type CommunityRow = {
@@ -35,4 +41,4 @@ export function describeWhen(row: Pick<CommunityRow, 'start' | 'end'>): string |
 
 export function roleLine(row: CommunityRow): string | null;
 
-export function communityNotes(entries: ReadonlyArray<CommunityEntry>): string[];
+export function communityNotes(entries: ReadonlyArray<CommunityEntry>): CommunityNote[];

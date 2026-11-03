@@ -13,7 +13,8 @@ const entry = ({
   description,
   order,
   note,
-} = {}) => ({ title, organisation, role, date, endDate, location, url, description, order, note });
+  communities,
+} = {}) => ({ title, organisation, role, date, endDate, location, url, description, order, note, communities });
 
 const undatedEntry = (overrides = {}) => {
   const { date: _date, ...undated } = entry(overrides);
@@ -168,13 +169,16 @@ test('communityRows leaves out entries written as a note', () => {
   assert.deepEqual(rows.map(({ organisation }) => organisation), ['WeDoTDD']);
 });
 
-test('communityNotes gives the text of every note, in order', () => {
+test('communityNotes gives each note its community names and text, in order', () => {
   const notes = communityNotes([
     undatedEntry({ note: true, order: 2, description: 'Second.' }),
     undatedEntry({ organisation: 'A row' }),
-    undatedEntry({ note: true, order: 1, description: 'First.' }),
+    undatedEntry({ note: true, order: 1, description: 'First.', communities: ['GDG', 'JUG'] }),
   ]);
-  assert.deepEqual(notes, ['First.', 'Second.']);
+  assert.deepEqual(notes, [
+    { communities: ['GDG', 'JUG'], description: 'First.' },
+    { communities: [], description: 'Second.' },
+  ]);
 });
 
 test('communityNotes skips a note with nothing to say', () => {
