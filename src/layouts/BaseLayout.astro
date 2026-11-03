@@ -2,6 +2,7 @@
 import { ClientRouter } from 'astro:transitions';
 import { SITE } from '../site.config';
 import { ogImagePath } from '../utils/og.js';
+import theme from '../utils/theme.js';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Oneko from '../components/Oneko.astro';
@@ -43,6 +44,7 @@ const structuredData = {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{pageTitle}</title>
+  <script is:inline set:html={theme.themeBootstrapScript} />
   <meta name="description" content={description} />
   <link rel="canonical" href={canonicalURL} />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -52,14 +54,6 @@ const structuredData = {
   <script is:inline>
     document.documentElement.classList.add('js');
     document.addEventListener('astro:after-swap', () => document.documentElement.classList.add('js'));
-  </script>
-  <script>
-    import theme from '../utils/theme.js';
-
-    const stored = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    theme.applyTheme(document.documentElement, theme.resolveTheme({ storedTheme: stored, prefersDark }));
   </script>
 
   <meta property="og:title" content={pageTitle} />

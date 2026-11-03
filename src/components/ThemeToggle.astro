@@ -24,7 +24,7 @@
     button.onclick = () => {
       const nextTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
       theme.applyTheme(document.documentElement, nextTheme);
-      localStorage.setItem('theme', nextTheme);
+      theme.storeTheme(window, nextTheme);
       button.setAttribute('aria-label', label(nextTheme === 'dark'));
     };
   }
