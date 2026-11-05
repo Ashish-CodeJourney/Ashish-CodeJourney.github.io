@@ -255,3 +255,9 @@ test('a project link says where it goes: Aether links to its docs, not a live si
   assert.match(html, /<a href="https:\/\/ashish-codejourney\.github\.io\/aether-gateway\/"[^>]*>Read the documentation<\/a>/);
   assert.doesNotMatch(html, /Visit the live site/);
 });
+
+test('AceUnit and ReqCover present me as a core contributor, not as the docs and bug-fix person', async () => {
+  const html = await ossHtml();
+  ['AceUnit', 'ReqCover'].forEach((name) => assert.match(html, new RegExp(`I(&#39;|')m a core contributor to ${name}\\.`)));
+  assert.doesNotMatch(html, /own the documentation/);
+});
