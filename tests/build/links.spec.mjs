@@ -23,7 +23,7 @@ test('every profile, my email and my résumé are links, with no link back to th
   const html = await links();
   site.links.filter((link) => link.icon !== 'website').forEach(({ url, label }) => assert.ok(html.includes(`href="${url}"`), `${label} should be linked`));
   assert.match(html, new RegExp(`href="mailto:${site.email}"`));
-  assert.match(html, /href="\/resume\/developer-advocate"/);
+  assert.match(html, /href="\/resume"/);
   assert.doesNotMatch(html, /href="https:\/\/ashish-codejourney\.github\.io/);
 });
 

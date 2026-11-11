@@ -1,7 +1,7 @@
 ---
 import { statSync } from 'node:fs';
 import { join } from 'node:path';
-import { RESUMES } from '../site.config';
+import { RESUME_PDF } from '../site.config';
 import { formatFileSize } from '../utils/resume.js';
 
 interface Props {
@@ -9,24 +9,16 @@ interface Props {
 }
 
 const { layout = 'inline' } = Astro.props;
-const resumes = RESUMES.map((resume) => ({
-  ...resume,
-  size: formatFileSize(statSync(join(process.cwd(), 'public', resume.pdf)).size),
-}));
+const size = formatFileSize(statSync(join(process.cwd(), 'public', RESUME_PDF)).size);
 ---
 
 <div class:list={['resume', layout]}>
   {layout === 'panel' && <p class="label">Résumé</p>}
-  {resumes.map((resume) => (
-    <div class="variant">
-      <p class="title">{resume.title}</p>
-      <p class="meta">PDF, {resume.size}</p>
-      <p class="actions">
-        <a class="primary" href={resume.view} target="_blank" rel="noopener">View résumé</a>
-        <a href={resume.pdf} download>Download PDF</a>
-      </p>
-    </div>
-  ))}
+  <p class="meta">PDF, {size}</p>
+  <p class="actions">
+    <a class="primary" href="/resume" target="_blank" rel="noopener">View résumé</a>
+    <a href={RESUME_PDF} download>Download PDF</a>
+  </p>
 </div>
 
 <style>
@@ -39,8 +31,6 @@ const resumes = RESUMES.map((resume) => ({
     background: var(--surface);
   }
   .label { font-weight: 650; font-size: var(--step-1); letter-spacing: -0.015em; }
-  .variant + .variant { margin-top: var(--space-4); }
-  .title { font-weight: 600; }
   .meta { color: var(--ink-2); font-size: var(--step--1); }
   .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-3); }
   .actions a {

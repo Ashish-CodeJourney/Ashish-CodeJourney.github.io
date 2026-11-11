@@ -7,7 +7,7 @@ export default defineConfig({
   site: 'https://ashishvaghela.in',
   trailingSlash: 'ignore',
   redirects: {
-    '/resume': '/Ashish_Vaghela_Software_Engineer.pdf',
+    '/resume': '/Ashish_Vaghela_Developer_Advocate.pdf',
     '/resume/developer-advocate': '/Ashish_Vaghela_Developer_Advocate.pdf',
     '/talks': '/speaking',
     '/talks/[slug]': '/speaking/[slug]',
