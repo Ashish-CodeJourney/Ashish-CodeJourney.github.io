@@ -8,6 +8,7 @@ export default defineConfig({
   trailingSlash: 'ignore',
   redirects: {
     '/resume': '/Ashish_Vaghela_Software_Engineer.pdf',
+    '/resume/developer-advocate': '/Ashish_Vaghela_Developer_Advocate.pdf',
     '/talks': '/speaking',
     '/talks/[slug]': '/speaking/[slug]',
   },

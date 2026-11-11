@@ -73,8 +73,11 @@ test('llms.txt introduces Ashish by full name, role, location and availability',
   assert.match(llms, /Open to full-time remote roles/);
 });
 
-test('only one résumé PDF is published; the old file name redirects to it', async () => {
+test('engineer and developer advocate résumé PDFs are published; the old file name redirects to the engineer one', async () => {
   const pdfs = (await listFiles()).filter((file) => extname(file) === '.pdf');
-  assert.deepEqual(pdfs.map((file) => file.slice(DIST.length).replace(/^\//, '')), ['Ashish_Vaghela_Software_Engineer.pdf']);
+  assert.deepEqual(
+    pdfs.map((file) => file.slice(DIST.length).replace(/^\//, '')).sort(),
+    ['Ashish_Vaghela_Developer_Advocate.pdf', 'Ashish_Vaghela_Software_Engineer.pdf'],
+  );
   assert.match(await readDist('_redirects'), /^\/Ashish_Vaghela_Resume\.pdf \/Ashish_Vaghela_Software_Engineer\.pdf 301$/m);
 });

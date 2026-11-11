@@ -85,6 +85,13 @@ test('résumé can be opened in the browser or downloaded as the real PDF, with 
   assert.doesNotMatch(html, /href="\/resume"[^>]*download/);
 });
 
+test('developer advocate résumé can be viewed or downloaded from about', async () => {
+  const html = await about();
+  assert.match(html, /Developer Advocate/);
+  assert.match(html, /<a[^>]+href="\/resume\/developer-advocate"[^>]*>View résumé</);
+  assert.match(html, /<a[^>]+href="\/Ashish_Vaghela_Developer_Advocate\.pdf"[^>]+download[^>]*>Download PDF</);
+});
+
 test('about never publishes a phone number', async () => {
   assert.doesNotMatch(await about(), /\+91|95104/);
 });
@@ -102,6 +109,8 @@ test('about states where Ashish works from and which roles he is open to', async
   assert.doesNotMatch(html, /somewhere on Earth/);
 });
 
-test('about offers the résumé once, not twice', async () => {
-  assert.equal(((await about()).match(/>View résumé</g) ?? []).length, 1);
+test('about offers each résumé once, not twice', async () => {
+  const html = await about();
+  assert.equal((html.match(/href="\/resume"[^>]*>View résumé</g) ?? []).length, 1);
+  assert.equal((html.match(/href="\/resume\/developer-advocate"[^>]*>View résumé</g) ?? []).length, 1);
 });

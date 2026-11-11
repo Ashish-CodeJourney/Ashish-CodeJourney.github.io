@@ -23,3 +23,8 @@ export const LINKS = data.links as ReadonlyArray<{
 }>;
 
 export const RESUME_PDF = '/Ashish_Vaghela_Software_Engineer.pdf';
+
+export const RESUMES = [
+  { title: 'Developer Advocate', view: '/resume/developer-advocate', pdf: '/Ashish_Vaghela_Developer_Advocate.pdf' },
+  { title: 'Software Engineer', view: '/resume', pdf: RESUME_PDF },
+] as const;

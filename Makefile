@@ -1,5 +1,5 @@
 .ONESHELL:
-.PHONY: install ci run dev build preview check test test-build lighthouse devto-snapshot clean help content-status publish
+.PHONY: resume-pdf install ci run dev build preview check test test-build lighthouse devto-snapshot clean help content-status publish
 
 help:
 	@echo "install        - install deps"
@@ -12,6 +12,7 @@ help:
 	@echo "test-build     - verify built dist/ output (run after build)"
 	@echo "lighthouse     - enforce Lighthouse perf/a11y/SEO budgets on dist/"
 	@echo "devto-snapshot - refresh src/data/devto-snapshot.json from dev.to"
+	@echo "resume-pdf     - render resume/developer-advocate.html to public/ PDF (needs chromium)"
 	@echo "clean          - remove dist, .astro, node_modules"
 	@echo "content-status - show pending changes in content/ and its pointer"
 	@echo "publish        - commit+push content/, then bump the submodule pointer"
@@ -78,3 +79,8 @@ publish:
 		git commit -m "chore: update content submodule"; \
 		git push origin trunk; \
 	fi
+
+resume-pdf:
+	chromium --headless --disable-gpu --no-sandbox --no-pdf-header-footer \
+		--print-to-pdf=$(CURDIR)/public/Ashish_Vaghela_Developer_Advocate.pdf \
+		file://$(CURDIR)/resume/developer-advocate.html
