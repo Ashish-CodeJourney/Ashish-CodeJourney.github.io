@@ -25,3 +25,9 @@ test('developer advocate résumé uses no em dashes', async () => {
 test('developer advocate résumé headline is not limited to the JVM', async () => {
   assert.doesNotMatch(await source(), /<p class="role">[^<]*JVM/);
 });
+
+test('developer advocate résumé states total npm downloads, not an unverified weekly figure', async () => {
+  const html = await source();
+  assert.match(html, /10k\+/);
+  assert.doesNotMatch(html, /weekly/i);
+});
