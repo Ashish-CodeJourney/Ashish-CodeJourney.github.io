@@ -39,7 +39,7 @@ test('hero describes the work without tying it to a single technology', async ()
 test('hero offers the résumé and an email as next steps', async () => {
   const html = await hero();
   assert.match(html, /<a[^>]+href="\/resume"[^>]*>[^<]*résumé/i);
-  assert.match(html, /<a[^>]+href="mailto:vaghelaashish111@gmail\.com"/);
+  assert.match(html, /<a[^>]+href="mailto:hi@ashishvaghela\.in"/);
 });
 
 test('greeting has a no-JavaScript fallback', async () => {

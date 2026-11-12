@@ -7,7 +7,7 @@ what roles he wants, where he is, and can share any page with a proper preview.
 ## Decisions (from user, 2026-11-03)
 - Availability: open to full-time remote roles: software engineering, developer advocacy, open source. Not "backend only".
 - Location shown as "India · IST" (no city in hero/About intro).
-- Email stays gmail.
+- Email is hi@ashishvaghela.in only.
 - About must not claim Kubernetes experience (existing spec).
 
 ## Increments (each: failing build spec → code → green)

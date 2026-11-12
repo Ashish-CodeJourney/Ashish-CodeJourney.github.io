@@ -31,3 +31,9 @@ test('developer advocate résumé states total npm downloads, not an unverified 
   assert.match(html, /10k\+/);
   assert.doesNotMatch(html, /weekly/i);
 });
+
+test('developer advocate résumé lists the custom domain email, not gmail', async () => {
+  const html = await source();
+  assert.match(html, /<a href="mailto:hi@ashishvaghela\.in">hi@ashishvaghela\.in<\/a>/);
+  assert.doesNotMatch(html, /gmail\.com/);
+});
