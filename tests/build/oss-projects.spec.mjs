@@ -258,6 +258,7 @@ test('a project link says where it goes: Aether links to its docs, not a live si
 
 test('AceUnit and ReqCover present me as a core contributor, not as the docs and bug-fix person', async () => {
   const html = await ossHtml();
-  ['AceUnit', 'ReqCover'].forEach((name) => assert.match(html, new RegExp(`I(&#39;|')m a core contributor to ${name}\\.`)));
+  assert.match(html, /I(&#39;|')m a core contributor to AceUnit\./);
+  assert.match(html, /I(&#39;|')m a core contributor and maintainer of ReqCover\./);
   assert.doesNotMatch(html, /own the documentation/);
 });
