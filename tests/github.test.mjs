@@ -156,8 +156,8 @@ test('linkForOwnRepo falls back to the repository on GitHub', () => {
   const projects = [{ href: '/projects/other/', github: 'https://github.com/Ashish-CodeJourney/other/' }];
 
   assert.equal(
-    linkForOwnRepo({ url: 'https://github.com/Ashish-CodeJourney/satteri-plugins', projects }),
-    'https://github.com/Ashish-CodeJourney/satteri-plugins',
+    linkForOwnRepo({ url: 'https://satteri-plugins.js.org/', projects }),
+    'https://satteri-plugins.js.org/',
   );
 });
 

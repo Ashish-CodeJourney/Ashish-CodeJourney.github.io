@@ -2,7 +2,7 @@
   "repos": [
     {
       "repo": "Ashish-CodeJourney/satteri-plugins",
-      "url": "https://github.com/Ashish-CodeJourney/satteri-plugins",
+      "url": "https://satteri-plugins.js.org/",
       "description": "Ports of remark and rehype plugins to Sätteri, the Rust markdown engine behind Astro 7.",
       "language": "TypeScript",
       "stars": 11,
