@@ -26,22 +26,37 @@ const notableSchema = z.object({
   showStars: z.boolean().optional(),
 });
 
+const advisorySchema = z.object({
+  id: z.string().trim().min(1),
+  project: z.string().trim().min(1),
+  title: z.string().trim().min(1),
+  url: z.url(),
+  severity: z.string().trim().min(1),
+  cvss: z.number().min(0).max(10),
+  cwe: z.string().trim().min(1),
+  published: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/),
+  fixedIn: optionalText,
+  summary: optionalText,
+});
+
 const fileSchema = z.object({
   ownProjects: z.array(entrySchema).default([]),
   contributions: z.array(entrySchema).default([]),
   notable: z.array(notableSchema).default([]),
+  advisories: z.array(advisorySchema).default([]),
 });
 
 const withoutMissing = (entry) => Object.fromEntries(Object.entries(entry).filter(([, value]) => value !== undefined));
 
 export const parseOssFile = (raw) => {
-  if (raw === undefined) return { ownProjects: [], contributions: [], notable: [] };
+  if (raw === undefined) return { ownProjects: [], contributions: [], notable: [], advisories: [] };
   const result = fileSchema.safeParse(raw);
   if (!result.success) throw new Error(`${SOURCE} is invalid: ${result.error.message}`);
   return {
     ownProjects: result.data.ownProjects.map(withoutMissing),
     contributions: result.data.contributions.map(withoutMissing),
     notable: result.data.notable.map(withoutMissing),
+    advisories: result.data.advisories.map(withoutMissing),
   };
 };
 

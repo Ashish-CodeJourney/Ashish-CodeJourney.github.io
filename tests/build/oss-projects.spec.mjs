@@ -52,10 +52,10 @@ test('open source page links to the GitHub profile', async () => {
   assert.match(html, new RegExp(`href="${PROFILE}"`));
 });
 
-test('open source page shows my projects, then projects I contribute to, then community', async () => {
+test('open source page shows my projects, then projects I contribute to, then security research, then community', async () => {
   const headings = matchesOf(await ossHtml(), /<h2[^>]*>([^<]+)<\/h2>/g);
 
-  assert.deepEqual(headings.slice(0, 3), ['My projects', 'Projects I contribute to', 'Community']);
+  assert.deepEqual(headings.slice(0, 4), ['My projects', 'Projects I contribute to', 'Security research', 'Community']);
 });
 
 test('open source page shows no pull request information', async () => {
@@ -261,4 +261,19 @@ test('AceUnit and ReqCover present me as a core contributor, not as the docs and
   assert.match(html, /I(&#39;|')m a core contributor to AceUnit\./);
   assert.match(html, /I(&#39;|')m a core contributor and maintainer of ReqCover\./);
   assert.doesNotMatch(html, /own the documentation/);
+});
+
+test('security research lists every advisory I reported, linked to the published advisory', async () => {
+  const { advisories = [] } = await ossFile();
+  assert.ok(advisories.length > 0, 'expected at least one advisory in content/oss.json');
+  const section = sectionOf(await ossHtml(), 'security');
+  assert.deepEqual(rowsOf(section, 'advisory'), advisories.map((entry) => entry.id));
+  advisories.forEach((entry) => {
+    const row = rowHtml(section, 'advisory', entry.id);
+    assert.match(row, new RegExp(`<a href="${entry.url}"`));
+    assert.match(row, new RegExp(entry.id));
+    assert.match(row, new RegExp(entry.cwe));
+    assert.match(row, new RegExp(`CVSS ${entry.cvss}`));
+    assert.match(row, new RegExp(`<time datetime="${entry.published}"`));
+  });
 });

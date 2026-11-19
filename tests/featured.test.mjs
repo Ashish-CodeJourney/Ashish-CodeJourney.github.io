@@ -71,7 +71,7 @@ test('parseOssFile treats a missing list as empty', () => {
 });
 
 test('parseOssFile gives empty lists when there is no file', () => {
-  assert.deepEqual(parseOssFile(undefined), { ownProjects: [], contributions: [], notable: [] });
+  assert.deepEqual(parseOssFile(undefined), { ownProjects: [], contributions: [], notable: [], advisories: [] });
 });
 
 test('parseOssFile rejects an entry with neither a repository nor a name', () => {
@@ -273,4 +273,36 @@ test('notableProjects hides stars when the file says the repo count would mislea
   const [result] = notableProjects({ entries: file.notable, repos: [{ ...repoDetails({ name: 'akash-network/website' }), stars: 158 }] });
 
   assert.equal(result.stars, null);
+});
+
+const advisory = (overrides = {}) => ({
+  id: 'GHSA-fm36-5jx4-vwhf',
+  project: 'JobRunr',
+  title: 'Path traversal in the dashboard lets anyone read classpath resources',
+  url: 'https://github.com/jobrunr/jobrunr/security/advisories/GHSA-fm36-5jx4-vwhf',
+  severity: 'Moderate',
+  cvss: 6.5,
+  cwe: 'CWE-22',
+  published: '2026-11-17',
+  fixedIn: '9.0.5',
+  summary: 'Found it, reported it privately, and worked with the maintainers on the fix.',
+  ...overrides,
+});
+
+test('parseOssFile reads the security advisories I reported, in file order', () => {
+  const first = advisory();
+  const second = advisory({ id: 'GHSA-aaaa-bbbb-cccc', project: 'Other' });
+  assert.deepEqual(parseOssFile({ advisories: [first, second] }).advisories, [first, second]);
+});
+
+test('parseOssFile gives no advisories when the file lists none', () => {
+  assert.deepEqual(parseOssFile(ossFile()).advisories, []);
+});
+
+test('parseOssFile rejects an advisory without a link to it', () => {
+  assert.throws(() => parseOssFile({ advisories: [advisory({ url: '' })] }), /content\/oss\.json/);
+});
+
+test('parseOssFile rejects an advisory with a CVSS score outside 0 to 10', () => {
+  assert.throws(() => parseOssFile({ advisories: [advisory({ cvss: 11 })] }), /content\/oss\.json/);
 });

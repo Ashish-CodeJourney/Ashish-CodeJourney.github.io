@@ -35,10 +35,24 @@ export type NotableProject = {
   readonly stars: number | null;
 };
 
+export type Advisory = {
+  readonly id: string;
+  readonly project: string;
+  readonly title: string;
+  readonly url: string;
+  readonly severity: string;
+  readonly cvss: number;
+  readonly cwe: string;
+  readonly published: string;
+  readonly fixedIn?: string;
+  readonly summary?: string;
+};
+
 export type OssFile = {
   readonly ownProjects: ReadonlyArray<FeaturedEntry>;
   readonly contributions: ReadonlyArray<FeaturedEntry>;
   readonly notable: ReadonlyArray<NotableEntry>;
+  readonly advisories: ReadonlyArray<Advisory>;
 };
 
 export function parseOssFile(raw: unknown): OssFile;

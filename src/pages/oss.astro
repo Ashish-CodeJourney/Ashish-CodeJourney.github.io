@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectRows from '../components/oss/ProjectRows.astro';
 import CommunityRows from '../components/oss/CommunityRows.astro';
 import NotableList from '../components/oss/NotableList.astro';
+import AdvisoryRows from '../components/oss/AdvisoryRows.astro';
 import github, { GITHUB_USERNAME } from '../utils/github.js';
 import { parseOssFile, listedRepos, featuredProjects, notableProjects, contributingLede } from '../utils/featured.js';
 import { communityRows, communityNotes } from '../utils/community.js';
@@ -42,7 +43,7 @@ const notes = communityNotes(communityEntries);
 
 <BaseLayout
   title="Open source"
-  description="The open source projects I maintain, the ones I contribute to, and the developer communities I help run."
+  description="The open source projects I maintain, the ones I contribute to, the vulnerabilities I have disclosed, and the developer communities I help run."
   voice="tech"
 >
   <div class="wrap">
@@ -71,6 +72,14 @@ const notes = communityNotes(communityEntries);
         <p class="lede">I'm choosing which projects to list here. <a href={PROFILE}>My GitHub profile</a> has the full picture.</p>
       )}
     </section>
+
+    {file.advisories.length > 0 && (
+      <section aria-labelledby="security">
+        <h2 id="security">Security research</h2>
+        <p class="lede">Vulnerabilities I found in open source projects and disclosed privately to their maintainers, so a fix shipped before the details went public.</p>
+        <AdvisoryRows advisories={file.advisories} />
+      </section>
+    )}
 
     <section aria-labelledby="community">
       <h2 id="community">Community</h2>
