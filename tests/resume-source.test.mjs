@@ -11,7 +11,7 @@ test('public developer advocate résumé never publishes a phone number', async 
 test('developer advocate résumé points to the current domain, not the old github.io site', async () => {
   const html = await source();
   assert.match(html, /https:\/\/ashishvaghela\.in/);
-  assert.doesNotMatch(html, /ashish-codejourney\.github\.io(?!\/(aether-gateway|MindGuard))/);
+  assert.doesNotMatch(html, /ashish-codejourney\.github\.io(?!\/(aether-gateway|Present))/);
 });
 
 test('developer advocate résumé leads with the developer advocate role', async () => {

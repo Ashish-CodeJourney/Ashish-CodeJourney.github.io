@@ -145,11 +145,11 @@ test('toRepo drops emoji from the description so it reads as plain text', () => 
 
 test('linkForOwnRepo links to the project page whose github link matches the repository', () => {
   const projects = [
-    { href: '/projects/mindguard/', github: 'https://github.com/Ashish-CodeJourney/mindguard.git' },
+    { href: '/projects/present/', github: 'https://github.com/Ashish-CodeJourney/present.git' },
     { href: '/projects/no-source/' },
   ];
 
-  assert.equal(linkForOwnRepo({ url: 'https://github.com/Ashish-CodeJourney/MindGuard', projects }), '/projects/mindguard/');
+  assert.equal(linkForOwnRepo({ url: 'https://github.com/Ashish-CodeJourney/Present', projects }), '/projects/present/');
 });
 
 test('linkForOwnRepo falls back to the repository on GitHub', () => {
