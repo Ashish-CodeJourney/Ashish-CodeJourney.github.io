@@ -45,6 +45,7 @@ jobs:
         run: make build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
 
       - name: Verify build output
         run: make test-build

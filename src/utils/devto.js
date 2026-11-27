@@ -3,6 +3,7 @@ const DEVTO_API = 'https://dev.to/api';
 export const DEVTO_USERNAME = 'ashish-codejourney';
 
 export const DEVTO_OVERRIDES = {
+  5134765: 'jvm-llm-gateway',
   4311008: 'astro-7-satteri-silent-bugs',
   4271844: 'oracle-cloud-free-vps-from-india',
   4158532: 'dot-files-two-years-later',
@@ -89,21 +90,23 @@ export const isPublishedLocally = (article, localEntries) => {
 
 const sleepFor = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const fetchJsonWithRetry = async (url, { fetch, sleep = sleepFor, attempts = 4, delayMs = 2000 }) => {
-  const response = await fetch(url);
+export const fetchJsonWithRetry = async (url, { fetch, headers, sleep = sleepFor, attempts = 4, delayMs = 2000 }) => {
+  const response = await fetch(url, { headers });
   if (response.ok) {
     return response.json();
   }
   if (response.status === 429 && attempts > 1) {
     await sleep(delayMs);
-    return fetchJsonWithRetry(url, { fetch, sleep, attempts: attempts - 1, delayMs: delayMs * 2 });
+    return fetchJsonWithRetry(url, { fetch, headers, sleep, attempts: attempts - 1, delayMs: delayMs * 2 });
   }
   throw new Error(`${response.status} from ${url}`);
 };
 
+const toEntry = (article, body, overrides) => toPostEntry(article, body, overrides[article.id] ?? slugFromPath(article.path));
+
 const mapArticle = (fetchJson) => async (article, overrides) => {
   const { body_markdown: body } = await fetchJson(`${DEVTO_API}/articles/${article.id}`);
-  return toPostEntry(article, body, overrides[article.id] ?? slugFromPath(article.path));
+  return toEntry(article, body, overrides);
 };
 
 const mapSequentially = (articles, mapOne, overrides) =>
@@ -112,12 +115,22 @@ const mapSequentially = (articles, mapOne, overrides) =>
     Promise.resolve([]),
   );
 
-export const loadDevtoEntries = async ({ username, fetchJson, localEntries, overrides, snapshot, warn }) => {
+const ownPublishedArticles = async (fetchJson, apiKey) => {
+  const articles = await fetchJson(`${DEVTO_API}/articles/me/published?per_page=1000`, { 'api-key': apiKey });
+  return { articles, mapOne: async (article, overrides) => toEntry(article, article.body_markdown, overrides) };
+};
+
+const publicArticles = async (fetchJson, username) => ({
+  articles: await fetchJson(`${DEVTO_API}/articles?username=${username}&per_page=1000`),
+  mapOne: mapArticle(fetchJson),
+});
+
+export const loadDevtoEntries = async ({ username, apiKey, fetchJson, localEntries, overrides, snapshot, warn }) => {
   try {
-    const articles = await fetchJson(`${DEVTO_API}/articles?username=${username}&per_page=1000`);
+    const { articles, mapOne } = apiKey ? await ownPublishedArticles(fetchJson, apiKey) : await publicArticles(fetchJson, username);
     const fresh = articles.filter((article) => !isPublishedLocally(article, localEntries));
 
-    return await mapSequentially(fresh, mapArticle(fetchJson), overrides);
+    return await mapSequentially(fresh, mapOne, overrides);
   } catch (error) {
     warn(`dev.to articles skipped: ${error.message}`);
     return snapshot;

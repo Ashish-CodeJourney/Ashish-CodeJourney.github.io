@@ -24,7 +24,7 @@ export type LocalEntry = {
   data: Record<string, unknown>;
 };
 
-export type FetchJson = (url: string) => Promise<unknown>;
+export type FetchJson = (url: string, headers?: Record<string, string>) => Promise<unknown>;
 
 export const DEVTO_USERNAME: string;
 
@@ -37,7 +37,8 @@ export const isPublishedLocally: (article: DevtoArticle, localEntries: readonly 
 export const fetchJsonWithRetry: (
   url: string,
   options: {
-    fetch: (url: string) => Promise<Response>;
+    fetch: (url: string, init?: { headers?: Record<string, string> }) => Promise<Response>;
+    headers?: Record<string, string>;
     sleep?: (ms: number) => Promise<void>;
     attempts?: number;
     delayMs?: number;
@@ -46,6 +47,7 @@ export const fetchJsonWithRetry: (
 
 export const loadDevtoEntries: (options: {
   username: string;
+  apiKey?: string;
   fetchJson: FetchJson;
   localEntries: readonly LocalEntry[];
   overrides: Record<number, string>;

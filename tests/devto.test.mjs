@@ -136,6 +136,50 @@ test('loadDevtoEntries falls back to the snapshot and warns when dev.to is unrea
   assert.deepEqual(warnings, ['dev.to articles skipped: network down']);
 });
 
+test('with an API key, loadDevtoEntries reads your own published articles, bypassing the stale public cache', async () => {
+  const requests = [];
+  const fetchJson = async (url, headers) => {
+    requests.push([url, headers]);
+    return [{ ...article(), body_markdown: 'Body from my published list' }];
+  };
+
+  const entries = await loadDevtoEntries({
+    username: USERNAME,
+    apiKey: 'secret-key',
+    fetchJson,
+    localEntries: [],
+    overrides: DEVTO_OVERRIDES,
+    snapshot: [],
+    warn: () => {},
+  });
+
+  assert.deepEqual(
+    entries.map((entry) => [entry.id, entry.body]),
+    [['dot-files-two-years-later', 'Body from my published list']],
+  );
+  assert.deepEqual(requests, [
+    ['https://dev.to/api/articles/me/published?per_page=1000', { 'api-key': 'secret-key' }],
+  ]);
+});
+
+test('fetchJsonWithRetry sends the given headers with every request, retries included', async () => {
+  const statuses = [429, 200];
+  const sentHeaders = [];
+  const fetch = async (_url, init) => {
+    sentHeaders.push(init?.headers);
+    const status = statuses.shift();
+    return { ok: status === 200, status, json: async () => [] };
+  };
+
+  await fetchJsonWithRetry('https://dev.to/api/articles/me/published', {
+    fetch,
+    headers: { 'api-key': 'secret-key' },
+    sleep: async () => {},
+  });
+
+  assert.deepEqual(sentHeaders, [{ 'api-key': 'secret-key' }, { 'api-key': 'secret-key' }]);
+});
+
 test('fetchJsonWithRetry retries a rate-limited request until it succeeds', async () => {
   const statuses = [429, 429, 200];
   const requested = [];

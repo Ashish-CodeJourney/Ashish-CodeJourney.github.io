@@ -7,7 +7,8 @@ const failures = [];
 
 const entries = await devto.loadDevtoEntries({
   username: DEVTO_USERNAME,
-  fetchJson: (url) => devto.fetchJsonWithRetry(url, { fetch }),
+  apiKey: process.env.DEVTO_API_KEY,
+  fetchJson: (url, headers) => devto.fetchJsonWithRetry(url, { fetch, headers }),
   localEntries: [],
   overrides: DEVTO_OVERRIDES,
   snapshot: [],

@@ -21,7 +21,8 @@ const withDevtoArticles = (localLoader: Loader): Loader => ({
 
     const entries = await loadDevtoEntries({
       username: DEVTO_USERNAME,
-      fetchJson: (url) => fetchJsonWithRetry(url, { fetch }),
+      apiKey: process.env.DEVTO_API_KEY,
+      fetchJson: (url, headers) => fetchJsonWithRetry(url, { fetch, headers }),
       localEntries: context.store.values(),
       overrides: DEVTO_OVERRIDES,
       snapshot: devtoSnapshot,
